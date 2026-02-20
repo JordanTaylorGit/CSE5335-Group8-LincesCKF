@@ -95,7 +95,7 @@ TODO: Add client, server, and databse folders
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/lincesckf.git
+git clone https://github.com/JordanTaylorGit/CSE5335-Group8-LincesCKF.git
 cd lincesckf
 
 # Install dependencies
