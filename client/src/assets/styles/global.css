@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Variables ─────────────────────────────────── */
+:root {
+  --color-silk-gold:    #bf7a45;
+  --color-silk-light:   #edd5be;
+  --color-obsidian:     #0d0d0d;
+  --color-obsidian-soft:#1a1a1a;
+  --color-ivory:        #f9f4ee;
+  --color-ivory-warm:   #f2e9dc;
+
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body:    'Jost', sans-serif;
+  --font-accent:  'Cinzel', serif;
+
+  --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-silk: 0 4px 32px rgba(191, 122, 69, 0.12);
+}
+
+/* ─── Base Reset & Defaults ─────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-ivory);
+  color: var(--color-obsidian);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ─── Typography ────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+}
+
+.font-accent { font-family: var(--font-accent); }
+
+/* ─── Utility Classes ───────────────────────────────── */
+.silk-gradient {
+  background: linear-gradient(135deg, #f9f4ee 0%, #edd5be 50%, #deb893 100%);
+  background-size: 200% 200%;
+  animation: silkShimmer 5s ease-in-out infinite;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(90deg, #bf7a45, #deb893, #bf7a45);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.divider-silk {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-silk-gold), transparent);
+}
+
+/* ─── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-ivory-warm); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-silk-gold);
+  border-radius: 3px;
+}
+
+/* ─── Focus Visible ─────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-silk-gold);
+  outline-offset: 3px;
+}
+
+/* ─── Button Base ───────────────────────────────────── */
+.btn-primary {
+  @apply inline-flex items-center justify-center px-8 py-3 font-accent text-sm tracking-widest uppercase;
+  background: var(--color-obsidian);
+  color: var(--color-ivory);
+  border: 1px solid var(--color-obsidian);
+  transition: var(--transition-smooth);
+  letter-spacing: 0.15em;
+}
+.btn-primary:hover {
+  background: var(--color-silk-gold);
+  border-color: var(--color-silk-gold);
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center px-8 py-3 font-accent text-sm uppercase;
+  background: transparent;
+  color: var(--color-obsidian);
+  border: 1px solid var(--color-obsidian);
+  transition: var(--transition-smooth);
+  letter-spacing: 0.15em;
+}
+.btn-outline:hover {
+  background: var(--color-obsidian);
+  color: var(--color-ivory);
+}
+
+/* ─── Card Base ─────────────────────────────────────── */
+.card-product {
+  @apply relative overflow-hidden bg-white;
+  border: 1px solid rgba(191, 122, 69, 0.15);
+  transition: var(--transition-smooth);
+  box-shadow: 0 2px 16px rgba(13, 13, 13, 0.05);
+}
+.card-product:hover {
+  box-shadow: var(--shadow-silk);
+  transform: translateY(-4px);
+}

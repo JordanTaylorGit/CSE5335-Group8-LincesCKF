@@ -1,0 +1,101 @@
+{
+  "nav": {
+    "catalog": "Catálogo",
+    "b2b": "Servicios B2B",
+    "about": "Nosotros",
+    "login": "Iniciar Sesión",
+    "account": "Mi Cuenta",
+    "logout": "Cerrar Sesión",
+    "cart": "Carrito"
+  },
+  "home": {
+    "hero_tagline": "El Arte de la Seda",
+    "hero_subtitle": "Prendas exclusivas confeccionadas con la mejor seda del mundo",
+    "cta_shop": "Explorar Colección",
+    "cta_b2b": "Alianzas B2B",
+    "featured_title": "Prendas Destacadas",
+    "services_title": "Nuestros Servicios",
+    "dtc_title": "Venta Directa",
+    "dtc_desc": "Prendas exclusivas de seda entregadas a tu puerta",
+    "b2b_title": "Manufactura B2B",
+    "b2b_desc": "Servicios de confección profesional para marcas de moda"
+  },
+  "catalog": {
+    "title": "Colección",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "categories": {
+      "all": "Todo",
+      "blouses": "Blusas",
+      "dresses": "Vestidos",
+      "shirts": "Camisas",
+      "scarves": "Pañuelos"
+    },
+    "add_to_cart": "Agregar al Carrito",
+    "view_details": "Ver Detalles",
+    "no_results": "No se encontraron productos"
+  },
+  "product": {
+    "details": "Detalles",
+    "care": "Instrucciones de Cuidado",
+    "size_guide": "Guía de Tallas",
+    "quantity": "Cantidad",
+    "add_to_cart": "Agregar al Carrito",
+    "in_stock": "En Stock",
+    "out_of_stock": "Agotado",
+    "material": "Material",
+    "color": "Color"
+  },
+  "cart": {
+    "title": "Carrito de Compras",
+    "empty": "Tu carrito está vacío",
+    "subtotal": "Subtotal",
+    "checkout": "Proceder al Pago",
+    "continue": "Continuar Comprando",
+    "remove": "Eliminar"
+  },
+  "checkout": {
+    "title": "Pago",
+    "shipping": "Información de Envío",
+    "payment": "Pago",
+    "review": "Revisar Pedido",
+    "place_order": "Realizar Pedido",
+    "order_summary": "Resumen del Pedido"
+  },
+  "auth": {
+    "login_title": "Bienvenida de Vuelta",
+    "register_title": "Crear Cuenta",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "confirm_password": "Confirmar Contraseña",
+    "name": "Nombre Completo",
+    "sign_in": "Iniciar Sesión",
+    "sign_up": "Crear Cuenta",
+    "no_account": "¿No tienes una cuenta?",
+    "have_account": "¿Ya tienes una cuenta?",
+    "forgot_password": "¿Olvidaste tu contraseña?"
+  },
+  "b2b": {
+    "title": "Servicios de Manufactura B2B",
+    "subtitle": "Servicios de confección premium para marcas de moda",
+    "services": "Servicios",
+    "contact": "Solicitar Cotización",
+    "min_order": "Pedido Mínimo",
+    "lead_time": "Tiempo de Entrega",
+    "quality": "Estándares de Calidad"
+  },
+  "account": {
+    "title": "Mi Cuenta",
+    "orders": "Mis Pedidos",
+    "profile": "Perfil",
+    "addresses": "Direcciones",
+    "wishlist": "Lista de Deseos"
+  },
+  "footer": {
+    "brand_desc": "Prendas premium de seda y servicios de confección B2B",
+    "links": "Enlaces Rápidos",
+    "contact": "Contacto",
+    "social": "Síguenos",
+    "rights": "Todos los derechos reservados"
+  }
+}
