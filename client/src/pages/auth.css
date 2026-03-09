@@ -1,0 +1,217 @@
+/*  
+Auth Pages (Login & Register) */
+/*
+ * Design Tokens
+ * 
+ * Font
+ *   Body / UI text  →  'Jost', sans-serif
+ *     Loaded via Google Fonts (see index.html).
+ *     Used for all labels, inputs, buttons, and helper text on auth pages.
+ *
+ * Colors
+ *   #0d0d0d  — Obsidian / primary black  (headings, active tab bg, active
+ *              toggle bg, submit button bg, input focus border, footer link)
+ *   #ffffff  — White  (page background, card background, text on dark bg)
+ *   #f3f4f6  — Light gray  (input field background, inactive tab/toggle bg)
+ *   #e5e7eb  — Border gray  (card border, tab border, toggle border,
+ *              default input border)
+ *   #374151  — Dark slate  (field labels)
+ *   #6b7280  — Mid gray  (inactive tab text, inactive toggle text)
+ *   #9ca3af  — Muted gray  (account description, forgot-password link,
+ *              footer helper text)
+ *   #dc2626  — Red  (validation / error messages)
+ *   #555555  — Dimmed black  (disabled/loading submit button background)
+ *
+ * Border radius
+ *   4px  — inputs, buttons, toggle buttons, submit button
+ *   6px  — tab navigation bar, card
+ *   8px  — auth card
+ *
+ * Transitions
+ *   border-color 0.15s  — input focus ring
+ *   all 0.15s           — account-type toggle buttons
+ *   background 0.15s    — submit button
+ * ─────────────────────────────────────────────────────────────────────────
+ */
+
+/* Page wrapper — full-viewport white centered layout */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;           /* White */
+  padding: 2rem 1.5rem;
+}
+
+/* Card — white box with light border */
+.auth-card {
+  width: 100%;
+  background: #fff;           /* White */
+  border: 1px solid #e5e7eb; /* Border gray */
+  border-radius: 8px;
+}
+
+/* Card width variants */
+.auth-card--login    { max-width: 560px; padding: 2.5rem 3rem; }
+.auth-card--register { max-width: 600px; padding: 2.25rem 3rem; }
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+.auth-header { margin-bottom: 1.5rem; }
+
+/* Page title — Jost 600, Obsidian */
+.auth-title {
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #0d0d0d;              /* Obsidian */
+  margin: 0;
+}
+
+/* ── Tab navigation (Login / Register toggle bar) ────────────────────── */
+.auth-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb; /* Border gray */
+}
+
+/* Shared tab base — Jost, 0.85rem */
+.auth-tab {
+  flex: 1;
+  padding: 0.6rem;
+  text-align: center;
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+/* Active tab — Obsidian bg, white text */
+.auth-tab--active   { background: #0d0d0d; color: #fff; font-weight: 500; }
+/* Inactive tab — light gray bg, mid-gray text */
+.auth-tab--inactive { background: #f3f4f6; color: #6b7280; }
+
+/* ── Form layout ─────────────────────────────────────────────────────── */
+.auth-form           { display: flex; flex-direction: column; gap: 1rem; }
+.auth-form--register { gap: 0.85rem; }   /* Slightly tighter for register */
+
+/* ── Field label — Jost 500, dark slate ─────────────────────────────── */
+.auth-label {
+  display: block;
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #374151;              /* Dark slate */
+  margin-bottom: 0.35rem;
+}
+
+/* ── Input field — light gray bg, border gray border ────────────────── */
+.auth-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f3f4f6;         /* Light gray */
+  border: 1px solid #e5e7eb;  /* Border gray */
+  border-radius: 4px;
+  padding: 0.65rem 0.9rem;
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.875rem;
+  color: #0d0d0d;              /* Obsidian */
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+/* Focus ring — border turns Obsidian */
+.auth-input:focus { border-color: #0d0d0d; } /* Obsidian */
+
+/* ── Account type toggle (Customer / Fashion Brand) ─────────────────── */
+.auth-toggle-row { display: flex; gap: 0.5rem; }
+
+/* Toggle button base — Jost 0.82rem */
+.auth-toggle-btn {
+  flex: 1;
+  padding: 0.55rem;
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.82rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid #e5e7eb;  /* Border gray */
+}
+
+/* Selected — Obsidian bg, white text */
+.auth-toggle-btn--active   { background: #0d0d0d; color: #fff; }
+/* Unselected — light gray bg, mid-gray text */
+.auth-toggle-btn--inactive { background: #f3f4f6; color: #6b7280; }
+
+/* Account type description hint — muted gray, Jost 0.75rem */
+.auth-account-desc {
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.75rem;
+  color: #9ca3af;              /* Muted gray */
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+/* ── Validation error — red, Jost 0.82rem ───────────────────────────── */
+.auth-error {
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.82rem;
+  color: #dc2626;              /* Red */
+  margin: 0;
+}
+
+/* ── Submit button — full-width, Obsidian bg ────────────────────────── */
+.auth-submit {
+  width: 100%;
+  padding: 0.72rem;
+  background: #0d0d0d;         /* Obsidian */
+  color: #fff;                 /* White */
+  border: none;
+  border-radius: 4px;
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 0.25rem;
+  transition: background 0.15s;
+}
+
+/* Loading state — dimmed, cursor blocked */
+.auth-submit--loading { background: #555; cursor: not-allowed; } /* Dimmed black */
+
+/* ── Forgot password link-button ────────────────────────────────────── */
+.auth-forgot-wrap { text-align: center; margin: 0; }
+
+/* Unstyled button — muted gray, Jost 0.8rem */
+.auth-forgot-btn {
+  background: none;
+  border: none;
+  color: #9ca3af;              /* Muted gray */
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ── Footer ("Already have an account?") ────────────────────────────── */
+/* Helper text — muted gray, Jost 0.82rem */
+.auth-footer-text {
+  text-align: center;
+  font-family: 'Jost', sans-serif; /* Body / UI font */
+  font-size: 0.82rem;
+  color: #9ca3af;              /* Muted gray */
+  margin-top: 1.25rem;
+  margin-bottom: 0;
+}
+
+/* Sign-in link — Obsidian, bold */
+.auth-footer-link {
+  color: #0d0d0d;              /* Obsidian */
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* ── Side-by-side first/last name row (Register only) ───────────────── */
+.auth-name-row { display: flex; gap: 0.75rem; }
+.auth-name-row > div { flex: 1; }

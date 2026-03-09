@@ -1,44 +1,79 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { loginUser, registerUser, getStoredSession, storeSession } from '../services/userAuth';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => getStoredSession());
+  const [loading, setLoading] = useState(false);
 
-  // On mount, restore session from localStorage
+  // Keep localStorage in sync whenever user changes
   useEffect(() => {
-    const stored = localStorage.getItem('lincesckf_user');
-    if (stored) {
-      try { setUser(JSON.parse(stored)); } catch (_) {}
+    storeSession(user);
+  }, [user]);
+
+  /**
+   * Login with email + password.
+   * @returns {{ success: boolean, message?: string }}
+   */
+  async function login({ email, password }) {
+    setLoading(true);
+    try {
+      const u = await loginUser({ email, password });
+      setUser(u);
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Login failed. Please try again.' };
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, []);
+  }
 
-  const login = async (email, password) => {
-    // TODO: Replace with real API call — POST /api/auth/login
-    // const { data } = await axios.post('/api/auth/login', { email, password });
-    const mockUser = { id: '1', email, name: 'Demo User', role: 'customer' };
-    setUser(mockUser);
-    localStorage.setItem('lincesckf_user', JSON.stringify(mockUser));
-    return mockUser;
-  };
+  /**
+   * Register a new account.
+   * @param {{ email, password, accountType, firstName, lastName, companyName, phone, preferredLanguage }}
+   * @returns {{ success: boolean, message?: string }}
+   */
+  async function register({
+    email,
+    password,
+    accountType = 'CUSTOMER',
+    firstName = '',
+    lastName = '',
+    companyName = '',
+    phone = '',
+  }) {
+    setLoading(true);
+    try {
+      const u = await registerUser({
+        email, password, accountType,
+        firstName, lastName, companyName, phone,
+      });
+      setUser(u); // auto-login after successful registration
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Registration failed. Please try again.' };
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  const register = async (name, email, password) => {
-    // TODO: Replace with real API call — POST /api/auth/register
-    const mockUser = { id: Date.now().toString(), email, name, role: 'customer' };
-    setUser(mockUser);
-    localStorage.setItem('lincesckf_user', JSON.stringify(mockUser));
-    return mockUser;
-  };
-
-  const logout = () => {
+  /** Clear session and log out. */
+  function logout() {
     setUser(null);
-    localStorage.removeItem('lincesckf_user');
-  };
+ }  
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAuthenticated: !!user,
+        login,
+        register,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -46,6 +81,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
   return ctx;
 }

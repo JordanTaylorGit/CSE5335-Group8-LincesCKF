@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, User, Menu, X } from 'lucide-react';
+import { ShoppingBag, Menu, X } from 'lucide-react';
 import { useAuth } from '@context/AuthContext';
 import { useCart } from '@context/CartContext';
 import { useLanguage } from '@context/LanguageContext';
@@ -56,10 +56,9 @@ export default function Navbar() {
           {/* Account */}
           <Link
             to={isAuthenticated ? '/account' : '/login'}
-            className="text-obsidian hover:text-silk-600 transition-colors"
-            aria-label={t('nav.account')}
+            className="font-body text-sm tracking-wider text-obsidian hover:text-silk-600 transition-colors"
           >
-            <User size={20} strokeWidth={1.5} />
+            {isAuthenticated ? t('nav.account') : t('nav.login')}
           </Link>
 
           {/* Cart */}
