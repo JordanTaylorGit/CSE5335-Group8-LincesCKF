@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@context/AuthContext';
 import { CartProvider } from '@context/CartContext';
@@ -16,7 +15,6 @@ import Login from '@pages/Login';
 import Register from '@pages/Register';
 import Account from '@pages/Account';
 import B2BServices from '@pages/B2BServices';
-import B2BContact from '@pages/B2BContact';
 import About from '@pages/About';
 import NotFound from '@pages/NotFound';
 
@@ -34,7 +32,6 @@ export default function App() {
                 <Route path="/catalog/:category" element={<Catalog />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/b2b" element={<B2BServices />} />
-                <Route path="/b2b/contact" element={<B2BContact />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

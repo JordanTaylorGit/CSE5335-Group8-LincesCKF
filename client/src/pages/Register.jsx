@@ -1,73 +1,144 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import './auth.css';
 
 export default function Register() {
   const { t } = useTranslation();
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
+  const [accountType, setAccountType] = useState('CUSTOMER');
+  const [form, setForm] = useState({
+    firstName: '', lastName: '', companyName: '', phone: '',
+    email: '', password: '', confirm: '',
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const isValidPhone = (v) => /^\d{10}$/.test(v.replace(/\D/g, ''));
+  const isBrand = accountType === 'BRAND';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.password !== form.confirm) return setError('Passwords do not match.');
-    setError(''); setLoading(true);
-    try {
-      await register(form.name, form.email, form.password);
-      navigate('/account');
-    } catch (err) {
-      setError(err.message || 'Registration failed.');
-    } finally {
-      setLoading(false);
-    }
+    setError('');
+    if (!isBrand && !form.firstName.trim()) return setError(t('auth.error_first_name_required'));
+    if (!isBrand && !form.lastName.trim()) return setError(t('auth.error_last_name_required'));
+    if (isBrand && !form.companyName.trim()) return setError(t('auth.error_company_name_required'));
+    if (!isValidEmail(form.email)) return setError(t('auth.error_invalid_email'));
+    if (!isValidPhone(form.phone)) return setError(t('auth.error_invalid_phone'));
+    if (form.password.length < 6) return setError(t('auth.error_password_length'));
+    if (form.password !== form.confirm) return setError(t('auth.error_passwords_match'));
+    setLoading(true);
+    const res = await register({
+      email: form.email, password: form.password, accountType,
+      firstName: form.firstName, lastName: form.lastName,
+      companyName: form.companyName, phone: form.phone,
+    });
+    setLoading(false);
+    if (res.success) navigate('/account', { replace: true });
+    else setError(res.message || t('auth.error_register_failed'));
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-ivory">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <p className="font-accent text-xl tracking-[0.2em] text-obsidian">
-            LINCES<span className="text-silk-500">'</span>CKF
-          </p>
-          <h1 className="font-display text-3xl md:text-4xl text-obsidian mt-4">
-            {t('auth.register_title')}
-          </h1>
+    <div className="auth-page">
+      <div className="auth-card auth-card--register">
+
+        <div className="auth-header">
+          <h2 className="auth-title">{t('auth.tab_register')}</h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {[
-            { key: 'name', label: t('auth.name'), type: 'text', placeholder: 'Your Name' },
-            { key: 'email', label: t('auth.email'), type: 'email', placeholder: 'you@example.com' },
-            { key: 'password', label: t('auth.password'), type: 'password', placeholder: '••••••••' },
-            { key: 'confirm', label: t('auth.confirm_password'), type: 'password', placeholder: '••••••••' },
-          ].map(f => (
-            <div key={f.key}>
-              <label className="block font-body text-xs uppercase tracking-widest text-obsidian/60 mb-2">{f.label}</label>
-              <input
-                type={f.type} name={f.key} required
-                value={form[f.key]} onChange={handleChange}
-                placeholder={f.placeholder}
-                className="w-full bg-white border border-obsidian/15 p-3 text-sm font-body focus:outline-none focus:border-silk-500"
-              />
+        <div role="tablist" aria-label={`${t('auth.tab_login')} / ${t('auth.tab_register')}`} className="auth-tabs">
+          <Link to="/login" role="tab" aria-selected="false" className="auth-tab auth-tab--inactive">
+            {t('auth.tab_login')}
+          </Link>
+          <div role="tab" aria-selected="true" aria-controls="register-panel" className="auth-tab auth-tab--active">
+            {t('auth.tab_register')}
+          </div>
+        </div>
+
+        <form id="register-panel" onSubmit={handleSubmit} noValidate aria-label={t('auth.tab_register')} className="auth-form auth-form--register">
+
+          <div role="group" aria-labelledby="reg-account-type-label">
+            <p id="reg-account-type-label" className="auth-label">{t('auth.account_type')}</p>
+            <div className="auth-toggle-row">
+              {[['CUSTOMER', t('auth.customer')], ['BRAND', t('auth.fashion_brand')]].map(([type, label]) => (
+                <button
+                  key={type}
+                  type="button"
+                  aria-pressed={accountType === type}
+                  onClick={() => setAccountType(type)}
+                  className={`auth-toggle-btn ${accountType === type ? 'auth-toggle-btn--active' : 'auth-toggle-btn--inactive'}`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
-          ))}
+            <p aria-live="polite" className="auth-account-desc">
+              {isBrand ? t('auth.brand_desc') : t('auth.customer_desc')}
+            </p>
+          </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {!isBrand && (
+            <div className="auth-name-row">
+              <div>
+                <label htmlFor="reg-first-name" className="auth-label">{t('auth.first_name')}</label>
+                <input id="reg-first-name" name="firstName" type="text" value={form.firstName} onChange={handleChange} placeholder="Jane" autoComplete="given-name" className="auth-input" />
+              </div>
+              <div>
+                <label htmlFor="reg-last-name" className="auth-label">{t('auth.last_name')}</label>
+                <input id="reg-last-name" name="lastName" type="text" value={form.lastName} onChange={handleChange} placeholder="Doe" autoComplete="family-name" className="auth-input" />
+              </div>
+            </div>
+          )}
 
-          <button type="submit" disabled={loading} className="btn-primary w-full">
-            {loading ? '...' : t('auth.sign_up')}
+          {isBrand && (
+            <div>
+              <label htmlFor="reg-company-name" className="auth-label">{t('auth.company_name')}</label>
+              <input id="reg-company-name" name="companyName" type="text" value={form.companyName} onChange={handleChange} placeholder="Acme Fashion Studio" autoComplete="organization" className="auth-input" />
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="reg-email" className="auth-label">{t('auth.email')}</label>
+            <input id="reg-email" name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@example.com" required autoComplete="email" aria-required="true" aria-invalid={!!error || undefined} aria-describedby={error ? 'reg-error' : undefined} className="auth-input" />
+          </div>
+
+          <div>
+            <label htmlFor="reg-phone" className="auth-label">{t('auth.phone')}</label>
+            <input id="reg-phone" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="5550000000" autoComplete="tel" className="auth-input" />
+          </div>
+
+          <div>
+            <label htmlFor="reg-password" className="auth-label">{t('auth.password')}</label>
+            <input id="reg-password" name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min. 6 characters" required autoComplete="new-password" aria-required="true" aria-invalid={!!error || undefined} aria-describedby={error ? 'reg-error' : undefined} className="auth-input" />
+          </div>
+
+          <div>
+            <label htmlFor="reg-confirm" className="auth-label">{t('auth.confirm_password')}</label>
+            <input id="reg-confirm" name="confirm" type="password" value={form.confirm} onChange={handleChange} placeholder="••••••••" required autoComplete="new-password" aria-required="true" aria-invalid={!!error || undefined} aria-describedby={error ? 'reg-error' : undefined} className="auth-input" />
+          </div>
+
+          {error && (
+            <p id="reg-error" role="alert" aria-live="assertive" className="auth-error">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            aria-busy={loading}
+            className={`auth-submit${loading ? ' auth-submit--loading' : ''}`}
+          >
+            {loading ? t('auth.creating_account') : t('auth.create_account_btn')}
           </button>
         </form>
 
-        <p className="text-center text-sm text-obsidian/50 mt-6 font-body">
+        <p className="auth-footer-text">
           {t('auth.have_account')}{' '}
-          <Link to="/login" className="text-silk-600 hover:underline">{t('auth.sign_in')}</Link>
+          <Link to="/login" className="auth-footer-link">{t('auth.sign_in_link')}</Link>
         </p>
       </div>
     </div>
