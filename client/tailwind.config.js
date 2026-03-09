@@ -4,6 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        // ── Legacy tokens (kept so existing components don't break) ──────────
         silk: {
           50:  '#fdf8f4',
           100: '#f7ece0',
@@ -18,36 +19,61 @@ export default {
         },
         obsidian: {
           DEFAULT: '#0d0d0d',
-          soft: '#1a1a1a',
-          light: '#2e2e2e',
+          soft:    '#1a1a1a',
+          light:   '#2e2e2e',
         },
         ivory: {
           DEFAULT: '#f9f4ee',
-          warm: '#f2e9dc',
+          warm:    '#f2e9dc',
+        },
+
+        // ── New theme tokens ─────────────────────────────────────────────────
+        // Usage examples:
+        //   bg-navy        text-navy
+        //   bg-silk-red    text-silk-red    hover:bg-silk-red
+        //   bg-sky-light   border-sky-mid
+        'silk-red': {
+          DEFAULT: '#C8102E',
+          dark:    '#A00D24',   // hover / pressed state
+          light:   '#E8395A',   // light variant if needed
+        },
+        navy: {
+          DEFAULT: '#0B2545',
+          light:   '#0F3060',   // slightly lighter navy
+          dark:    '#071830',   // deeper navy for footers/headers
+        },
+        sky: {
+          light:   '#E8F4FD',   // light-blue subsection backgrounds
+          mid:     '#B8D4E8',   // borders, dividers, icon strokes
+          dark:    '#7AAECB',   // stronger sky accent if needed
         },
       },
+
       fontFamily: {
         display: ['"Cormorant Garamond"', 'serif'],
-        body: ['"Jost"', 'sans-serif'],
-        accent: ['"Cinzel"', 'serif'],
+        body:    ['"Jost"', 'sans-serif'],
+        accent:  ['"Cinzel"', 'serif'],
       },
+
       spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
+        '18':  '4.5rem',
+        '88':  '22rem',
         '128': '32rem',
       },
+
       animation: {
-        'fade-up': 'fadeUp 0.6s ease forwards',
+        'fade-up':      'fadeUp 0.6s ease forwards',
         'silk-shimmer': 'silkShimmer 3s ease-in-out infinite',
       },
+
       keyframes: {
         fadeUp: {
-          '0%': { opacity: 0, transform: 'translateY(20px)' },
+          '0%':   { opacity: 0, transform: 'translateY(20px)' },
           '100%': { opacity: 1, transform: 'translateY(0)' },
         },
         silkShimmer: {
           '0%, 100%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
+          '50%':      { backgroundPosition: '100% 50%' },
         },
       },
     },
