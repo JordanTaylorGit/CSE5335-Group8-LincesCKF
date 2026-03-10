@@ -1,0 +1,43 @@
+{
+  "catalog": {
+    "heroLabel": "Colección Premium de Seda",
+    "title": "Catálogo de Productos",
+    "subtitle": "Explora prendas y accesorios de seda de lujo diseñados para elegancia, comodidad y estilo atemporal.",
+    "results": "Mostrando {{count}} producto(s)",
+    "searchPlaceholder": "Buscar prendas de seda...",
+    "allCategories": "Todas las Categorías",
+    "sortBy": "Ordenar Por",
+    "priceLowHigh": "Precio: Menor a Mayor",
+    "priceHighLow": "Precio: Mayor a Menor",
+    "nameAZ": "Nombre: A-Z",
+    "blouses": "Blusas",
+    "dresses": "Vestidos",
+    "shirts": "Camisas",
+    "scarves": "Bufandas"
+  },
+  "product": {
+    "size": "Talla",
+    "color": "Color",
+    "quantity": "Cantidad",
+    "addToCart": "Agregar al Carrito",
+    "view": "Ver",
+    "productNotFound": "Producto no encontrado."
+  },
+  "cart": {
+    "title": "Carrito de Compras",
+    "subtitle": "Revisa las prendas de seda seleccionadas, actualiza cantidades o continúa al pago.",
+    "empty": "Tu carrito está vacío",
+    "emptyText": "Agrega productos desde el catálogo para continuar.",
+    "subtotal": "Subtotal",
+    "totalItems": "Total de Artículos",
+    "totalPrice": "Precio Total",
+    "orderSummary": "Resumen del Pedido",
+    "continueShopping": "Seguir Comprando",
+    "proceedCheckout": "Proceder al Pago",
+    "clearCart": "Vaciar Carrito",
+    "remove": "Eliminar"
+  },
+  "student3": {
+    "label": "Estudiante 3"
+  }
+}

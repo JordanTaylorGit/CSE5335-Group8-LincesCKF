@@ -1,0 +1,43 @@
+{
+  "catalog": {
+    "heroLabel": "Premium Silk Collection",
+    "title": "Product Catalog",
+    "subtitle": "Explore luxury silk garments and accessories crafted for elegance, comfort, and timeless style.",
+    "results": "Showing {{count}} product(s)",
+    "searchPlaceholder": "Search silk garments...",
+    "allCategories": "All Categories",
+    "sortBy": "Sort By",
+    "priceLowHigh": "Price: Low to High",
+    "priceHighLow": "Price: High to Low",
+    "nameAZ": "Name: A-Z",
+    "blouses": "Blouses",
+    "dresses": "Dresses",
+    "shirts": "Shirts",
+    "scarves": "Scarves"
+  },
+  "product": {
+    "size": "Size",
+    "color": "Color",
+    "quantity": "Quantity",
+    "addToCart": "Add to Cart",
+    "view": "View",
+    "productNotFound": "Product not found."
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "subtitle": "Review selected silk garments, update quantities, or proceed to checkout.",
+    "empty": "Your cart is empty",
+    "emptyText": "Add products from the catalog to continue.",
+    "subtotal": "Subtotal",
+    "totalItems": "Total Items",
+    "totalPrice": "Total Price",
+    "orderSummary": "Order Summary",
+    "continueShopping": "Continue Shopping",
+    "proceedCheckout": "Proceed to Checkout",
+    "clearCart": "Clear Cart",
+    "remove": "Remove"
+  },
+  "student3": {
+    "label": "Student 3"
+  }
+}
