@@ -1,59 +1,58 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { ShoppingBag } from 'lucide-react';
-import { useCart } from '@context/CartContext';
-import { useLanguage } from '@context/LanguageContext';
+import { Link } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
-export default function ProductCard({ product }) {
-  const { t } = useTranslation();
-  const { addItem } = useCart();
-  const { language } = useLanguage();
-
-  const name = language === 'es' ? product.nameEs : product.nameEn;
-  const image = product.images?.[0] || '/images/placeholder.jpg';
-
-  const handleQuickAdd = (e) => {
-    e.preventDefault();
-    addItem(product, 1, product.sizes?.[0], product.colors?.[0]);
-  };
+function ProductCard({ product }) {
+  const { addToCart } = useCart();
 
   return (
-    <article className="card-product group">
-      {/* Image */}
-      <Link to={`/product/${product.id}`} className="block relative overflow-hidden aspect-[3/4]">
+    <div className="bg-white border border-[#e8dfd4] shadow-sm hover:shadow-md transition rounded-sm overflow-hidden">
+      <div className="bg-[#f2f2f2]">
         <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
+          src={product.image}
+          alt={product.name}
+          className="w-full h-[360px] object-cover"
         />
-        {/* Quick Add Overlay */}
-        <div className="absolute inset-0 bg-obsidian/0 group-hover:bg-obsidian/10 transition-all duration-300 flex items-end justify-center pb-6 opacity-0 group-hover:opacity-100">
-          <button
-            onClick={handleQuickAdd}
-            className="btn-primary text-xs py-2 px-6 flex items-center gap-2"
-          >
-            <ShoppingBag size={14} />
-            {t('catalog.add_to_cart')}
-          </button>
-        </div>
-      </Link>
-
-      {/* Info */}
-      <div className="p-4">
-        <p className="font-body text-xs text-silk-500 uppercase tracking-widest mb-1">
-          {t(`catalog.categories.${product.category}`)}
-        </p>
-        <Link to={`/product/${product.id}`}>
-          <h3 className="font-display text-lg text-obsidian hover:text-silk-600 transition-colors leading-tight">
-            {name}
-          </h3>
-        </Link>
-        <p className="font-body text-sm text-obsidian/60 mt-2">
-          ${product.price.toLocaleString()} {product.currency}
-        </p>
       </div>
-    </article>
+
+      <div className="px-5 py-4">
+        <p className="text-[15px] text-[#7d7d7d] lowercase">{product.category}</p>
+
+        <h3 className="text-[22px] text-[#14213d] mt-2 font-medium">
+          {product.name}
+        </h3>
+
+        <p className="text-[16px] text-[#14213d] mt-4 font-semibold">
+          ${product.price.toFixed(2)}
+        </p>
+
+        <div className="flex items-center gap-2 mt-4">
+          {product.colors?.map((color, index) => (
+            <span
+              key={index}
+              className="w-7 h-7 rounded-full border border-[#ddd]"
+              style={{ backgroundColor: color }}
+            ></span>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mt-5">
+          <button
+            onClick={() => addToCart(product, { quantity: 1 })}
+            className="bg-[#111a2f] text-white py-3 rounded-none hover:bg-[#1b2744] transition"
+          >
+            Add to Cart
+          </button>
+
+          <Link
+            to={`/catalog/${product.id}`}
+            className="border border-[#111a2f] text-[#111a2f] text-center py-3 hover:bg-[#111a2f] hover:text-white transition"
+          >
+            View
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
+
+export default ProductCard;

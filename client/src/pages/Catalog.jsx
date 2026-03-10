@@ -1,101 +1,115 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { SlidersHorizontal } from 'lucide-react';
-import ProductCard from '@components/shared/ProductCard';
-import { getProducts, CATEGORIES } from '@utils/products';
+import { useMemo, useState } from "react";
+import ProductCard from "../components/shared/ProductCard";
+import CatalogFilters from "../components/catalog/CatalogFilters";
 
-const SORT_OPTIONS = [
-  { value: 'default', labelKey: 'Default' },
-  { value: 'price-asc', labelKey: 'Price: Low → High' },
-  { value: 'price-desc', labelKey: 'Price: High → Low' },
+const products = [
+  {
+    id: 1,
+    name: "Classic Silk Blouse",
+    price: 189,
+    category: "blouse",
+    type: "Women",
+    image: "/images/blouse1.jpg",
+    description: "Elegant silk blouse with timeless tailoring and luxury texture.",
+    colors: ["#edead7", "#f0b7c2", "#1017a7"]
+  },
+  {
+    id: 2,
+    name: "Evening Silk Dress",
+    price: 349,
+    category: "dress",
+    type: "Women",
+    image: "/images/dress1.jpg",
+    description: "Refined evening silk dress created for graceful premium occasions.",
+    colors: ["#000000", "#a0002c", "#ede8b3"]
+  },
+  {
+    id: 3,
+    name: "Luxury Silk Scarf",
+    price: 89,
+    category: "scarf",
+    type: "Accessories",
+    image: "/images/scarf1.jpg",
+    description: "Soft and luxurious silk scarf with premium drape and finish.",
+    colors: ["#edead7", "#f0b7c2", "#1017a7", "#a0002c"]
+  },
+  {
+    id: 4,
+    name: "Men's Silk Shirt",
+    price: 229,
+    category: "shirt",
+    type: "Men",
+    image: "/images/shirt1.jpg",
+    description: "Luxury silk shirt crafted for sophisticated everyday wear.",
+    colors: ["#ede8b3", "#1017a7", "#000000"]
+  }
 ];
 
-export default function Catalog() {
-  const { t } = useTranslation();
-  const { category: paramCategory } = useParams();
-  const [activeCategory, setActiveCategory] = useState(paramCategory || 'all');
-  const [sort, setSort] = useState('default');
+function Catalog() {
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [sort, setSort] = useState("default");
 
-  const rawProducts = activeCategory === 'all' ? getProducts() : getProducts(activeCategory);
+  const filteredProducts = useMemo(() => {
+    let data = [...products];
 
-  const products = [...rawProducts].sort((a, b) => {
-    if (sort === 'price-asc') return a.price - b.price;
-    if (sort === 'price-desc') return b.price - a.price;
-    return 0;
-  });
+    if (category !== "All") {
+      data = data.filter((product) => product.category === category);
+    }
+
+    if (search.trim()) {
+      data = data.filter((product) =>
+        `${product.name} ${product.category} ${product.type}`
+          .toLowerCase()
+          .includes(search.toLowerCase())
+      );
+    }
+
+    if (sort === "price-low-high") {
+      data.sort((a, b) => a.price - b.price);
+    }
+
+    if (sort === "price-high-low") {
+      data.sort((a, b) => b.price - a.price);
+    }
+
+    if (sort === "name-a-z") {
+      data.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return data;
+  }, [search, category, sort]);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-10 py-20">
-      {/* Header */}
-      <div className="mb-12 text-center">
-        <h1 className="font-display text-5xl md:text-6xl text-obsidian">{t('catalog.title')}</h1>
-        <div className="divider-silk w-24 mx-auto mt-6" />
-      </div>
-
-      {/* Filters Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
-        {/* Category Filters */}
-        <div className="flex flex-wrap gap-2">
-          <FilterBtn
-            active={activeCategory === 'all'}
-            onClick={() => setActiveCategory('all')}
-          >
-            {t('catalog.categories.all')}
-          </FilterBtn>
-          {CATEGORIES.map(cat => (
-            <FilterBtn
-              key={cat}
-              active={activeCategory === cat}
-              onClick={() => setActiveCategory(cat)}
-            >
-              {t(`catalog.categories.${cat}`)}
-            </FilterBtn>
-          ))}
+    <div className="bg-[#f2f2f2] min-h-screen">
+      <div className="max-w-[1500px] mx-auto px-6 lg:px-10 py-14">
+        <div className="text-center mb-10">
+          <p className="text-[#14213d] text-[18px]">Featured Products</p>
         </div>
 
-        {/* Sort */}
-        <div className="flex items-center gap-2 text-sm text-obsidian/60">
-          <SlidersHorizontal size={14} />
-          <select
-            value={sort}
-            onChange={e => setSort(e.target.value)}
-            className="bg-transparent font-body text-sm border-b border-silk-300 focus:outline-none focus:border-silk-600 pb-0.5 cursor-pointer"
-          >
-            {SORT_OPTIONS.map(o => (
-              <option key={o.value} value={o.value}>{o.labelKey}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+        <CatalogFilters
+          search={search}
+          setSearch={setSearch}
+          category={category}
+          setCategory={setCategory}
+          sort={sort}
+          setSort={setSort}
+        />
 
-      {/* Grid */}
-      {products.length === 0 ? (
-        <p className="text-center text-obsidian/40 py-24 font-display text-2xl">
-          {t('catalog.no_results')}
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map(product => (
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-7 mt-8">
+          {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
-      )}
+
+        <div className="flex justify-center mt-14">
+          <button className="border border-[#111a2f] text-[#111a2f] px-10 py-4 hover:bg-[#111a2f] hover:text-white transition">
+            View All Products
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
-function FilterBtn({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`font-accent text-xs px-5 py-2 tracking-widest uppercase border transition-all duration-200 ${
-        active
-          ? 'bg-obsidian text-ivory border-obsidian'
-          : 'bg-transparent text-obsidian border-obsidian/20 hover:border-obsidian'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
+export default Catalog;

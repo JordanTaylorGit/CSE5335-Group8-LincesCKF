@@ -1,0 +1,31 @@
+function ProductGallery({ images, selectedImage, setSelectedImage, name }) {
+  return (
+    <div>
+      <div className="bg-white border border-[#e8dfd4] p-3">
+        <img
+          src={selectedImage}
+          alt={name}
+          className="w-full h-[520px] object-cover"
+        />
+      </div>
+
+      <div className="grid grid-cols-4 gap-3 mt-4">
+        {images.map((img, index) => (
+          <button
+            key={index}
+            onClick={() => setSelectedImage(img)}
+            className={`border-2 ${selectedImage === img ? "border-[#111a2f]" : "border-[#e8dfd4]"}`}
+          >
+            <img
+              src={img}
+              alt={`${name}-${index}`}
+              className="w-full h-24 object-cover"
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default ProductGallery;
