@@ -44,6 +44,7 @@ export default function Navbar() {
           <NavLink to="/catalog">{t("nav.catalog")}</NavLink>
           <NavLink to="/b2b">{t("nav.b2b")}</NavLink>
           <NavLink to="/custom-orders">{t("nav.customOrders")}</NavLink>
+          <NavLink to="/contact">{t("nav.contact")}</NavLink>
           <NavLink to="/about">{t("nav.about")}</NavLink>
         </nav>
 
@@ -107,6 +108,9 @@ export default function Navbar() {
             </NavLink>
             <NavLink to="/custom-orders" mobile>
               {t("nav.customOrders")}
+            </NavLink>
+            <NavLink to="/contact" mobile>
+              {t("nav.contact")}
             </NavLink>
             <NavLink to="/about" mobile>
               {t("nav.about")}
