@@ -39,8 +39,10 @@ export default function Register() {
       companyName: form.companyName, phone: form.phone,
     });
     setLoading(false);
-    if (res.success) navigate('/account', { replace: true });
-    else setError(res.message || t('auth.error_register_failed'));
+    if (res.success) {navigate('/account', { replace: true }); alert('Welcome!' + res.firstName);
+      navigate('/account', { replace: true });
+      alert('Welcome!' + res.firstName);
+    } else setError(res.message || t('auth.error_register_failed'));
   };
 
   return (
