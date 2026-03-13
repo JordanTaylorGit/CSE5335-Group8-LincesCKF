@@ -1,58 +1,63 @@
-import CartItem from "../components/cart/CartItem";
-import CartSummary from "../components/cart/CartSummary";
 import { useCart } from "../context/CartContext";
 
 function Cart() {
-  const cartContext = useCart();
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
 
-  if (!cartContext) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f2f2f2]">
-        <div className="bg-white border border-[#e8dfd4] p-8 text-center">
-          <h2 className="text-2xl text-[#14213d] font-medium">
-            Cart context not found
-          </h2>
-          <p className="text-[#596273] mt-3">
-            Make sure CartProvider is wrapping your app in main.jsx.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  const { cartItems = [] } = cartContext;
+  const totalPrice = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
 
   return (
-    <div className="bg-[#f2f2f2] min-h-screen">
-      <div className="max-w-[1500px] mx-auto px-6 lg:px-10 py-14">
-        <div className="text-center mb-10">
-          <p className="text-[#14213d] text-[18px]">Shopping Cart</p>
-        </div>
+    <div>
+      <h1 style={{ marginBottom: "24px" }}>Shopping Cart</h1>
 
-        {!Array.isArray(cartItems) || cartItems.length === 0 ? (
-          <div className="bg-white border border-[#e8dfd4] p-12 text-center">
-            <h2 className="text-3xl text-[#14213d] font-medium">
-              Your cart is empty
-            </h2>
-            <p className="text-[#596273] mt-4">
-              Add products from the catalog to continue.
-            </p>
-          </div>
-        ) : (
-          <div className="grid lg:grid-cols-[2fr_1fr] gap-8">
-            <div className="space-y-5">
-              {cartItems.map((item, index) => (
-                <CartItem
-                  key={`${item.id || "item"}-${item.size || ""}-${item.color || ""}-${index}`}
-                  item={item}
-                />
-              ))}
+      {cartItems.length === 0 ? (
+        <p>Your cart is empty</p>
+      ) : (
+        <>
+          {cartItems.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                display: "flex",
+                gap: "20px",
+                alignItems: "center",
+                backgroundColor: "#ffffff",
+                borderRadius: "14px",
+                padding: "16px",
+                marginBottom: "16px",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.06)",
+              }}
+            >
+              <img
+                src={item.image}
+                alt={item.name}
+                style={{
+                  width: "120px",
+                  height: "120px",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                }}
+              />
+
+              <div style={{ flex: 1 }}>
+                <h3 style={{ margin: "0 0 8px 0" }}>{item.name}</h3>
+                <p style={{ margin: "0 0 8px 0" }}>${item.price}</p>
+                <p style={{ margin: "0 0 12px 0" }}>Quantity: {item.quantity}</p>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button onClick={() => updateQuantity(item.id, 1)}>+</button>
+                  <button onClick={() => updateQuantity(item.id, -1)}>-</button>
+                  <button onClick={() => removeFromCart(item.id)}>Remove</button>
+                </div>
+              </div>
             </div>
+          ))}
 
-            <CartSummary />
-          </div>
-        )}
-      </div>
+          <h2>Total: ${totalPrice}</h2>
+        </>
+      )}
     </div>
   );
 }

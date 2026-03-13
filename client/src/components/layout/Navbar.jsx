@@ -9,7 +9,7 @@ import { useLanguage } from "@context/LanguageContext";
 export default function Navbar() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
-  const { count } = useCart();
+  const { cartItems, cartCount, message } = useCart();
   const { language, toggleLanguage } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -75,12 +75,22 @@ export default function Navbar() {
             aria-label={t("nav.cart")}
           >
             <ShoppingBag size={20} strokeWidth={1.5} />
-            {count > 0 && (
+            {(cartItems ? cartItems.length: 0) > 0 && (
               <span className="absolute -top-2 -right-2 bg-silk-red text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-body">
-                {count}
+                {cartItems ? cartItems.length : 0}
               </span>
             )}
           </Link>
+
+            {/* Added to cart toast */}
+            {message && (
+              <div
+                className="absolute right-0 top-8 z-50 whitespace-nowrap font-body text-xs text-white bg-navy px-3 py-2 shadow-md"
+                style={{ borderLeft: '3px solid #C8102E', animation: 'fadeUp 0.3s ease forwards' }}
+              >
+                {message}
+              </div>
+            )}
 
           {/* Mobile Menu Toggle */}
           <button
