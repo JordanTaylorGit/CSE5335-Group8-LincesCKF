@@ -9,46 +9,65 @@ function ProductDetails() {
   const product = products.find((item) => item.id === Number(id));
 
   if (!product) {
-    return <div className="p-6 text-lg">Product not found</div>;
+    return <h2>Product not found</h2>;
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f4f1]">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-[420px] w-full object-cover sm:h-[520px] lg:h-[620px]"
-            />
-          </div>
+    <div
+      style={{
+        display: "flex",
+        gap: "40px",
+        padding: "20px",
+        background: "#fff",
+        borderRadius: "10px",
+      }}
+    >
+      <img
+        src={product.image}
+        alt={product.name}
+        style={{
+          width: "350px",
+          height: "350px",
+          objectFit: "cover",
+        }}
+      />
 
-          <div className="flex flex-col justify-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-              {product.category}
-            </p>
+      <div>
+        <h1>{product.name}</h1>
 
-            <h1 className="mt-2 text-4xl font-semibold lowercase text-gray-900">
-              {product.name}
-            </h1>
+        <p style={{ color: "#6b7280" }}>
+          Category: {product.category}
+        </p>
 
-            <p className="mt-4 text-2xl text-gray-700">${product.price}</p>
+        <h2>${product.price}</h2>
 
-            <p className="mt-6 text-sm leading-7 text-gray-600">
-              {product.description}
-            </p>
+        <p
+          style={{
+            marginTop: "15px",
+            lineHeight: "1.6",
+            color: "#374151",
+          }}
+        >
+          {product.description}
+          
+        </p>
 
-            <button
-              onClick={() => addToCart(product)}
-              className="mt-8 w-full rounded-2xl bg-black px-5 py-3 text-white hover:opacity-90 sm:w-fit"
-            >
-              Add to Cart
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => addToCart(product)}
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            background: "#111827",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+          }}
+        >
+          Add to Cart
+        </button>
       </div>
-    </main>
+    </div>
   );
 }
 

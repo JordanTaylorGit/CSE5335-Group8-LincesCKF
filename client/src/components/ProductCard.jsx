@@ -1,42 +1,92 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 function ProductCard({ product }) {
-  const navigate = useNavigate();
   const { addToCart } = useCart();
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-md">
-      <div className="w-full h-40 overflow-hidden bg-gray-100 sm:h-48 lg:h-52">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="h-full w-full object-cover"
-        />
-      </div>
+    <div
+      style={{
+        backgroundColor: "#ffffff",
+        borderRadius: "16px",
+        overflow: "hidden",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "360px",
+      }}
+    >
+      <img
+        src={product.image}
+        alt={product.name}
+        style={{
+          width: "100%",
+          height: "200px",
+          objectFit: "cover",
+        }}
+      />
 
-      <div className="p-4">
-        <p className="text-xs uppercase tracking-[0.15em] text-gray-500">
-          {product.category}
+      <div
+        style={{
+          padding: "16px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          flexGrow: 1,
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: "20px", color: "#111827" }}>
+          {product.name}
+        </h3>
+
+        <p style={{ margin: 0, color: "#6b7280" }}>{product.category}</p>
+
+        <p
+          style={{
+            margin: 0,
+            fontSize: "18px",
+            fontWeight: "bold",
+            color: "#111827",
+          }}
+        >
+          ${product.price}
         </p>
 
-        <h2 className="mt-1 text-base font-medium lowercase text-gray-900">
-          {product.name}
-        </h2>
-
-        <p className="mt-1 text-sm text-gray-600">${product.price}</p>
-
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={() => navigate(`/product/${product.id}`)}
-            className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+        <div
+          style={{
+            marginTop: "auto",
+            display: "flex",
+            gap: "10px",
+          }}
+        >
+          <Link
+            to={`/product/${product.id}`}
+            style={{
+              flex: 1,
+              textAlign: "center",
+              padding: "10px 12px",
+              borderRadius: "8px",
+              backgroundColor: "#e5e7eb",
+              textDecoration: "none",
+              color: "#111827",
+              fontWeight: 500,
+            }}
           >
             View
-          </button>
+          </Link>
 
           <button
             onClick={() => addToCart(product)}
-            className="flex-1 rounded-xl bg-black px-3 py-2 text-sm text-white hover:opacity-90"
+            style={{
+              flex: 1,
+              padding: "10px 12px",
+              border: "none",
+              borderRadius: "8px",
+              backgroundColor: "#111827",
+              color: "#ffffff",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
           >
             Add to Cart
           </button>
