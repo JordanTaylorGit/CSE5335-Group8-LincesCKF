@@ -1,92 +1,99 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 function ProductCard({ product }) {
+  const navigate = useNavigate();
   const { addToCart } = useCart();
 
+  const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || null);
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
+
+  const handleViewProduct = () => {
+    navigate(`/product/${product.id}`);
+  };
+
+  const handleAddToCart = () => {
+    addToCart(product, selectedColor?.name, selectedSize);
+  };
+
   return (
-    <div
-      style={{
-        backgroundColor: "#ffffff",
-        borderRadius: "16px",
-        overflow: "hidden",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "360px",
-      }}
-    >
+    <div className="overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-sm">
       <img
         src={product.image}
         alt={product.name}
-        style={{
-          width: "100%",
-          height: "200px",
-          objectFit: "cover",
-        }}
+        className="h-[150px] w-full object-cover"
       />
 
-      <div
-        style={{
-          padding: "16px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          flexGrow: 1,
-        }}
-      >
-        <h3 style={{ margin: 0, fontSize: "20px", color: "#111827" }}>
+      <div className="p-3">
+        <p className="text-[12px] capitalize text-gray-500">{product.category}</p>
+
+        <h3 className="mt-1 text-[14px] font-medium text-slate-900 line-clamp-1">
           {product.name}
         </h3>
 
-        <p style={{ margin: 0, color: "#6b7280" }}>{product.category}</p>
-
-        <p
-          style={{
-            margin: 0,
-            fontSize: "18px",
-            fontWeight: "bold",
-            color: "#111827",
-          }}
-        >
-          ${product.price}
+        <p className="mt-1 text-[14px] font-semibold text-slate-900">
+          ${product.price.toFixed(2)}
         </p>
 
-        <div
-          style={{
-            marginTop: "auto",
-            display: "flex",
-            gap: "10px",
-          }}
-        >
-          <Link
-            to={`/product/${product.id}`}
-            style={{
-              flex: 1,
-              textAlign: "center",
-              padding: "10px 12px",
-              borderRadius: "8px",
-              backgroundColor: "#e5e7eb",
-              textDecoration: "none",
-              color: "#111827",
-              fontWeight: 500,
-            }}
+        <div className="mt-2">
+          <p className="mb-1 text-[11px] font-medium text-slate-700">Colors</p>
+          <div className="flex flex-wrap gap-1">
+            {product.colors?.map((color) => (
+              <button
+                key={color.name}
+                type="button"
+                onClick={() => setSelectedColor(color)}
+                className={`inline-flex cursor-pointer items-center gap-1 rounded-md border px-1.5 py-1 text-[10px] transition active:scale-95 ${
+                  selectedColor?.name === color.name
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
+                }`}
+                title={color.name}
+              >
+                <span
+                  className="h-3 w-3 rounded-full border border-gray-300"
+                  style={{ backgroundColor: color.value }}
+                />
+                <span>{color.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-2">
+          <p className="mb-1 text-[11px] font-medium text-slate-700">Sizes</p>
+          <div className="flex flex-wrap gap-1">
+            {product.sizes?.map((size) => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => setSelectedSize(size)}
+                className={`cursor-pointer rounded border px-2 py-[2px] text-[10px] font-medium transition active:scale-95 ${
+                  selectedSize === size
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-3 flex gap-2">
+          <button
+            type="button"
+            onClick={handleViewProduct}
+            className="flex-1 cursor-pointer rounded border border-slate-900 px-2 py-2 text-[11px] font-medium text-slate-900 transition hover:bg-slate-900 hover:text-white active:scale-95 active:shadow-inner"
           >
-            View
-          </Link>
+            View Product
+          </button>
 
           <button
-            onClick={() => addToCart(product)}
-            style={{
-              flex: 1,
-              padding: "10px 12px",
-              border: "none",
-              borderRadius: "8px",
-              backgroundColor: "#111827",
-              color: "#ffffff",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            type="button"
+            onClick={handleAddToCart}
+            className="flex-1 cursor-pointer rounded bg-slate-900 px-2 py-2 text-[11px] font-medium text-white transition hover:bg-slate-800 active:scale-95 active:shadow-inner"
           >
             Add to Cart
           </button>

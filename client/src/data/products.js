@@ -2,47 +2,64 @@ const products = [
   {
     id: 1,
     name: "Classic Silk Blouse",
-    price: 189,
     category: "blouse",
-    type: "Women",
+    price: 189,
     image: "/images/item1.jpg",
-    description: "Elegant silk blouse with timeless tailoring and luxury texture.",
-    colors: ["#edead7", "#f0b7c2", "#1017a7"],
-    sizes: ["XS", "S", "M", "L", "XL"]
+    description:
+      "Elegant silk blouse with a soft finish and premium tailoring for a refined look.",
+    colors: [
+      { name: "Cream", value: "#f3eedf" },
+      { name: "Pink", value: "#f6b7c1" },
+      { name: "Blue", value: "#1826b8" },
+    ],
+    sizes: ["S", "M", "L"],
   },
   {
     id: 2,
     name: "Evening Silk Dress",
-    price: 349,
     category: "dress",
-    type: "Women",
+    price: 349,
     image: "/images/item2.jpg",
-    description: "Refined evening silk dress created for graceful premium occasions.",
-    colors: ["#000000", "#a0002c", "#ede8b3"],
-    sizes: ["XS", "S", "M", "L", "XL"]
+    description:
+      "Luxury evening silk dress with graceful flow and timeless style for special occasions.",
+    colors: [
+      { name: "Black", value: "#000000" },
+      { name: "Maroon", value: "#9d002d" },
+      { name: "Gold", value: "#efe7b2" },
+    ],
+    sizes: ["S", "M", "L"],
   },
   {
     id: 3,
     name: "Luxury Silk Scarf",
-    price: 89,
     category: "scarf",
-    type: "Accessories",
+    price: 89,
     image: "/images/item3.jpg",
-    description: "Soft and luxurious silk scarf with premium drape and finish.",
-    colors: ["#edead7", "#f0b7c2", "#1017a7", "#a0002c"],
-    sizes: ["XS", "S", "M", "L", "XL"]
+    description:
+      "Premium silk scarf with a soft texture and elegant drape for everyday styling.",
+    colors: [
+      { name: "Cream", value: "#f3eedf" },
+      { name: "Pink", value: "#f6b7c1" },
+      { name: "Blue", value: "#1826b8" },
+      { name: "Red", value: "#9d002d" },
+    ],
+    sizes: ["Free"],
   },
   {
     id: 4,
-    name: "Men's Silk Shirt",
-    price: 229,
+    name: "Formal Silk Shirt",
     category: "shirt",
-    type: "Men",
+    price: 159,
     image: "/images/item4.jpg",
-    description: "Luxury silk shirt crafted for sophisticated everyday wear.",
-    colors: ["#ede8b3", "#1017a7", "#000000"],
-    sizes: ["XS", "S", "M", "L", "XL"]
-  }
+    description:
+      "A polished silk shirt designed for formal and semi-formal styling with a smooth feel.",
+    colors: [
+      { name: "Gold", value: "#d7c27b" },
+      { name: "White", value: "#ffffff" },
+      { name: "Black", value: "#111827" },
+    ],
+    sizes: ["M", "L", "XL"],
+  },
 ];
 
 export default products;
