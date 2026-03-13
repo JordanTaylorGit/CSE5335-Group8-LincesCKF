@@ -1,22 +1,22 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { CartProvider } from "./context/CartContext";
-import { LanguageProvider } from "./context/LanguageContext";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import Layout from "./components/layout/Layout";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@context/AuthContext';
+import { CartProvider } from '@context/CartContext';
+import { LanguageProvider } from '@context/LanguageContext';
+import ProtectedRoute from '@components/auth/ProtectedRoute';
+import Layout from '@components/layout/Layout';
 
-import Home from "./pages/Home";
-import Catalog from "./pages/Catalog";
-import ProductDetails from "./pages/ProductDetails";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Account from "./pages/Account";
-import B2BServices from "./pages/B2BServices";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
+// Pages — lazy loaded for code splitting
+import Home from '@pages/Home';
+import Catalog from '@pages/Catalog';
+import ProductDetail from '@pages/ProductDetail';
+import Cart from '@pages/Cart';
+import Checkout from '@pages/Checkout';
+import Login from '@pages/Login';
+import Register from '@pages/Register';
+import Account from '@pages/Account';
+import B2BServices from '@pages/B2BServices';
+import About from '@pages/About';
+import NotFound from '@pages/NotFound';
 
 export default function App() {
   return (
@@ -26,17 +26,18 @@ export default function App() {
           <Router>
             <Layout>
               <Routes>
+                {/* Public Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/catalog" element={<Catalog />} />
                 <Route path="/catalog/:category" element={<Catalog />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/b2b" element={<B2BServices />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/cart" element={<Cart />} />
 
+                {/* Cart — accessible without auth, checkout requires auth */}
+                <Route path="/cart" element={<Cart />} />
                 <Route
                   path="/checkout"
                   element={
@@ -46,6 +47,7 @@ export default function App() {
                   }
                 />
 
+                {/* Protected Account */}
                 <Route
                   path="/account/*"
                   element={
@@ -55,6 +57,7 @@ export default function App() {
                   }
                 />
 
+                {/* 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Layout>
