@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Instagram, Mail, Facebook } from "lucide-react";
+import { Instagram, Mail, Facebook, Twitter, Linkedin } from "lucide-react";
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -13,9 +13,6 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div>
-            {/* <p className="font-accent text-xl tracking-[0.2em] text-ivory mb-4">
-              LINCES<span className="text-silk-400">'</span>CKF
-            </p> */}
             <h3 className="text-xl font-semibold text-white font-sans mb-4">
               Linces'CKF
             </h3>
@@ -24,16 +21,45 @@ export default function Footer() {
             </p>
             <div className="flex gap-4 mt-6">
               <a
-                href="https://instagram.com"
+                href="https://instagram.com/lincesckf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-ivory/40 hover:text-silk-400 transition-colors"
+                aria-label="Instagram"
               >
                 <Instagram size={18} />
               </a>
               <a
+                href="https://facebook.com/lincesckf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-ivory/40 hover:text-silk-400 transition-colors"
+                aria-label="Facebook"
+              >
+                <Facebook size={18} />
+              </a>
+              <a
+                href="https://twitter.com/lincesckf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-ivory/40 hover:text-silk-400 transition-colors"
+                aria-label="Twitter"
+              >
+                <Twitter size={18} />
+              </a>
+              <a
+                href="https://linkedin.com/company/lincesckf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-ivory/40 hover:text-silk-400 transition-colors"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={18} />
+              </a>
+              <a
                 href="mailto:contact@lincesckf.com"
                 className="text-ivory/40 hover:text-silk-400 transition-colors"
+                aria-label="Email"
               >
                 <Mail size={18} />
               </a>
@@ -42,9 +68,6 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            {/* <h4 className="font-accent text-xs tracking-widest uppercase text-silk-400 mb-5">
-              {t("footer.links")}
-            </h4> */}
             <h4 className="text-base font-semibold text-white font-sans mb-4">
               Quick Links
             </h4>
@@ -64,6 +87,14 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  to="/custom-orders"
+                  className="hover:text-ivory transition-colors"
+                >
+                  Custom Orders
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/about"
                   className="hover:text-ivory transition-colors"
                 >
@@ -72,10 +103,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/account"
+                  to="/contact"
                   className="hover:text-ivory transition-colors"
                 >
-                  My Account
+                  Contact
                 </Link>
               </li>
             </ul>
@@ -83,15 +114,14 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            {/* <h4 className="font-accent text-xs tracking-widest uppercase text-silk-400 mb-5">
-              {t("footer.contact")}
-            </h4> */}
             <h4 className="text-base font-semibold text-white font-sans mb-4">
               Contact Us
             </h4>
             <address className="not-italic text-sm space-y-2 text-ivory/60">
               <p>contact@lincesckf.com</p>
               <p>+1 (555) 000-0000</p>
+              <p>123 Silk Street</p>
+              <p>Fashion District, NY 10001</p>
             </address>
           </div>
 
@@ -101,20 +131,42 @@ export default function Footer() {
               Follow Us
             </h4>
             <div className="flex flex-col gap-3">
-              <Link
-                to="/"
+              <a
+                href="https://instagram.com/lincesckf"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 text-ivory/60 hover:text-silk-400 transition-colors text-sm"
               >
                 <Instagram size={18} />
                 Instagram
-              </Link>
-              <Link
-                to="/"
+              </a>
+              <a
+                href="https://facebook.com/lincesckf"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 text-ivory/60 hover:text-silk-400 transition-colors text-sm"
               >
                 <Facebook size={18} />
                 Facebook
-              </Link>
+              </a>
+              <a
+                href="https://twitter.com/lincesckf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-ivory/60 hover:text-silk-400 transition-colors text-sm"
+              >
+                <Twitter size={18} />
+                Twitter
+              </a>
+              <a
+                href="https://linkedin.com/company/lincesckf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-ivory/60 hover:text-silk-400 transition-colors text-sm"
+              >
+                <Linkedin size={18} />
+                LinkedIn
+              </a>
             </div>
           </div>
         </div>

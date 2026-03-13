@@ -14,6 +14,7 @@ const translations = {
       customOrders: "Custom Orders",
       catalog: "Catalog",
       b2b: "B2B Services",
+      contact: "Contact",
       about: "About",
       login: "Login",
       account: "My Account",
@@ -146,6 +147,12 @@ const translations = {
         title: "On-time Delivery",
         desc: "Deadline compliance with international logistics for your collection.",
       },
+      cta: {
+        eyebrow: "Ready to Partner",
+        heading: "Let's Create Something Beautiful",
+        desc: "Start your journey with premium silk manufacturing tailored to your brand's vision.",
+        button: "Request a Quote",
+      },
     },
     account: {
       title: "My Account",
@@ -276,6 +283,152 @@ const translations = {
         desc: "We'll be in touch soon.",
       },
     },
+    customOrders: {
+      step1: {
+        title: "Choose Your Order Type",
+        subtitle: "Select the type of custom order that best fits your needs",
+      },
+      step2: {
+        title: "Provide Your Details",
+        subtitle: "Fill out the form with your information and requirements",
+      },
+      step3: {
+        title: "Success!",
+        subtitle: "Your custom order request has been submitted",
+      },
+      progress: {
+        step1: "Order Type",
+        step2: "Details",
+        step3: "Complete",
+      },
+      back: "Back",
+      submit: "Submit Request",
+      submitting: "Submitting...",
+      success: {
+        title: "Request Submitted Successfully!",
+        message: "Thank you for your interest. We'll review your request and get back to you within 48 hours.",
+        email: "Email",
+        orderType: "Order Type",
+        timeline: "Timeline",
+        newRequest: "Submit New Request",
+        continueShopping: "Continue Shopping",
+      },
+      types: {
+        customGarment: {
+          title: "Custom Garment",
+          description: "Single bespoke piece with personalized measurements and design preferences",
+        },
+        bulkOrder: {
+          title: "Bulk Order",
+          description: "Multiple existing products with quantity discounts and fast delivery",
+        },
+        b2bManufacturing: {
+          title: "B2B Manufacturing",
+          description: "Large-scale production partnership with private labeling and quality assurance",
+        },
+      },
+      form: {
+        name: "Full Name",
+        email: "Email Address",
+        phone: "Phone Number",
+        company: "Company / Brand Name",
+        quantity: "Estimated Quantity",
+        timeline: "Preferred Timeline",
+        message: "Project Details",
+        selectTimeline: "Select timeline",
+        messagePlaceholder: "Describe your project, preferred fabrics, technical specifications, and any other requirements...",
+      },
+      timelines: {
+        "1-2weeks": "1-2 weeks",
+        "1-2months": "1-2 months",
+        "3-6months": "3-6 months",
+        "6plusmonths": "6+ months",
+      },
+    },
+    contact: {
+      title: "Contact Us",
+      subtitle: "Have a question or need assistance? We'd love to hear from you.",
+      email: {
+        title: "Email",
+      },
+      phone: {
+        title: "Phone",
+        hours: "Mon-Fri, 9am-6pm EST",
+      },
+      address: {
+        title: "Address",
+      },
+      form: {
+        title: "Send us a Message",
+        name: "Name",
+        email: "Email",
+        subject: "Subject",
+        message: "Message",
+        selectSubject: "Select a subject",
+        submit: "Send Message",
+        options: {
+          product: "Product Inquiry",
+          custom: "Custom Order",
+          b2b: "B2B Partnership",
+          support: "Customer Support",
+          other: "Other",
+        },
+      },
+      success: {
+        title: "Message Sent!",
+        message: "Thank you for contacting us. We'll get back to you within 24 hours.",
+        sendAnother: "Send Another Message",
+      },
+    },
+    about: {
+      hero: {
+        title: "About Linces'CKF",
+        subtitle: "Crafting premium silk garments with passion and precision since 1985",
+      },
+      story: {
+        title: "Our Story",
+        paragraph1: "Founded in 1985, Linces'CKF began as a small family-owned silk workshop in the heart of the textile district. What started as a passion for creating beautiful silk garments has grown into a leading name in premium silk manufacturing.",
+        paragraph2: "For nearly four decades, we've dedicated ourselves to mastering the art of silk craftsmanship. Our commitment to quality, sustainability, and innovation has made us a trusted partner for fashion brands and individuals seeking the finest silk products.",
+        paragraph3: "Today, we serve both direct consumers through our premium collection and fashion brands through our comprehensive manufacturing services. Every piece that leaves our workshop carries the mark of our dedication to excellence and our respect for this timeless fabric.",
+      },
+      values: {
+        title: "Our Values",
+        excellence: {
+          title: "Quality Excellence",
+          description: "We never compromise on quality. Every product meets our rigorous standards.",
+        },
+        sustainability: {
+          title: "Sustainability",
+          description: "Eco-friendly practices and ethical sourcing are at the core of our operations.",
+        },
+        craftsmanship: {
+          title: "Craftsmanship",
+          description: "Decades of expertise and attention to detail in every stitch.",
+        },
+        partnership: {
+          title: "Partnership",
+          description: "Building lasting relationships with our clients and community.",
+        },
+      },
+      team: {
+        title: "Meet Our Team",
+        subtitle: "Our dedicated team of artisans, designers, and manufacturing experts bring decades of combined experience",
+        roles: {
+          artisans: "Master Artisans",
+          artisansDesc: "Skilled craftspeople with decades of experience",
+          design: "Design Team",
+          designDesc: "Creative minds developing new collections",
+          quality: "Quality Control",
+          qualityDesc: "Ensuring every piece meets our standards",
+        },
+      },
+      stats: {
+        experience: "Years of Experience",
+        partners: "Fashion Brand Partners",
+        customers: "Satisfied Customers",
+        quality: "Premium Silk Quality",
+      },
+    },
   },
 
   es: {
@@ -284,6 +437,7 @@ const translations = {
       customOrders: "Pedidos Personalizados",
       catalog: "Catálogo",
       b2b: "Servicios B2B",
+      contact: "Contacto",
       about: "Nosotros",
       login: "Iniciar Sesión",
       account: "Mi Cuenta",
@@ -422,6 +576,12 @@ const translations = {
         title: "Entregas Puntuales",
         desc: "Cumplimiento de plazos con logística internacional para su colección.",
       },
+      cta: {
+        eyebrow: "Listo para Asociarse",
+        heading: "Creemos Algo Hermoso",
+        desc: "Comience su viaje con manufactura de seda premium adaptada a la visión de su marca.",
+        button: "Solicitar Cotización",
+      },
     },
     account: {
       title: "Mi Cuenta",
@@ -550,6 +710,152 @@ const translations = {
       success: {
         title: "¡Solicitud Enviada!",
         desc: "Nos pondremos en contacto pronto.",
+      },
+    },
+    customOrders: {
+      step1: {
+        title: "Elige tu Tipo de Pedido",
+        subtitle: "Selecciona el tipo de pedido personalizado que mejor se adapte a tus necesidades",
+      },
+      step2: {
+        title: "Proporciona tus Datos",
+        subtitle: "Completa el formulario con tu información y requisitos",
+      },
+      step3: {
+        title: "¡Éxito!",
+        subtitle: "Tu solicitud de pedido personalizado ha sido enviada",
+      },
+      progress: {
+        step1: "Tipo de Pedido",
+        step2: "Detalles",
+        step3: "Completado",
+      },
+      back: "Atrás",
+      submit: "Enviar Solicitud",
+      submitting: "Enviando...",
+      success: {
+        title: "¡Solicitud Enviada Exitosamente!",
+        message: "Gracias por tu interés. Revisaremos tu solicitud y nos pondremos en contacto contigo en 48 horas.",
+        email: "Correo Electrónico",
+        orderType: "Tipo de Pedido",
+        timeline: "Cronograma",
+        newRequest: "Enviar Nueva Solicitud",
+        continueShopping: "Continuar Comprando",
+      },
+      types: {
+        customGarment: {
+          title: "Prenda Personalizada",
+          description: "Pieza única hecha a medida con medidas personalizadas y preferencias de diseño",
+        },
+        bulkOrder: {
+          title: "Pedido por Mayor",
+          description: "Múltiples productos existentes con descuentos por volumen y entrega rápida",
+        },
+        b2bManufacturing: {
+          title: "Manufactura B2B",
+          description: "Asociación de producción a gran escala con etiquetado privado y garantía de calidad",
+        },
+      },
+      form: {
+        name: "Nombre Completo",
+        email: "Dirección de Correo",
+        phone: "Número de Teléfono",
+        company: "Empresa / Nombre de Marca",
+        quantity: "Cantidad Estimada",
+        timeline: "Cronograma Preferido",
+        message: "Detalles del Proyecto",
+        selectTimeline: "Seleccionar cronograma",
+        messagePlaceholder: "Describe tu proyecto, telas preferidas, especificaciones técnicas y cualquier otro requisito...",
+      },
+      timelines: {
+        "1-2weeks": "1-2 semanas",
+        "1-2months": "1-2 meses",
+        "3-6months": "3-6 meses",
+        "6plusmonths": "6+ meses",
+      },
+    },
+    contact: {
+      title: "Contáctanos",
+      subtitle: "¿Tienes una pregunta o necesitas ayuda? Nos encantaría escucharte.",
+      email: {
+        title: "Correo Electrónico",
+      },
+      phone: {
+        title: "Teléfono",
+        hours: "Lun-Vie, 9am-6pm EST",
+      },
+      address: {
+        title: "Dirección",
+      },
+      form: {
+        title: "Envíanos un Mensaje",
+        name: "Nombre",
+        email: "Correo Electrónico",
+        subject: "Asunto",
+        message: "Mensaje",
+        selectSubject: "Selecciona un asunto",
+        submit: "Enviar Mensaje",
+        options: {
+          product: "Consulta de Producto",
+          custom: "Pedido Personalizado",
+          b2b: "Alianza B2B",
+          support: "Soporte al Cliente",
+          other: "Otro",
+        },
+      },
+      success: {
+        title: "¡Mensaje Enviado!",
+        message: "Gracias por contactarnos. Nos pondremos en contacto contigo en 24 horas.",
+        sendAnother: "Enviar Otro Mensaje",
+      },
+    },
+    about: {
+      hero: {
+        title: "Sobre Linces'CKF",
+        subtitle: "Creando prendas de seda premium con pasión y precisión desde 1985",
+      },
+      story: {
+        title: "Nuestra Historia",
+        paragraph1: "Fundada en 1985, Linces'CKF comenzó como un pequeño taller de seda familiar en el corazón del distrito textil. Lo que empezó como una pasión por crear hermosas prendas de seda se ha convertido en un nombre líder en la manufactura de seda premium.",
+        paragraph2: "Durante casi cuatro décadas, nos hemos dedicado a dominar el arte de la artesanía en seda. Nuestro compromiso con la calidad, la sostenibilidad y la innovación nos ha convertido en un socio de confianza para marcas de moda e individuos que buscan los mejores productos de seda.",
+        paragraph3: "Hoy en día, servimos tanto a consumidores directos a través de nuestra colección premium como a marcas de moda a través de nuestros servicios de manufactura integral. Cada pieza que sale de nuestro taller lleva la marca de nuestra dedicación a la excelencia y nuestro respeto por esta tela atemporal.",
+      },
+      values: {
+        title: "Nuestros Valores",
+        excellence: {
+          title: "Excelencia en Calidad",
+          description: "Nunca comprometemos la calidad. Cada producto cumple con nuestros rigurosos estándares.",
+        },
+        sustainability: {
+          title: "Sostenibilidad",
+          description: "Prácticas ecológicas y abastecimiento ético están en el núcleo de nuestras operaciones.",
+        },
+        craftsmanship: {
+          title: "Artesanía",
+          description: "Décadas de experiencia y atención al detalle en cada puntada.",
+        },
+        partnership: {
+          title: "Asociación",
+          description: "Construyendo relaciones duraderas con nuestros clientes y comunidad.",
+        },
+      },
+      team: {
+        title: "Conoce a Nuestro Equipo",
+        subtitle: "Nuestro equipo dedicado de artesanos, diseñadores y expertos en manufactura aportan décadas de experiencia combinada",
+        roles: {
+          artisans: "Maestros Artesanos",
+          artisansDesc: "Artesanos calificados con décadas de experiencia",
+          design: "Equipo de Diseño",
+          designDesc: "Mentes creativas desarrollando nuevas colecciones",
+          quality: "Control de Calidad",
+          qualityDesc: "Asegurando que cada pieza cumpla con nuestros estándares",
+        },
+      },
+      stats: {
+        experience: "Años de Experiencia",
+        partners: "Socios de Marcas de Moda",
+        customers: "Clientes Satisfechos",
+        quality: "Calidad de Seda Premium",
       },
     },
   },

@@ -16,6 +16,8 @@ import Register from '@pages/Register';
 import Account from '@pages/Account';
 import B2BServices from '@pages/B2BServices';
 import About from '@pages/About';
+import CustomOrders from '@pages/CustomOrders';
+import Contact from '@pages/Contact';
 import NotFound from '@pages/NotFound';
 
 export default function App() {
@@ -32,7 +34,9 @@ export default function App() {
                 <Route path="/catalog/:category" element={<Catalog />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/b2b" element={<B2BServices />} />
+                <Route path="/custom-orders" element={<CustomOrders />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
