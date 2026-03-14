@@ -1,61 +1,61 @@
 import { useCart } from "../../context/CartContext";
 
 function CartItem({ item }) {
-  const { increaseQuantity, decreaseQuantity, removeFromCart } = useCart();
-
-  if (!item) return null;
+  const { removeFromCart, increaseQuantity, decreaseQuantity } = useCart();
 
   return (
-    <div className="bg-white border border-[#e8dfd4] p-5 flex flex-col md:flex-row gap-5">
+    <div className="grid gap-4 rounded-xl border border-gray-200 bg-white p-4 md:grid-cols-[120px_1fr_auto]">
       <img
-        src={item.image || "https://via.placeholder.com/300x300?text=Product"}
-        alt={item.name || "Product"}
-        className="w-full md:w-[180px] h-[220px] md:h-[180px] object-cover"
+        src={item.image}
+        alt={item.name}
+        className="h-[120px] w-full rounded-lg object-cover md:w-[120px]"
       />
 
-      <div className="flex-1">
-        <p className="text-sm text-[#7b7b7b] lowercase">{item.category || "category"}</p>
-        <h3 className="text-2xl text-[#14213d] font-medium mt-1">
-          {item.name || "Unnamed Product"}
-        </h3>
-
-        <p className="mt-3 text-[#596273]">Size: {item.size || "N/A"}</p>
-        <p className="mt-1 text-[#596273]">Color: {item.color || "N/A"}</p>
-        <p className="mt-3 text-lg font-semibold text-[#14213d]">
-          ${Number(item.price || 0).toFixed(2)}
+      <div>
+        <h3 className="text-[18px] font-medium text-slate-900">{item.name}</h3>
+        <p className="mt-1 text-sm text-slate-500">Color: {item.selectedColor}</p>
+        <p className="mt-1 text-sm text-slate-500">Size: {item.selectedSize}</p>
+        <p className="mt-3 text-[18px] font-semibold text-slate-900">
+          ${item.price.toFixed(2)}
         </p>
+      </div>
 
-        <div className="flex items-center gap-3 mt-4">
+      <div className="flex flex-col items-start gap-3 md:items-end">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => decreaseQuantity(item.id, item.size, item.color)}
-            className="w-10 h-10 border border-[#111a2f] text-[#111a2f]"
+            type="button"
+            onClick={() =>
+              decreaseQuantity(item.id, item.selectedColor, item.selectedSize)
+            }
+            className="h-9 w-9 rounded-md border border-gray-300 bg-white text-lg font-medium text-slate-700"
           >
             -
           </button>
 
-          <span className="font-semibold text-[#14213d]">{item.quantity || 1}</span>
+          <span className="min-w-[32px] text-center text-[16px] font-medium text-slate-900">
+            {item.quantity}
+          </span>
 
           <button
-            onClick={() => increaseQuantity(item.id, item.size, item.color)}
-            className="w-10 h-10 border border-[#111a2f] text-[#111a2f]"
+            type="button"
+            onClick={() =>
+              increaseQuantity(item.id, item.selectedColor, item.selectedSize)
+            }
+            className="h-9 w-9 rounded-md border border-gray-300 bg-white text-lg font-medium text-slate-700"
           >
             +
           </button>
         </div>
 
         <button
-          onClick={() => removeFromCart(item.id, item.size, item.color)}
-          className="mt-4 text-red-600 hover:underline"
+          type="button"
+          onClick={() =>
+            removeFromCart(item.id, item.selectedColor, item.selectedSize)
+          }
+          className="rounded-md bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
         >
           Remove
         </button>
-      </div>
-
-      <div className="md:text-right">
-        <p className="text-sm text-[#7b7b7b]">Subtotal</p>
-        <p className="text-xl font-semibold text-[#14213d] mt-1">
-          ${(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
-        </p>
       </div>
     </div>
   );

@@ -1,64 +1,48 @@
+import CartItem from "../components/cart/CartItem";
 import { useCart } from "../context/CartContext";
 
 function Cart() {
-  const { cartItems, removeFromCart, updateQuantity } = useCart();
-
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const { cartItems, cartTotal, message } = useCart();
 
   return (
-    <div>
-      <h1 style={{ marginBottom: "24px" }}>Shopping Cart</h1>
+    <main className="min-h-screen bg-[#f5f5f5] py-8">
 
-      {cartItems.length === 0 ? (
-        <p>Your cart is empty</p>
-      ) : (
-        <>
-          {cartItems.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: "flex",
-                gap: "20px",
-                alignItems: "center",
-                backgroundColor: "#ffffff",
-                borderRadius: "14px",
-                padding: "16px",
-                marginBottom: "16px",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.06)",
-              }}
-            >
-              <img
-                src={item.image}
-                alt={item.name}
-                style={{
-                  width: "120px",
-                  height: "120px",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                }}
-              />
+      <div className="mx-auto max-w-[1400px] px-8">
+        <h1 className="mb-8 text-[28px] font-semibold text-slate-900">
+          Shopping Cart
+        </h1>
 
-              <div style={{ flex: 1 }}>
-                <h3 style={{ margin: "0 0 8px 0" }}>{item.name}</h3>
-                <p style={{ margin: "0 0 8px 0" }}>${item.price}</p>
-                <p style={{ margin: "0 0 12px 0" }}>Quantity: {item.quantity}</p>
+        {cartItems.length === 0 ? (
+          <div className="rounded-xl bg-white p-8 text-[18px] text-slate-500 shadow-sm">
+            Your cart is empty
+          </div>
+        ) : (
+          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+            <div className="space-y-4">
+              {cartItems.map((item) => (
+                <CartItem
+                  key={`${item.id}-${item.selectedColor}-${item.selectedSize}`}
+                  item={item}
+                />
+              ))}
+            </div>
 
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <button onClick={() => updateQuantity(item.id, 1)}>+</button>
-                  <button onClick={() => updateQuantity(item.id, -1)}>-</button>
-                  <button onClick={() => removeFromCart(item.id)}>Remove</button>
-                </div>
+            <div className="h-fit rounded-xl bg-white p-6 shadow-sm">
+              <h2 className="text-[20px] font-semibold text-slate-900">
+                Order Summary
+              </h2>
+
+              <div className="mt-6 flex items-center justify-between text-[16px] text-slate-600">
+                <span>Total</span>
+                <span className="text-[20px] font-bold text-slate-900">
+                  ${cartTotal.toFixed(2)}
+                </span>
               </div>
             </div>
-          ))}
-
-          <h2>Total: ${totalPrice}</h2>
-        </>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
 

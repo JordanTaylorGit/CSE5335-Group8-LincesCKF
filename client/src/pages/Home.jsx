@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import HeroSection from '../components/home/HeroSection';
-import ProductCard from '../components/shared/ProductCard';
+import ProductCard from '../components/ProductCard';
 import { getFeaturedProducts } from '../data/products';
 
 /*

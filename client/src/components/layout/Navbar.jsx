@@ -75,9 +75,9 @@ export default function Navbar() {
             aria-label={t("nav.cart")}
           >
             <ShoppingBag size={20} strokeWidth={1.5} />
-            {(cartItems ? cartItems.length: 0) > 0 && (
+            {cartCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-silk-red text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-body">
-                {cartItems ? cartItems.length : 0}
+                {cartCount}
               </span>
             )}
           </Link>
