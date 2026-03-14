@@ -3,17 +3,15 @@ import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import HeroSection from '../components/home/HeroSection';
+import ProductCard from '../components/shared/ProductCard';
+import { getFeaturedProducts } from '../data/products';
 
 /*
  * Home.jsx — Teammate 4 - Jordan Taylor
  */
 
-// ─── Mock featured products ───────────────────────────────────────────────────
-const FEATURED_PRODUCTS = [
-  { id: 1, nameKey: 'product.blouse.name', subtitleDefault: 'Classic Silk Blouse', price: '$285', categoryKey: 'product.category.dtc', badge: 'New' },
-  { id: 2, nameKey: 'product.dress.name',  subtitleDefault: 'Silk Midi Dress',     price: '$520', categoryKey: 'product.category.dtc', badge: 'Best Seller' },
-  { id: 3, nameKey: 'product.scarf.name',  subtitleDefault: 'Hand-painted Silk Scarf', price: '$145', categoryKey: 'product.category.dtc', badge: null },
-];
+// ─── updated featured products ───────────────────────────────────────────────────
+const FEATURED_PRODUCTS = getFeaturedProducts();
 
 // ─── B2B feature cards ────────────────────────────────────────────────────────
 const B2B_FEATURES = [
@@ -63,115 +61,6 @@ function SectionHeading({ children, light = false }) {
     }}>
       {children}
     </h2>
-  );
-}
-
-// ─── Product card ─────────────────────────────────────────────────────────────
-function ProductCard({ product, index }) {
-  const { t }  = useTranslation();
-  const ref    = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-40px' });
-
-  return (
-    <motion.article
-      ref={ref}
-      initial={{ opacity: 0, y: 36 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: index * 0.1 }}
-      className="group"
-      style={{ flex: '1 1 280px' }}
-    >
-      <Link to={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
-        {/* Image placeholder */}
-        <div
-          className="relative overflow-hidden mb-4"
-          style={{
-            height: 320,
-            background: '#d5d5d5',
-            border: '1px solid #B8D4E8',
-          }}
-        >
-          {/* Silk fabric placeholder visual */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style={{ opacity: 0.2, color: '#0B2545' }}>
-              <path d="M26 6C14.954 6 6 14.954 6 26s8.954 20 20 20 20-8.954 20-20S37.046 6 26 6z" stroke="currentColor" strokeWidth="1"/>
-              <path d="M10 26c0-8.837 7.163-16 16-16s16 7.163 16 16" stroke="currentColor" strokeWidth="1"/>
-            </svg>
-          </div>
-
-          {/* Hover overlay */}
-          <div
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100"
-            style={{ background: 'rgba(11,37,69,0.55)', transition: 'opacity 0.3s ease' }}
-          >
-            <span style={{
-              fontFamily: 'Cinzel, serif',
-              fontSize: '0.62rem',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: '#ffffff',
-              border: '1px solid rgba(255,255,255,0.5)',
-              padding: '9px 18px',
-            }}>
-              {t('product.view')}
-            </span>
-          </div>
-
-          {/* Badge */}
-          {product.badge && (
-            <div style={{
-              position: 'absolute', top: 12, left: 12,
-              fontFamily: 'Cinzel, serif',
-              fontSize: '0.54rem',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: '#ffffff',
-              background: '#C8102E',
-              padding: '3px 8px',
-            }}>
-              {product.badge}
-            </div>
-          )}
-        </div>
-
-        {/* Info */}
-        <p style={{
-          fontFamily: 'Cinzel, serif',
-          fontSize: '0.56rem',
-          letterSpacing: '0.22em',
-          textTransform: 'uppercase',
-          color: '#C8102E',
-          marginBottom: 5,
-        }}>
-          {t(product.categoryKey)}
-        </p>
-        <h3 style={{
-          fontFamily: 'Cormorant Garamond, Georgia, serif',
-          fontSize: '1.25rem',
-          fontWeight: 500,
-          color: '#0B2545',
-          marginBottom: 2,
-        }}>
-          {t(product.nameKey)}
-        </h3>
-        <p style={{
-          fontFamily: 'Jost, sans-serif',
-          fontSize: '0.82rem',
-          color: 'rgba(11,37,69,0.45)',
-          marginBottom: 8,
-        }}>
-          {product.subtitleDefault}
-        </p>
-        <p style={{
-          fontFamily: 'Cormorant Garamond, Georgia, serif',
-          fontSize: '1.1rem',
-          fontWeight: 600,
-          color: '#C8102E',
-        }}>
-          {product.price}
-        </p>
-      </Link>
-    </motion.article>
   );
 }
 
@@ -333,7 +222,7 @@ export default function HomePage() {
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(184,212,232,0.15)'; e.currentTarget.style.borderColor = '#E8F4FD'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#B8D4E8'; }}
             >
-              {t('b2b.cta')}
+              {t('hero.ctaB2B')}
               <svg width="13" height="8" viewBox="0 0 13 8" fill="none">
                 <path d="M0 4h11M7.5 1L11 4l-3.5 3" stroke="currentColor" strokeWidth="1.2" />
               </svg>
@@ -376,7 +265,7 @@ export default function HomePage() {
             {t('cta.desc')}
           </p>
           <Link
-            to="/services#quote"
+            to="/custom-orders"
             className="inline-flex items-center gap-3"
             style={{
               fontFamily: 'Cinzel, serif',

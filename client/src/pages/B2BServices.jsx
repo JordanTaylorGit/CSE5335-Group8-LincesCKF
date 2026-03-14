@@ -283,56 +283,12 @@ export default function ServicesPage() {
       {/* ── 3. Process Steps (navy) ── */}
       <ProcessSteps />
 
-      {/* ── 4. B2B Features (white) ── */}
-      <section className="py-24 px-6" style={{ background: '#ffffff' }}>
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="mb-14"
-            initial={{ opacity: 0, y: 24 }}
-            animate={whyView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.65 }}
-          >
-            <Eyebrow text={t('b2b.eyebrow')} />
-            <h2 style={{
-              fontFamily: 'Cormorant Garamond, Georgia, serif',
-              fontSize: 'clamp(1.9rem, 3.5vw, 3rem)',
-              fontWeight: 300,
-              color: '#0B2545',
-              letterSpacing: '-0.02em',
-            }}>
-              {t('b2b.heading')}
-            </h2>
-            <p style={{
-              fontFamily: 'Jost, sans-serif',
-              fontSize: '1rem',
-              fontWeight: 300,
-              color: 'rgba(11,37,69,0.55)',
-              maxWidth: 500,
-              lineHeight: 1.8,
-              marginTop: 10,
-            }}>
-              {t('b2b.desc')}
-            </p>
-          </motion.div>
-
-          <div className="flex flex-wrap gap-5">
-            {B2B_FEATURES.map((f, i) => <B2BFeatureCard key={i} feature={f} index={i} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 5. CTA Section (navy) ── */}
+      {/* ── 4. CTA Section (white) ── */}
       <section
         className="relative py-24 px-6 overflow-hidden"
-        style={{ background: '#0B2545' }}
+        style={{ background: '#ffffff' }}
       >
-        {/* Decorative background elements */}
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 60% 50% at 70% 50%, rgba(184,212,232,0.1) 0%, transparent 70%)',
-        }} />
-        <div className="absolute inset-0" style={{
-          background: 'linear-gradient(135deg, rgba(255,174,66,0.1) 0%, transparent 50%)',
-        }} />
+
 
         <div className="relative z-10 max-w-6xl mx-auto text-center">
           <motion.div
@@ -340,12 +296,12 @@ export default function ServicesPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75 }}
           >
-            <Eyebrow text={t('b2b.cta.eyebrow')} dark />
+            <Eyebrow text={t('b2b.cta.eyebrow')} />
             <h2 style={{
               fontFamily: 'Cormorant Garamond, Georgia, serif',
               fontSize: 'clamp(2.2rem, 5vw, 4.5rem)',
               fontWeight: 300,
-              color: '#ffffff',
+              color: '#0B2545',
               letterSpacing: '-0.02em',
               lineHeight: 1.1,
               marginBottom: 16,
@@ -356,7 +312,7 @@ export default function ServicesPage() {
               fontFamily: 'Jost, sans-serif',
               fontSize: '1.1rem',
               fontWeight: 300,
-              color: 'rgba(232,244,253,0.8)',
+              color: 'rgba(11,37,69,0.6)',
               maxWidth: 600,
               lineHeight: 1.8,
               margin: '0 auto 32px',
