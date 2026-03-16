@@ -1,26 +1,35 @@
-function CartSummary({ cartItems }) {
-  const total = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+import { Link } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+
+function CartSummary() {
+  const { cartItems, cartTotal } = useCart();
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900">Summary</h2>
+    <div className="bg-white rounded-xl shadow-md p-6 h-fit">
+      <h2 className="text-xl font-semibold mb-4">Cart Summary</h2>
 
-      <div className="mt-4 flex items-center justify-between text-sm text-gray-700">
-        <span>Items</span>
-        <span>{cartItems.length}</span>
+      <div className="space-y-3 text-sm">
+        <div className="flex justify-between">
+          <span>Items</span>
+          <span>{cartItems.length}</span>
+        </div>
+
+        <div className="flex justify-between font-semibold text-lg border-t pt-3">
+          <span>Total</span>
+          <span>${cartTotal.toFixed(2)}</span>
+        </div>
       </div>
 
-      <div className="mt-2 flex items-center justify-between text-sm text-gray-700">
-        <span>Total</span>
-        <span>${total}</span>
-      </div>
-
-      <button className="mt-5 w-full rounded-2xl bg-black px-4 py-3 text-sm text-white hover:opacity-90">
-        Checkout
-      </button>
+      <Link
+        to="/checkout"
+        className={`mt-5 block w-full text-center rounded-lg px-4 py-3 font-medium transition ${
+          cartItems.length === 0
+            ? "bg-gray-300 text-gray-500 pointer-events-none"
+            : "bg-black text-white hover:opacity-90"
+        }`}
+      >
+        Proceed to Checkout
+      </Link>
     </div>
   );
 }

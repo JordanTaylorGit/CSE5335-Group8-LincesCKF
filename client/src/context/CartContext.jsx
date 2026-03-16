@@ -1,101 +1,47 @@
-import { createContext, useContext, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
-  const [message, setMessage] = useState("");
-  const timerRef = useRef(null);
 
-  const showMessage = (text) => {
-    setMessage(text);
+  const addToCart = (product) => {
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.id === product.id);
 
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = setTimeout(() => {
-      setMessage("");
-    }, 5000);
-  };
-
-  const addToCart = (product, selectedColor, selectedSize) => {
-    if (!selectedColor || !selectedSize) {
-      showMessage("Please select color and size");
-      return;
-    }
-
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (item) =>
-          item.id === product.id &&
-          item.selectedColor === selectedColor &&
-          item.selectedSize === selectedSize
-      );
-
-      if (existingItem) {
-        showMessage("Quantity updated in cart");
-        return prevItems.map((item) =>
-          item.id === product.id &&
-          item.selectedColor === selectedColor &&
-          item.selectedSize === selectedSize
+      if (existing) {
+        return prev.map((item) =>
+          item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
 
-      showMessage("Product added to cart");
-      return [
-        ...prevItems,
-        {
-          ...product,
-          selectedColor,
-          selectedSize,
-          quantity: 1,
-        },
-      ];
+      return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  const removeFromCart = (id, selectedColor, selectedSize) => {
-    setCartItems((prevItems) =>
-      prevItems.filter(
-        (item) =>
-          !(
-            item.id === id &&
-            item.selectedColor === selectedColor &&
-            item.selectedSize === selectedSize
-          )
-      )
-    );
-
-    showMessage("Product removed from cart");
+  const removeFromCart = (productId) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== productId));
   };
 
-  const increaseQuantity = (id, selectedColor, selectedSize) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id &&
-        item.selectedColor === selectedColor &&
-        item.selectedSize === selectedSize
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      )
-    );
-  };
+  const updateQuantity = (productId, type) => {
+    setCartItems((prev) =>
+      prev
+        .map((item) => {
+          if (item.id !== productId) return item;
 
-  const decreaseQuantity = (id, selectedColor, selectedSize) => {
-    setCartItems((prevItems) =>
-      prevItems
-        .map((item) =>
-          item.id === id &&
-          item.selectedColor === selectedColor &&
-          item.selectedSize === selectedSize
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
+          const newQuantity =
+            type === "increase" ? item.quantity + 1 : item.quantity - 1;
+
+          return { ...item, quantity: newQuantity };
+        })
         .filter((item) => item.quantity > 0)
     );
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
   };
 
   const cartCount = useMemo(
@@ -114,11 +60,10 @@ export function CartProvider({ children }) {
         cartItems,
         addToCart,
         removeFromCart,
-        increaseQuantity,
-        decreaseQuantity,
+        updateQuantity,
+        clearCart,
         cartCount,
         cartTotal,
-        message,
       }}
     >
       {children}
