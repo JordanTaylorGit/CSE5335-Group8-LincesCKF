@@ -1,14 +1,15 @@
-import { useRef } from 'react';
+/* Student 1 - Velupula, Lakshmi - ID# - 1002216063
+ * Student 2 - Tran, Andy - ID# - 1002116149
+ * Student 3 - Todupunoori Hareesh - ID# - 1002275378
+ * Student 4 - Taylor, Jordan - ID# - 1002080693
+ * Student 5 - Poudel, Ishan - ID# - 1001838432
+ */
+
 import { Link } from 'react-router-dom';
-import { motion, useInView } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import HeroSection from '../components/home/HeroSection';
 import ProductCard from '../components/ProductCard';
 import { getFeaturedProducts } from '../data/products';
-
-/*
- * Home.jsx — Teammate 4 - Jordan Taylor
- */
 
 // ─── updated featured products ───────────────────────────────────────────────────
 const FEATURED_PRODUCTS = getFeaturedProducts();
@@ -67,15 +68,9 @@ function SectionHeading({ children, light = false }) {
 // ─── B2B feature card ─────────────────────────────────────────────────────────
 function B2BFeatureCard({ feature, index }) {
   const { t }  = useTranslation();
-  const ref    = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-40px' });
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 28 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.09 }}
+    <div
       style={{
         flex: '1 1 220px',
         padding: '28px 24px',
@@ -105,20 +100,13 @@ function B2BFeatureCard({ feature, index }) {
       }}>
         {t(feature.descKey)}
       </p>
-    </motion.div>
+    </div>
   );
 }
 
 // ─── Main HomePage ────────────────────────────────────────────────────────────
 export default function HomePage() {
   const { t } = useTranslation();
-
-  const featuredRef  = useRef(null);
-  const featuredView = useInView(featuredRef, { once: true });
-  const b2bRef       = useRef(null);
-  const b2bView      = useInView(b2bRef, { once: true });
-  const ctaRef       = useRef(null);
-  const ctaView      = useInView(ctaRef, { once: true });
 
   return (
     <main>
@@ -128,13 +116,7 @@ export default function HomePage() {
       {/* ══ 2. FEATURED PRODUCTS (white bg) ══════════════════════════════════ */}
       <section className="py-24 px-6" style={{ background: '#ffffff' }}>
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            ref={featuredRef}
-            className="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4"
-            initial={{ opacity: 0, y: 28 }}
-            animate={featuredView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.65 }}
-          >
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4">
             <div>
               <Eyebrow text={t('featured.eyebrow')} />
               <SectionHeading>{t('featured.heading')}</SectionHeading>
@@ -162,7 +144,7 @@ export default function HomePage() {
             }}>
               {t('featured.viewAll')}
             </Link>
-          </motion.div>
+          </div>
 
           <div className="flex flex-wrap gap-8">
             {FEATURED_PRODUCTS.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
@@ -173,13 +155,7 @@ export default function HomePage() {
       {/* ══ 3. B2B OVERVIEW (navy bg) ════════════════════════════════════════ */}
       <section className="py-24 px-6" style={{ background: '#0B2545' }}>
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            ref={b2bRef}
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 28 }}
-            animate={b2bView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.65 }}
-          >
+          <div className="text-center mb-16">
             <Eyebrow text={t('b2b.eyebrow')} dark />
             <SectionHeading light>{t('b2b.heading')}</SectionHeading>
             <p style={{
@@ -193,18 +169,13 @@ export default function HomePage() {
             }}>
               {t('b2b.desc')}
             </p>
-          </motion.div>
+          </div>
 
           <div className="flex flex-wrap gap-5 mb-14">
             {B2B_FEATURES.map((f, i) => <B2BFeatureCard key={i} feature={f} index={i} />)}
           </div>
 
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0 }}
-            animate={b2bView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
+          <div className="text-center">
             <Link
               to="/b2b"
               className="inline-flex items-center gap-3"
@@ -227,22 +198,16 @@ export default function HomePage() {
                 <path d="M0 4h11M7.5 1L11 4l-3.5 3" stroke="currentColor" strokeWidth="1.2" />
               </svg>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ══ 4. QUOTE CTA BANNER (sky-blue bg) ═══════════════════════════════ */}
       <section
-        ref={ctaRef}
         className="py-20 px-6 text-center"
         style={{ background: '#ffffff', borderTop: '1px solid #B8D4E8', borderBottom: '1px solid #B8D4E8' }}
       >
-        <motion.div
-          className="max-w-2xl mx-auto"
-          initial={{ opacity: 0, y: 24 }}
-          animate={ctaView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7 }}
-        >
+        <div className="max-w-2xl mx-auto">
           <Eyebrow text={t('cta.eyebrow')} />
           <h2 style={{
             fontFamily: 'Cormorant Garamond, Georgia, serif',
@@ -283,7 +248,7 @@ export default function HomePage() {
           >
             {t('cta.button')}
           </Link>
-        </motion.div>
+        </div>
       </section>
     </main>
   );

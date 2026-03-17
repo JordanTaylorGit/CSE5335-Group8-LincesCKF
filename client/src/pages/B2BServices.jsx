@@ -1,12 +1,12 @@
-import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, useInView } from 'framer-motion';
+/* Student 1 - Velupula, Lakshmi - ID# - 1002216063
+ * Student 2 - Tran, Andy - ID# - 1002116149
+ * Student 3 - Todupunoori Hareesh - ID# - 1002275378
+ * Student 4 - Taylor, Jordan - ID# - 1002080693
+ * Student 5 - Poudel, Ishan - ID# - 1001838432
+ */
+
 import { useTranslation } from 'react-i18next';
 import ProcessSteps from '../components/home/ProcessSteps';
-
-/*
- * B2BServices.jsx — Teammate 4 - Jordan Taylor
- */
 
 const SERVICES = [
   {
@@ -66,8 +66,6 @@ function Eyebrow({ text, dark = false }) {
 // ─── Page hero ────────────────────────────────────────────────────────────────
 function PageHero() {
   const { t } = useTranslation();
-  const vars  = { hidden: {}, visible: { transition: { staggerChildren: 0.14, delayChildren: 0.2 } } };
-  const line  = { hidden: { opacity: 0, y: 32 }, visible: { opacity: 1, y: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } } };
 
   return (
     <section
@@ -79,17 +77,11 @@ function PageHero() {
         background: 'radial-gradient(ellipse 60% 50% at 70% 50%, rgba(184,212,232,0.1) 0%, transparent 70%)',
       }} />
 
-      <motion.div
-        className="relative z-10 max-w-6xl mx-auto w-full"
-        variants={vars}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.div variants={line}>
+      <div className="relative z-10 max-w-6xl mx-auto w-full">
+        <div>
           <Eyebrow text={t('services.eyebrow')} dark />
-        </motion.div>
-        <motion.h1
-          variants={line}
+        </div>
+        <h1
           style={{
             fontFamily: 'Cormorant Garamond, Georgia, serif',
             fontSize: 'clamp(2.6rem, 6vw, 5.5rem)',
@@ -102,9 +94,8 @@ function PageHero() {
         >
           {t('services.pageTitle')}{' '}
           <em style={{ color: '#ffae42', fontStyle: 'italic' }}>{t('services.pageTitleAccent')}</em>
-        </motion.h1>
-        <motion.p
-          variants={line}
+        </h1>
+        <p
           style={{
             fontFamily: 'Jost, sans-serif',
             fontSize: '1rem',
@@ -115,8 +106,8 @@ function PageHero() {
           }}
         >
           {t('services.pageDesc')}
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </section>
   );
 }
@@ -124,15 +115,9 @@ function PageHero() {
 // ─── Service card ─────────────────────────────────────────────────────────────
 function ServiceCard({ service, index }) {
   const { t }  = useTranslation();
-  const ref    = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-50px' });
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 36 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.09 }}
+    <div
       style={{
         flex: '1 1 240px',
         padding: '32px 28px',
@@ -188,22 +173,16 @@ function ServiceCard({ service, index }) {
       }}>
         {t(service.descKey)}
       </p>
-    </motion.div>
+    </div>
   );
 }
 
 // ─── B2B Feature card ─────────────────────────────────────────────────────────
 function B2BFeatureCard({ feature, index }) {
   const { t }  = useTranslation();
-  const ref    = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-50px' });
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 36 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.09 }}
+    <div
       style={{
         flex: '1 1 240px',
         padding: '32px 28px',
@@ -235,17 +214,13 @@ function B2BFeatureCard({ feature, index }) {
       }}>
         {t(feature.descKey)}
       </p>
-    </motion.div>
+    </div>
   );
 }
 
 // ─── Main ServicesPage ────────────────────────────────────────────────────────
 export default function ServicesPage() {
   const { t }      = useTranslation();
-  const offerRef   = useRef(null);
-  const offerView  = useInView(offerRef, { once: true });
-  const whyRef     = useRef(null);
-  const whyView    = useInView(whyRef, { once: true });
 
   return (
     <main style={{ background: '#ffffff' }}>
@@ -255,13 +230,7 @@ export default function ServicesPage() {
       {/* ── 2. What We Offer (white) ── */}
       <section className="py-24 px-6" style={{ background: '#ffffff' }}>
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            ref={offerRef}
-            className="mb-14"
-            initial={{ opacity: 0, y: 24 }}
-            animate={offerView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.65 }}
-          >
+          <div className="mb-14">
             <Eyebrow text={t('services.what.eyebrow')} />
             <h2 style={{
               fontFamily: 'Cormorant Garamond, Georgia, serif',
@@ -272,8 +241,7 @@ export default function ServicesPage() {
             }}>
               {t('services.what.heading')}
             </h2>
-          </motion.div>
-
+          </div>
           <div className="flex flex-wrap gap-5">
             {SERVICES.map((s, i) => <ServiceCard key={i} service={s} index={i} />)}
           </div>
@@ -288,14 +256,8 @@ export default function ServicesPage() {
         className="relative py-24 px-6 overflow-hidden"
         style={{ background: '#ffffff' }}
       >
-
-
         <div className="relative z-10 max-w-6xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75 }}
-          >
+          <div>
             <Eyebrow text={t('b2b.cta.eyebrow')} />
             <h2 style={{
               fontFamily: 'Cormorant Garamond, Georgia, serif',
@@ -319,10 +281,7 @@ export default function ServicesPage() {
             }}>
               {t('b2b.cta.desc')}
             </p>
-            <motion.a
-              href="/contact"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <a href="/contact"
               style={{
                 display: 'inline-block',
                 padding: '16px 32px',
@@ -342,8 +301,8 @@ export default function ServicesPage() {
               onMouseLeave={e => { e.currentTarget.style.background = '#ffae42'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(11,37,69,0.3)'; }}
             >
               {t('b2b.cta.button')}
-            </motion.a>
-          </motion.div>
+            </a>
+          </div>
         </div>
       </section>
     </main>

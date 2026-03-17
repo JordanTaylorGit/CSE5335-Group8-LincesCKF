@@ -1,41 +1,24 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+/* Student 1 - Velupula, Lakshmi - ID# - 1002216063
+ * Student 2 - Tran, Andy - ID# - 1002116149
+ * Student 3 - Todupunoori Hareesh - ID# - 1002275378
+ * Student 4 - Taylor, Jordan - ID# - 1002080693
+ * Student 5 - Poudel, Ishan - ID# - 1001838432
+ */
+
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-/*
- * HeroSection.jsx — Teammate 4 - Jordan Taylor
- */
-
 export default function HeroSection() {
   const { t } = useTranslation();
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const y       = useTransform(scrollYProgress, [0, 1], ['0%', '28%']);
-  const opacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
-
-  const containerVariants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.16, delayChildren: 0.25 } },
-  };
-  const lineVariants = {
-    hidden:  { opacity: 0, y: 36 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] } },
-  };
-  const badgeVariants = {
-    hidden:  { opacity: 0, y: 12 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-  };
 
   return (
     <section
-      ref={ref}
       className="relative w-full overflow-hidden"
       style={{ minHeight: '100vh' }}
       aria-label={t('hero.ariaLabel')}
     >
       {/* ── Silk-red background ── */}
-      <motion.div className="absolute inset-0 z-0" style={{ y }}>
+      <div className="absolute inset-0 z-0" >
         {/* Base silk red. TODO change to img */}
         <div className="absolute inset-0" style={{ background: '#C8102E' }} />
 
@@ -60,21 +43,16 @@ export default function HeroSection() {
             )`,
           }}
         />
-      </motion.div>
+      </div>
 
       {/* ── Content ── */}
-      <motion.div
+      <div
         className="relative z-10 flex flex-col items-center justify-center text-center px-6"
-        style={{ minHeight: '100vh', opacity }}
+        style={{ minHeight: '100vh' }}
       >
-        <motion.div
-          className="max-w-4xl mx-auto"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="max-w-4xl mx-auto">
           {/* Badge */}
-          <motion.div variants={badgeVariants} className="inline-flex items-center gap-3 mb-8">
+          <div className="inline-flex items-center gap-3 mb-8">
             <span style={{ display: 'block', height: 1, width: 36, background: 'rgba(255,255,255,0.5)' }} />
             <span style={{
               fontFamily: 'Cinzel, serif',
@@ -86,12 +64,11 @@ export default function HeroSection() {
               {t('hero.badge')}
             </span>
             <span style={{ display: 'block', height: 1, width: 36, background: 'rgba(255,255,255,0.5)' }} />
-          </motion.div>
+          </div>
 
           {/* Headline */}
           <div className="overflow-hidden mb-3">
-            <motion.h1
-              variants={lineVariants}
+            <h1
               style={{
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 fontSize: 'clamp(3.2rem, 8vw, 7.5rem)',
@@ -103,13 +80,12 @@ export default function HeroSection() {
             >
               {t('hero.headline1')}
               <span style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.75)' }}>CKF</span>
-            </motion.h1>
+            </h1>
           </div>
 
           {/* Tagline */}
           <div className="overflow-hidden mb-6">
-            <motion.p
-              variants={lineVariants}
+            <p
               style={{
                 fontFamily: 'Cinzel, serif',
                 fontSize: 'clamp(0.65rem, 1.4vw, 0.9rem)',
@@ -119,13 +95,12 @@ export default function HeroSection() {
               }}
             >
               {t('hero.tagline')}
-            </motion.p>
+            </p>
           </div>
 
           {/* Description */}
           <div className="overflow-hidden mb-12">
-            <motion.p
-              variants={lineVariants}
+            <p
               className="max-w-xl mx-auto"
               style={{
                 fontFamily: 'Jost, sans-serif',
@@ -136,14 +111,11 @@ export default function HeroSection() {
               }}
             >
               {t('hero.description')}
-            </motion.p>
+            </p>
           </div>
 
           {/* CTAs */}
-          <motion.div
-            variants={lineVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          >
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {/* Primary — white filled */}
             <Link
               to="/catalog"
@@ -188,11 +160,9 @@ export default function HeroSection() {
             >
               {t('hero.ctaB2B')}
             </Link>
-          </motion.div>
-        </motion.div>
-
-
-      </motion.div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

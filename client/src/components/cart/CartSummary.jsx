@@ -2,41 +2,34 @@ import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 
 function CartSummary() {
-  const { cartCount = 0, cartTotal = 0, clearCart } = useCart();
+  const { cartItems, cartTotal } = useCart();
 
   return (
-    <div className="bg-white border border-[#e8dfd4] p-6 sticky top-24">
-      <h2 className="text-3xl font-medium text-[#14213d] mb-5">Order Summary</h2>
+    <div className="bg-white rounded-xl shadow-md p-6 h-fit">
+      <h2 className="text-xl font-semibold mb-4">Cart Summary</h2>
 
-      <div className="flex justify-between py-3 border-b border-[#eee4d8]">
-        <span className="text-[#596273]">Total Items</span>
-        <span className="text-[#14213d] font-semibold">{cartCount}</span>
+      <div className="space-y-3 text-sm">
+        <div className="flex justify-between">
+          <span>Items</span>
+          <span>{cartItems.length}</span>
+        </div>
+
+        <div className="flex justify-between font-semibold text-lg border-t pt-3">
+          <span>Total</span>
+          <span>${cartTotal.toFixed(2)}</span>
+        </div>
       </div>
 
-      <div className="flex justify-between py-3 border-b border-[#eee4d8]">
-        <span className="text-[#596273]">Total Price</span>
-        <span className="text-[#14213d] font-semibold">${Number(cartTotal).toFixed(2)}</span>
-      </div>
-
-      <div className="flex flex-col gap-3 mt-6">
-        <button className="bg-[#111a2f] text-white py-3 hover:bg-[#1b2744] transition">
-          Proceed to Checkout
-        </button>
-
-        <button
-          onClick={clearCart}
-          className="border border-red-400 text-red-600 py-3 hover:bg-red-50 transition"
-        >
-          Clear Cart
-        </button>
-
-        <Link
-          to="/catalog"
-          className="border border-[#111a2f] text-[#111a2f] text-center py-3 hover:bg-[#111a2f] hover:text-white transition"
-        >
-          Continue Shopping
-        </Link>
-      </div>
+      <Link
+        to="/checkout"
+        className={`mt-5 block w-full text-center rounded-lg px-4 py-3 font-medium transition ${
+          cartItems.length === 0
+            ? "bg-gray-300 text-gray-500 pointer-events-none"
+            : "bg-black text-white hover:opacity-90"
+        }`}
+      >
+        Proceed to Checkout
+      </Link>
     </div>
   );
 }

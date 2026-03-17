@@ -1,10 +1,11 @@
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
-
-/*
- * ProcessSteps.jsx — Teammate 4 - Jordan Taylor
+/* Student 1 - Velupula, Lakshmi - ID# - 1002216063
+ * Student 2 - Tran, Andy - ID# - 1002116149
+ * Student 3 - Todupunoori Hareesh - ID# - 1002275378
+ * Student 4 - Taylor, Jordan - ID# - 1002080693
+ * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
+
+import { useTranslation } from 'react-i18next';
 
 const STEPS = [
   {
@@ -59,21 +60,15 @@ const STEPS = [
 
 function StepCard({ step, index }) {
   const { t } = useTranslation();
-  const ref    = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 44 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: index * 0.13 }}
+    <div
       className="relative flex flex-col items-center text-center px-4"
       style={{ flex: '1 1 220px' }}
     >
       {/* Connector line (desktop only, not on last) */}
       {index < STEPS.length - 1 && (
-        <motion.div
+        <div
           className="hidden lg:block absolute top-9 z-0"
           style={{
             left: 'calc(50% + 36px)',
@@ -81,9 +76,6 @@ function StepCard({ step, index }) {
             height: 1,
             background: 'linear-gradient(90deg, #B8D4E8 0%, rgba(184,212,232,0.15) 100%)',
           }}
-          initial={{ scaleX: 0, originX: 0 }}
-          animate={inView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.7, delay: index * 0.13 + 0.35 }}
         />
       )}
 
@@ -154,14 +146,12 @@ function StepCard({ step, index }) {
       }}>
         {t(step.descKey)}
       </p>
-    </motion.div>
+    </div>
   );
 }
 
 export default function ProcessSteps() {
   const { t }   = useTranslation();
-  const headRef = useRef(null);
-  const inView  = useInView(headRef, { once: true });
 
   return (
     <section
@@ -171,12 +161,8 @@ export default function ProcessSteps() {
     >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <motion.div
-          ref={headRef}
+        <div
           className="text-center mb-20"
-          initial={{ opacity: 0, y: 28 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7 }}
         >
           <p style={{
             fontFamily: 'Cinzel, serif',
@@ -212,7 +198,7 @@ export default function ProcessSteps() {
           }}>
             {t('process.subheading')}
           </p>
-        </motion.div>
+        </div>
 
         {/* Steps */}
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-6 relative">
