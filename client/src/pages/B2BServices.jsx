@@ -70,11 +70,18 @@ function PageHero() {
   return (
     <section
       className="relative flex items-end px-6 pb-20 overflow-hidden"
-      style={{ minHeight: '52vh', background: '#0B2545' }}
+      style={{
+        minHeight: '52vh',
+        background: `url('https://images.unsplash.com/photo-1684259499086-93cb3e555803?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaWxrJTIwbWFudWZhY3R1cmluZyUyMGZhY3RvcnklMjBwcm9kdWN0aW9ufGVufDF8fHx8MTc2OTk4OTI0Mnww&ixlib=rb-4.1.0&q=80&w=1080') center/cover no-repeat`,
+      }}
     >
+      {/* Overlay for readability */}
+      <div className="absolute inset-0" style={{
+        background: 'linear-gradient(180deg, rgba(11,37,69,0.82) 0%, rgba(11,37,69,0.55) 60%, rgba(11,37,69,0.25) 100%)',
+      }} />
       {/* Sky-blue radial glow */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 60% 50% at 70% 50%, rgba(184,212,232,0.1) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse 60% 50% at 70% 50%, rgba(184,212,232,0.13) 0%, transparent 70%)',
       }} />
 
       <div className="relative z-10 max-w-6xl mx-auto w-full">
@@ -85,24 +92,26 @@ function PageHero() {
           style={{
             fontFamily: 'Cormorant Garamond, Georgia, serif',
             fontSize: 'clamp(2.6rem, 6vw, 5.5rem)',
-            fontWeight: 300,
-            color: '#ffffff',
+            fontWeight: 700,
+            color: '#fff',
             letterSpacing: '-0.02em',
             lineHeight: 1.05,
             marginBottom: 18,
+            textShadow: '0 4px 32px rgba(11,37,69,0.85), 0 1px 8px #0B2545',
           }}
         >
           {t('services.pageTitle')}{' '}
-          <em style={{ color: '#ffae42', fontStyle: 'italic' }}>{t('services.pageTitleAccent')}</em>
+          <em style={{ color: '#ffae42', fontStyle: 'italic', textShadow: '0 2px 16px rgba(11,37,69,0.45)' }}>{t('services.pageTitleAccent')}</em>
         </h1>
         <p
           style={{
             fontFamily: 'Jost, sans-serif',
-            fontSize: '1rem',
-            fontWeight: 300,
-            color: 'rgba(232,244,253,0.6)',
+            fontSize: '1.1rem',
+            fontWeight: 400,
+            color: '#E8F4FD',
             maxWidth: 500,
             lineHeight: 1.8,
+            textShadow: '0 2px 16px rgba(11,37,69,0.45), 0 1px 8px #0B2545',
           }}
         >
           {t('services.pageDesc')}
