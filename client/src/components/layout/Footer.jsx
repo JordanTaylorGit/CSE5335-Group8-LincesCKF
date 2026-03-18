@@ -13,7 +13,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div>
-            <h3 className="text-xl font-semibold text-white font-serif mb-4">
+            <h3 className="text-xl font-semibold text-white font-sans mb-4">
               Linces'CKF
             </h3>
             <p className="text-sm leading-relaxed text-ivory/60 max-w-xs">
@@ -68,7 +68,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-base font-semibold text-white font-serif mb-4">
+            <h4 className="text-base font-semibold text-white font-sans mb-4">
               Quick Links
             </h4>
             <ul className="space-y-3 text-sm">
@@ -114,7 +114,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-base font-semibold text-white font-serif mb-4">
+            <h4 className="text-base font-semibold text-white font-sans mb-4">
               Contact Us
             </h4>
             <address className="not-italic text-sm space-y-2 text-ivory/60">
@@ -127,7 +127,7 @@ export default function Footer() {
 
           {/* Follow Us */}
           <div>
-            <h4 className="text-base font-semibold text-white font-serif mb-4">
+            <h4 className="text-base font-semibold text-white font-sans mb-4">
               Follow Us
             </h4>
             <div className="flex flex-col gap-3">
