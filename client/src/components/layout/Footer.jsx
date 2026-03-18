@@ -13,9 +13,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div>
-            <h3 className="text-xl font-semibold text-white font-sans mb-4">
-              Linces'CKF
-            </h3>
+              <p className="font-accent text-xl tracking-[0.2em] text-ivory mb-4">
+              LINCES<span className="text-white">'</span>CKF
+            </p>
             <p className="text-sm leading-relaxed text-ivory/60 max-w-xs">
               {t("footer.brand_desc")}
             </p>
@@ -68,8 +68,8 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-base font-semibold text-white font-sans mb-4">
-              Quick Links
+            <h4 className=" font-semibold text-lg tracking-widest uppercase text-white mb-4">
+              {t('footer.links')}
             </h4>
             <ul className="space-y-3 text-sm">
               <li>
@@ -114,8 +114,8 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-base font-semibold text-white font-sans mb-4">
-              Contact Us
+             <h4 className="font-semibold text-lg tracking-widest uppercase text-white mb-4">
+              {t('footer.contact')}
             </h4>
             <address className="not-italic text-sm space-y-2 text-ivory/60">
               <p>contact@lincesckf.com</p>
@@ -127,8 +127,8 @@ export default function Footer() {
 
           {/* Follow Us */}
           <div>
-            <h4 className="text-base font-semibold text-white font-sans mb-4">
-              Follow Us
+             <h4 className="font-semibold text-lg tracking-widest uppercase text-white mb-4">
+              {t('follow us')}
             </h4>
             <div className="flex flex-col gap-3">
               <a

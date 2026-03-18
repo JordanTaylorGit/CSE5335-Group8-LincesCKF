@@ -14,14 +14,20 @@ export default function HeroSection() {
   return (
     <section
       className="relative w-full overflow-hidden"
-      style={{ minHeight: '100vh' }}
+      style={{ minHeight: '50vh' }}
       aria-label={t('hero.ariaLabel')}
     >
       {/* ── Silk-red background ── */}
       <div className="absolute inset-0 z-0" >
         {/* Base silk red. TODO change to img */}
-        <div className="absolute inset-0" style={{ background: '#C8102E' }} />
+              {/* <div className="absolute inset-0" style={{ background: "#C8102E" }} /> */}
 
+        {/* Hero background image */}
+        <img
+          src="https://images.unsplash.com/photo-1758551015352-fa735f167422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwc2lsayUyMGZhYnJpYyUyMGZsb3dpbmclMjBsdXh1cnl8ZW58MXx8fHwxNzY5OTg5MTkwfDA&ixlib=rb-4.1.0&q=80&w=1080"
+          alt="Premium silk fabric"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         {/* Silk sheen — lighter diagonal highlight */}
         <div
           className="absolute inset-0"
@@ -48,7 +54,7 @@ export default function HeroSection() {
       {/* ── Content ── */}
       <div
         className="relative z-10 flex flex-col items-center justify-center text-center px-6"
-        style={{ minHeight: '100vh' }}
+        style={{ minHeight: '50vh' }}
       >
         <div className="max-w-4xl mx-auto">
           {/* Badge */}
