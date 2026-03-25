@@ -5,6 +5,7 @@ import { ShoppingBag, Menu, X, Globe } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { useCart } from "@context/CartContext";
 import { useLanguage } from "@context/LanguageContext";
+import AuthModal from "../AuthModal.jsx";
 
 export default function Navbar() {
   const { t } = useTranslation();
@@ -13,6 +14,7 @@ export default function Navbar() {
   const { language, toggleLanguage } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -61,12 +63,18 @@ export default function Navbar() {
           </button>
 
           {/* Account */}
-          <Link
-            to={isAuthenticated ? "/account" : "/login"}
-            className="font-body text-sm tracking-wider text-navy hover:text-silk-red transition-colors"
-          >
-            {isAuthenticated ? t("nav.account") : t("nav.login")}
-          </Link>
+          {isAuthenticated ? (
+            <Link to="/account" className="font-body text-sm tracking-wider text-navy hover:text-silk-red transition-colors">
+              {t("nav.account")}
+            </Link>
+          ) : (
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="font-body text-sm tracking-wider text-navy hover:text-silk-red transition-colors"
+            >
+              {t("nav.login")}
+            </button>
+          )}
 
           {/* Cart */}
           <Link
@@ -103,6 +111,8 @@ export default function Navbar() {
         </div>
       </div>
 
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden bg-white border-t border-sky-mid py-6 px-6">
@@ -125,9 +135,13 @@ export default function Navbar() {
             <NavLink to="/about" mobile>
               {t("nav.about")}
             </NavLink>
-            <NavLink to={isAuthenticated ? "/account" : "/login"} mobile>
-              {isAuthenticated ? t("nav.account") : t("nav.login")}
-            </NavLink>
+            {isAuthenticated ? (
+              <NavLink to="/account" mobile>{t("nav.account")}</NavLink>
+            ) : (
+              <button onClick={() => { setMobileOpen(false); setAuthOpen(true); }} className="font-body text-lg text-navy hover:text-silk-red transition-colors text-left">
+                {t("nav.login")}
+              </button>
+            )}
           </nav>
         </div>
       )}

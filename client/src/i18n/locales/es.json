@@ -37,6 +37,11 @@
     "clearCart": "Vaciar Carrito",
     "remove": "Eliminar"
   },
+  "account": {
+    "title": "Mi Cuenta",
+    "greeting": "Hola, {{name}}",
+    "profile": "Perfil"
+  },
   "student3": {
     "label": "Estudiante 3"
   }

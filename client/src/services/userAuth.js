@@ -25,6 +25,7 @@ function safeUser(u) {
     phone: u.phone,
     accountType: u.accountType,
     createdAt: u.createdAt,
+    notifications: u.notifications || { email: true, sms: false },
     // convenience: full display name
     name: u.companyName || [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email,
   };
@@ -94,6 +95,65 @@ export function loginUser({ email, password }) {
       }
       resolve(safeUser(found));
     }, 450);
+  });
+}
+
+/**
+ * Update profile details for an existing user.
+ */
+export function updateUserProfile({ id, firstName, lastName, companyName, phone, email }) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const users = loadUsers();
+      const idx = users.findIndex(u => u.id === id);
+      if (idx === -1) return reject({ message: 'User not found.' });
+      const emailLower = email.toLowerCase().trim();
+      const emailTaken = users.find(u => u.email === emailLower && u.id !== id);
+      if (emailTaken) return reject({ message: 'An account with this email already exists.' });
+      users[idx] = {
+        ...users[idx],
+        firstName: firstName?.trim() ?? users[idx].firstName,
+        lastName: lastName?.trim() ?? users[idx].lastName,
+        companyName: companyName?.trim() ?? users[idx].companyName,
+        phone: phone?.trim() ?? users[idx].phone,
+        email: emailLower,
+      };
+      saveUsers(users);
+      resolve(safeUser(users[idx]));
+    }, 400);
+  });
+}
+
+/**
+ * Change password for an existing user.
+ */
+export function updateUserPassword({ id, currentPassword, newPassword }) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const users = loadUsers();
+      const idx = users.findIndex(u => u.id === id);
+      if (idx === -1) return reject({ message: 'User not found.' });
+      if (users[idx].password !== currentPassword) return reject({ message: 'Current password is incorrect.' });
+      users[idx].password = newPassword;
+      saveUsers(users);
+      resolve({ success: true });
+    }, 400);
+  });
+}
+
+/**
+ * Save notification preferences for a user.
+ */
+export function updateUserNotifications({ id, notifications }) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const users = loadUsers();
+      const idx = users.findIndex(u => u.id === id);
+      if (idx === -1) return reject({ message: 'User not found.' });
+      users[idx].notifications = notifications;
+      saveUsers(users);
+      resolve(safeUser(users[idx]));
+    }, 300);
   });
 }
 

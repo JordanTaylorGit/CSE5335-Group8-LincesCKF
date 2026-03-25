@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@context/AuthContext';
 import { CartProvider } from '@context/CartContext';
 import { LanguageProvider } from '@context/LanguageContext';
@@ -11,8 +11,6 @@ import Catalog from '@pages/Catalog';
 import ProductDetail from '@pages/ProductDetail';
 import Cart from '@pages/Cart';
 import Checkout from '@pages/Checkout';
-import Login from '@pages/Login';
-import Register from '@pages/Register';
 import Account from '@pages/Account';
 import B2BServices from '@pages/B2BServices';
 import About from '@pages/About';
@@ -37,8 +35,8 @@ export default function App() {
                 <Route path="/custom-orders" element={<CustomOrders />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Navigate to="/" replace />} />
+                <Route path="/register" element={<Navigate to="/" replace />} />
 
                 {/* Cart — accessible without auth, checkout requires auth */}
                 <Route path="/cart" element={<Cart />} />

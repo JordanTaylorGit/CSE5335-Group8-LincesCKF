@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { loginUser, registerUser, getStoredSession, storeSession } from '../services/userAuth';
+import { loginUser, registerUser, getStoredSession, storeSession, updateUserProfile, updateUserPassword, updateUserNotifications } from '../services/userAuth';
 
 const AuthContext = createContext(null);
 
@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
     try {
       const u = await loginUser({ email, password });
       setUser(u);
-      return { success: true };
+      return { success: true, user: u };
     } catch (err) {
       return { success: false, message: err?.message || 'Login failed. Please try again.' };
     } finally {
@@ -58,10 +58,42 @@ export function AuthProvider({ children }) {
     }
   }
 
+  /** Update profile details. */
+  async function updateProfile({ firstName, lastName, companyName, phone, email }) {
+    try {
+      const updated = await updateUserProfile({ id: user.id, firstName, lastName, companyName, phone, email });
+      setUser(updated);
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Failed to update profile.' };
+    }
+  }
+
+  /** Change password. */
+  async function updatePassword({ currentPassword, newPassword }) {
+    try {
+      await updateUserPassword({ id: user.id, currentPassword, newPassword });
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Failed to update password.' };
+    }
+  }
+
+  /** Save notification preferences. */
+  async function updateNotifications(notifications) {
+    try {
+      const updated = await updateUserNotifications({ id: user.id, notifications });
+      setUser(updated);
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Failed to save preferences.' };
+    }
+  }
+
   /** Clear session and log out. */
   function logout() {
     setUser(null);
- }  
+  }
 
   return (
     <AuthContext.Provider
@@ -72,6 +104,9 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
+        updateProfile,
+        updatePassword,
+        updateNotifications,
       }}
     >
       {children}
