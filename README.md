@@ -1,4 +1,10 @@
-# Linces'CKF — Premium Silk E-Commerce Platform
+# UTA CSE 5335 WebData Management Project Linces'CKF — Premium Silk E-Commerce Platform
+# Group 8
+# Student 1 - Velupula, Lakshmi
+# Student 2 - Tran, Andy
+# Student 3 - Todupunoori, Hareesh
+# Student 4 - Taylor, Jordan
+# Student 5 - Poudel, Ishan
 
 A bilingual (Spanish/English) e-commerce platform for a premium silk garment brand, featuring **Direct-to-Consumer** sales and **B2B Manufacturing Services**.
 
@@ -23,7 +29,7 @@ A bilingual (Spanish/English) e-commerce platform for a premium silk garment bra
 | Internationalization | i18next (ES + EN) |
 | Styling | Tailwind CSS + Custom CSS Variables |
 | Animations | Framer Motion |
-| HTTP Client | Axios |
+| HTTP Client | UTA Cloud Phase 2 | Alternative host Phase 3 |
 | Package Manager | npm |
 
 ---
@@ -65,7 +71,7 @@ lincesckf/
 │   │   ├── Catalog.jsx
 │   │   ├── ProductDetail.jsx
 │   │   ├── Cart.jsx
-│   │   ├── Checkout.jsx         # Stub — integrate Stripe here
+│   │   ├── Checkout.jsx         
 │   │   ├── Login.jsx
 │   │   ├── Register.jsx
 │   │   ├── Account.jsx
@@ -118,29 +124,27 @@ npm run preview
 
 ## 🌐 Features
 
-### ✅ Implemented (Scaffold)
-- [x] Bilingual UI (ES/EN) with language toggle — defaults to Spanish
-- [x] React Router v6 with protected routes
+### ✅ Implemented — Phase 2 Frontend powered by React
+- [x] Bilingual UI (ES/EN) with language toggle — defaults to english
+- [ ] React Router v6 with protected routes
 - [x] Authentication context (login/register/logout with localStorage session)
 - [x] Shopping cart with quantity management and localStorage persistence
 - [x] Product catalog with category filters and sorting
 - [x] Product detail pages with size/color selection
-- [x] Responsive navigation (mobile menu)
-- [x] Luxury aesthetic design system (Cormorant Garamond + Cinzel + Jost)
+- [ ] Responsive navigation (mobile menu)
+- [ ] Luxury aesthetic design system (Cormorant Garamond + Cinzel + Jost)
 - [x] Home page with hero, featured products, services overview
 - [x] B2B Services page + contact inquiry form
-- [x] Account dashboard with order history stubs
+- [ ] Account dashboard with order history stubs
 
-### 🔧 TODOs — Connect to Backend
+### 🔧 TODOs — Phase 3 Connect to Backend
 - [ ] Replace mock `AuthContext` login/register with real API (`POST /api/auth/login`, `/api/auth/register`)
 - [ ] Replace `utils/products.js` mock data with API calls (`GET /api/products`, `GET /api/products/:id`)
-- [ ] Implement Checkout flow with Stripe or preferred payment gateway
+- [ ] Implement Checkout flow
 - [ ] Add order management APIs (`POST /api/orders`, `GET /api/orders/:userId`)
-- [ ] Implement wishlist functionality
 - [ ] Add JWT token refresh logic
 - [ ] B2B inquiry form — connect to `POST /api/b2b/inquiry`
 - [ ] Add product image upload management (admin)
-- [ ] Implement admin dashboard
 
 ---
 
@@ -180,9 +184,6 @@ POST   /api/b2b/inquiry
 
 1. Branch from `main` — use `feature/`, `fix/`, or `chore/` prefixes
 2. Follow existing code style (functional components, hooks)
-3. Keep i18n keys in sync — update both `en.json` and `es.json`
-4. Test across mobile and desktop breakpoints
+3. Test across mobile and desktop breakpoints
 
 ---
-
-© 2025 Linces'CKF. All rights reserved.
