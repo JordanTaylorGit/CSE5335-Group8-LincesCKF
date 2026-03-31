@@ -1,10 +1,12 @@
 # UTA CSE 5335 WebData Management Project Linces'CKF — Premium Silk E-Commerce Platform
-# Group 8
-# Student 1 - Velupula, Lakshmi
-# Student 2 - Tran, Andy
-# Student 3 - Todupunoori, Hareesh
-# Student 4 - Taylor, Jordan
-# Student 5 - Poudel, Ishan
+Group 8
+Student 1 - Velupula, Lakshmi
+Student 2 - Tran, Andy
+Student 3 - Todupunoori, Hareesh
+Student 4 - Taylor, Jordan
+Student 5 - Poudel, Ishan
+
+---
 
 A bilingual (Spanish/English) e-commerce platform for a premium silk garment brand, featuring **Direct-to-Consumer** sales and **B2B Manufacturing Services**.
 
