@@ -6,7 +6,7 @@
  */
 
 import { useMemo, useState } from "react";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../components/shared/ProductCard";
 import products from "../data/products";
 
 function Catalog() {

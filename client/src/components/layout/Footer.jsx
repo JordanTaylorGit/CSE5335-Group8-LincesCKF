@@ -84,12 +84,12 @@ export default function Footer() {
                   to="/catalog"
                   className="hover:text-ivory transition-colors"
                 >
-                  Catalog
+                  {t('nav.catalog')}
                 </Link>
               </li>
               <li>
                 <Link to="/b2b" className="hover:text-ivory transition-colors">
-                  B2B Services
+                  {t('nav.b2b')}
                 </Link>
               </li>
               <li>
@@ -97,7 +97,7 @@ export default function Footer() {
                   to="/custom-orders"
                   className="hover:text-ivory transition-colors"
                 >
-                  Custom Orders
+                  {t('nav.customOrders')}
                 </Link>
               </li>
               <li>
@@ -105,7 +105,7 @@ export default function Footer() {
                   to="/about"
                   className="hover:text-ivory transition-colors"
                 >
-                  About
+                  {t('nav.about')}
                 </Link>
               </li>
               <li>
@@ -113,7 +113,7 @@ export default function Footer() {
                   to="/contact"
                   className="hover:text-ivory transition-colors"
                 >
-                  Contact
+                  {t('nav.contact')}
                 </Link>
               </li>
             </ul>
@@ -135,7 +135,7 @@ export default function Footer() {
           {/* Follow Us */}
           <div>
              <h4 className="font-semibold text-lg tracking-widest uppercase text-white mb-4">
-              {t('follow us')}
+              {t('footer.social')}
             </h4>
             <div className="flex flex-col gap-3">
               <a

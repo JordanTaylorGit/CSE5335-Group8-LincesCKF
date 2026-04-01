@@ -10,82 +10,110 @@ export const CATEGORIES = ['blouse', 'dress', 'shirt', 'accessory', 'skirt', 'ro
 const products = [
   {
     id: 1,
-    name: "Classic Silk Blouse",
+    nameEn: 'Classic Silk Blouse',
+    nameEs: 'Blusa de Seda Clásica',
+    name:   'Classic Silk Blouse',        // fallback for components using product.name
+    category: 'blouse',
+    type: 'Women',
     price: 189,
-    category: "blouse",
-    type: "Women",
-    image: "/images/silkBlouse.jpeg",
-    description: "Elegant silk blouse with timeless tailoring and luxury texture.",
+    currency: 'USD',
+    material: '100% Mulberry Silk',
+    image: '/images/silkBlouse.jpeg',
+    images: ['/images/silkBlouse.jpeg'],
     colors: [
-      { name: "Cream", value: "#f3eedf" },
-      { name: "Pink", value: "#f6b7c1" },
-      { name: "Blue", value: "#1826b8" },      
+      { name: 'Cream', value: '#f3eedf' },
+      { name: 'Pink',  value: '#f6b7c1' },
+      { name: 'Blue',  value: '#1826b8' },
     ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    featured: true,    
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    descriptionEn: 'Timeless elegance meets modern sophistication in this luxurious silk blouse. Crafted from 100% premium mulberry silk.',
+    descriptionEs: 'Elegancia atemporal en esta lujosa blusa de seda mulberry 100% pura.',
+    description:   'Timeless elegance meets modern sophistication in this luxurious silk blouse. Crafted from 100% premium mulberry silk.',
+    featured: true,
   },
   {
     id: 2,
-    name: "Evening Silk Dress",
+    nameEn: 'Evening Silk Dress',
+    nameEs: 'Vestido de Seda de Noche',
+    name:   'Evening Silk Dress',
+    category: 'dress',
+    type: 'Women',
     price: 349,
-    category: "dress",
-    type: "Women",
-    image: "/images/silkDress.jpeg",
-    description: "Refined evening silk dress created for graceful premium occasions.",
+    currency: 'USD',
+    material: '100% Mulberry Silk',
+    image: '/images/silkDress.jpeg',
+    images: ['/images/silkDress.jpeg'],
     colors: [
-      { name: "Black", value: "#000000" },
-      { name: "Maroon", value: "#9d002d" },
-      { name: "Gold", value: "#efe7b2" },      
+      { name: 'Black',  value: '#000000' },
+      { name: 'Maroon', value: '#9d002d' },
+      { name: 'Gold',   value: '#efe7b2' },
     ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    featured: true,    
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    descriptionEn: 'An exquisite evening dress that flows with graceful movement, made from the finest mulberry silk.',
+    descriptionEs: 'Un exquisito vestido de noche que fluye con movimiento elegante.',
+    description:   'An exquisite evening dress that flows with graceful movement, made from the finest mulberry silk.',
+    featured: true,
   },
   {
     id: 3,
-    name: "Luxury Silk Scarf",
+    nameEn: 'Luxury Silk Scarf',
+    nameEs: 'Pañuelo de Seda de Lujo',
+    name:   'Luxury Silk Scarf',
+    category: 'scarf',
+    type: 'Accessories',
     price: 89,
-    category: "scarf",
-    type: "Accessories",
-    image: "/images/silkScarf.jpeg",
-    description: "Soft and luxurious silk scarf with premium drape and finish.",
+    currency: 'USD',
+    material: '100% Mulberry Silk',
+    image: '/images/silkScarf.jpeg',
+    images: ['/images/silkScarf.jpeg'],
     colors: [
-      { name: "Cream", value: "#f3eedf" },
-      { name: "Pink", value: "#f6b7c1" },
-      { name: "Blue", value: "#1826b8" },
-      { name: "Red", value: "#9d002d" },      
+      { name: 'Cream', value: '#f3eedf' },
+      { name: 'Pink',  value: '#f6b7c1' },
+      { name: 'Blue',  value: '#1826b8' },
+      { name: 'Red',   value: '#9d002d' },
     ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    featured: true,    
+    sizes: ['One Size'],
+    descriptionEn: 'A versatile accessory crafted from premium silk, adding elegance to any outfit.',
+    descriptionEs: 'Un accesorio versátil de seda premium que añade elegancia a cualquier atuendo.',
+    description:   'A versatile accessory crafted from premium silk, adding elegance to any outfit.',
+    featured: true,
   },
   {
     id: 4,
-    name: "Men's Silk Shirt",
+    nameEn: "Men's Silk Shirt",
+    nameEs: 'Camisa de Seda para Hombre',
+    name:   "Men's Silk Shirt",
+    category: 'shirt',
+    type: 'Men',
     price: 229,
-    category: "shirt",
-    type: "Men",
-    image: "/images/silkShirt.jpeg",
-    description: "Luxury silk shirt crafted for sophisticated everyday wear.",
+    currency: 'USD',
+    material: '100% Mulberry Silk',
+    image: '/images/silkShirt.jpeg',
+    images: ['/images/silkShirt.jpeg'],
     colors: [
-      { name: "Gold", value: "#d7c27b" },
-      { name: "White", value: "#ffffff" },
-      { name: "Black", value: "#111827" },
+      { name: 'Gold',  value: '#d7c27b' },
+      { name: 'White', value: '#ffffff' },
+      { name: 'Black', value: '#111827' },
     ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    featured: false,    
-  }
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    descriptionEn: 'Refined and sophisticated, this silk shirt is perfect for any occasion.',
+    descriptionEs: 'Refinada y sofisticada, esta camisa de seda es perfecta para cualquier ocasión.',
+    description:   'Refined and sophisticated, this silk shirt is perfect for any occasion.',
+    featured: false,
+  },
 ];
-
+ 
 export default products;
-
+ 
 export function getProducts(category) {
   if (!category || category === 'all') return products;
   return products.filter(p => p.category === category);
 }
-
+ 
 export function getFeaturedProducts() {
   return products.filter(p => p.featured);
 }
-
+ 
 export function getProductById(id) {
-  return products.find(p => p.id === String(id)) || null;
+  return products.find(p => p.id === Number(id)) || null;
 }

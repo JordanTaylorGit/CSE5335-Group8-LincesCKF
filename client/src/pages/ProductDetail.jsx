@@ -9,15 +9,20 @@ import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import products from "../data/products";
+import { useTranslation } from 'react-i18next';
 
 function ProductDetails() {
   const { id } = useParams();
   const { addToCart, message } = useCart();
+  const { i18n } = useTranslation();
 
   const product = useMemo(
     () => products.find((item) => item.id === Number(id)),
     [id]
   );
+
+  const productName = i18n.language === 'es' ? product?.nameEs : product?.nameEn;
+  const productDesc = i18n.language === 'es' ? product?.descriptionEs : product?.descriptionEn;
 
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0] || null);
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || "");
@@ -42,7 +47,7 @@ function ProductDetails() {
           <p className="text-sm capitalize text-gray-500">{product.category}</p>
 
           <h1 className="mt-2 text-[32px] font-semibold text-slate-900">
-            {product.name}
+            {productName}
           </h1>
 
           <p className="mt-4 text-[28px] font-bold text-slate-900">
@@ -50,7 +55,7 @@ function ProductDetails() {
           </p>
 
           <p className="mt-6 text-[16px] leading-7 text-slate-600">
-            {product.description}
+            {productDesc}
           </p>
 
           <div className="mt-8">

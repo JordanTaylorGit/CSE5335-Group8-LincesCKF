@@ -8,7 +8,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HeroSection from '../components/home/HeroSection';
-import ProductCard from '../components/ProductCard';
+import ProductCard from '../components/shared/ProductCard';
 import { getFeaturedProducts } from '../data/products';
 
 // ─── updated featured products ───────────────────────────────────────────────────
