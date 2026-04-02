@@ -31,7 +31,7 @@ function ProductCard({ product }) {
       <img
         src={product.image}
         alt={product.name}
-        className="h-[150px] w-full object-cover"
+        className="h-[280px] w-full object-contain object-top"
       />
 
       <div className="p-3">
