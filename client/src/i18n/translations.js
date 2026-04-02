@@ -12,6 +12,7 @@
  *   1. Add it under `en` with the English string.
  *   2. Add the Spanish equivalent directly below under `es`.
  * No need to touch two separate files.
+ * TODO: Clean up duplicate keys, and ensure no broken keys in source.
  */
 
 const translations = {
@@ -54,7 +55,6 @@ const translations = {
       add_to_cart: "Add to Cart",
       view_details: "View Details",
       no_results: "No products found",
-      // ── Added from en.json (Teammate 3 catalog page) ──
       heroLabel: "Premium Silk Collection",
       subtitle: "Explore luxury silk garments and accessories crafted for elegance, comfort, and timeless style.",
       results: "Showing {{count}} product(s)",
@@ -538,7 +538,6 @@ const translations = {
       add_to_cart: "Agregar al Carrito",
       view_details: "Ver Detalles",
       no_results: "No se encontraron productos",
-      // ── Added from es.json (Teammate 3 catalog page) ──
       heroLabel: "Colección Premium de Seda",
       subtitle: "Explora prendas y accesorios de seda de lujo diseñados para elegancia, comodidad y estilo atemporal.",
       results: "Mostrando {{count}} producto(s)",
@@ -579,7 +578,6 @@ const translations = {
       checkout: "Proceder al Pago",
       continue: "Continuar Comprando",
       remove: "Eliminar",
-      // ── Added from es.json (Teammate 3 cart page) ──
       subtitle: "Revisa las prendas de seda seleccionadas, actualiza cantidades o continúa al pago.",
       emptyText: "Agrega productos desde el catálogo para continuar.",
       totalItems: "Total de Artículos",

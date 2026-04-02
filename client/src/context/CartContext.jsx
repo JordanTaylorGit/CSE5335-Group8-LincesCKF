@@ -52,11 +52,13 @@ export function CartProvider({ children }) {
       }
 
       showMessage("Product added to cart");
+      const colorObj = product.colors?.find(c => c.name === selectedColor);
       return [
         ...prevItems,
         {
           ...product,
           selectedColor,
+          selectedColorEs: colorObj?.nameEs || selectedColor,          
           selectedSize,
           quantity: 1,
         },

@@ -13,8 +13,8 @@ import { useTranslation } from 'react-i18next';
 
 function ProductDetails() {
   const { id } = useParams();
-  const { addToCart, message } = useCart();
-  const { i18n } = useTranslation();
+  const { addToCart } = useCart();
+  const { t, i18n } = useTranslation();
 
   const product = useMemo(
     () => products.find((item) => item.id === Number(id)),
@@ -28,7 +28,7 @@ function ProductDetails() {
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || "");
 
   if (!product) {
-    return <div className="p-10 text-lg">Product not found</div>;
+    return <div className="p-10 text-lg">{t('product.productNotFound')}</div>;
   }
 
   return (
@@ -44,7 +44,10 @@ function ProductDetails() {
         </div>
 
         <div className="rounded-[18px] bg-white p-8 shadow-sm">
-          <p className="text-sm capitalize text-gray-500">{product.category}</p>
+          <p className="text-sm capitalize text-gray-500">{t({ blouse: 'catalog.blouses', 
+            dress: 'catalog.dresses', shirt: 'catalog.shirts', scarf: 'catalog.scarves', 
+            skirt: 'catalog.skirt', robe: 'catalog.robe' }[product.category] || product.category)}
+          </p>
 
           <h1 className="mt-2 text-[32px] font-semibold text-slate-900">
             {productName}
@@ -60,7 +63,7 @@ function ProductDetails() {
 
           <div className="mt-8">
             <h3 className="mb-3 text-[18px] font-medium text-slate-900">
-              Select Color
+              {t('product.color')}
             </h3>
 
             <div className="flex flex-wrap gap-3">
@@ -79,7 +82,7 @@ function ProductDetails() {
                     className="h-4 w-4 rounded-full border border-gray-300"
                     style={{ backgroundColor: color.value }}
                   />
-                  <span>{color.name}</span>
+                  <span>{i18n.language === 'es' ? color.nameEs : color.name}</span>
                 </button>
               ))}
             </div>
@@ -87,7 +90,7 @@ function ProductDetails() {
 
           <div className="mt-8">
             <h3 className="mb-3 text-[18px] font-medium text-slate-900">
-              Select Size
+              {t('product.size')}
             </h3>
 
             <div className="flex flex-wrap gap-3">
@@ -112,7 +115,7 @@ function ProductDetails() {
             onClick={() => addToCart(product, selectedColor?.name, selectedSize)}
             className="mt-10 cursor-pointer rounded-lg bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 active:scale-95 active:shadow-inner"
           >
-            Add to Cart
+            {t('product.addToCart')}
           </button>
         </div>
       </div>

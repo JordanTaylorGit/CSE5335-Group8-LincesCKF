@@ -6,16 +6,30 @@
  */
 
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ProductCard from "../components/shared/ProductCard";
 import products from "../data/products";
 
 function Catalog() {
-  const [selectedCategory, setSelectedCategory] = useState("All Products");
+  const { t } = useTranslation();
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const categories = ["All Products", ...new Set(products.map((p) => p.category))];
+  const categories = ["all", ...new Set(products.map((p) => p.category))];
+
+  const categoryLabels = {
+    all:    'catalog.allCategories',
+    blouse: 'catalog.blouses',
+    dress:  'catalog.dresses',
+    shirt:  'catalog.shirts',
+    scarf:  'catalog.scarves',
+    skirt:  'catalog.skirt',
+    robe:   'catalog.robe',
+  };
+
+  const getLabel = (key) => t(categoryLabels[key]) || key;
 
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === "All Products") {
+    if (selectedCategory === "all") {
       return products;
     }
     return products.filter((product) => product.category === selectedCategory);
@@ -24,7 +38,7 @@ function Catalog() {
   return (
     <div>
       <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ marginBottom: "10px" }}>Product Catalog</h1>
+        <h1 style={{ marginBottom: "10px" }}>{t('catalog.title')}</h1>
 
         <div
           style={{
@@ -49,13 +63,13 @@ function Catalog() {
                 fontWeight: 500,
               }}
             >
-              {category}
+              {getLabel(category)}
             </button>
           ))}
         </div>
 
         <p style={{ color: "#6b7280" }}>
-          Showing: <strong>{selectedCategory}</strong>
+          {t('catalog.results', { count: filteredProducts.length })}
         </p>
       </div>
 
@@ -71,7 +85,7 @@ function Catalog() {
         ))}
       </div>
 
-      {filteredProducts.length === 0 && <p>No products found.</p>}
+      {filteredProducts.length === 0 && <p>{t('catalog.no_results')}.</p>}
     </div>
   );
 }

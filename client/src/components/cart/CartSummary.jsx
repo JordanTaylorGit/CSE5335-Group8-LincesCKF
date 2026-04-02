@@ -7,22 +7,24 @@
 
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { useTranslation } from "react-i18next";
 
 function CartSummary() {
   const { cartItems, cartTotal } = useCart();
+  const { t } = useTranslation();
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 h-fit">
-      <h2 className="text-xl font-semibold mb-4">Cart Summary</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('cart.orderSummary')}</h2>
 
       <div className="space-y-3 text-sm">
         <div className="flex justify-between">
-          <span>Items</span>
+          <span>{t('cart.totalItems')}</span>
           <span>{cartItems.length}</span>
         </div>
 
         <div className="flex justify-between font-semibold text-lg border-t pt-3">
-          <span>Total</span>
+          <span>{t('cart.totalPrice')}</span>
           <span>${cartTotal.toFixed(2)}</span>
         </div>
       </div>
@@ -35,7 +37,7 @@ function CartSummary() {
             : "bg-black text-white hover:opacity-90"
         }`}
       >
-        Proceed to Checkout
+        {t('cart.proceedCheckout')}
       </Link>
     </div>
   );
