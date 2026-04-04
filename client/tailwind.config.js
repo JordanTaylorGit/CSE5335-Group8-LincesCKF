@@ -11,7 +11,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ── Legacy tokens (kept so existing components don't break) ──────────
+        // ── Legacy tokens (kept so existing components don't break while updating) ──────────
+        // ── TODO: Remove once all old values are removed from html and jsx files   ──────────        
         silk: {
           50: "#fdf8f4",
           100: "#f7ece0",
@@ -35,55 +36,71 @@ export default {
         },
 
         // ── New theme tokens ─────────────────────────────────────────────────
+        // Below are the chosen colors, fonts, and animations for the website theme and CSS Values.
+        // COLOR ROLES:
+        //   silk-red   : #C8102E hero section BACKGROUND ONLY (never as text)
+        //   silk-amber : #d4900a accent on white/light sections (eyebrows, prices, active states)
+        //   silk-gold  : #ffae42 accent on dark navy sections (buttons, highlights)
+        //   navy       : #0B2545 all body text and dark backgrounds
+        //   sky-light  : #E8F4FD light subsection backgrounds
+        //   sky-mid    : #B8D4E8 borders, dividers, icon strokes
+        //
         // Usage examples:
-        //   bg-navy        text-navy
-        //   bg-silk-red    text-silk-red    hover:bg-silk-red
-        //   bg-sky-light   border-sky-mid
-        "silk-red": {
-          DEFAULT: "#C8102E",
-          dark: "#A00D24", // hover / pressed state
-          light: "#E8395A", // light variant if needed
+        //   bg-silk-red          hero bg only
+        //   text-silk-amber      eyebrow labels, prices, active navigation on white
+        //   bg-silk-gold         CTA button on navy bg
+        //   hover:bg-navy        button hover
+        //   bg-sky-light         subsection bg
+        //   border-sky-mid       card borders
+        'silk-red': {
+          DEFAULT: '#C8102E',   // hero background only
+        },
+        'silk-amber': {
+          DEFAULT: '#d4900a',   // accent on white/light — readable warm gold
+          light:   '#f0a800',   // lighter variant
+          dark:    '#b37a00',   // darker pressed state
+        },
+        'silk-gold': {
+          DEFAULT: '#ffae42',   // accent on dark navy sections
+          hover:   '#ffb85a',   // hover state
         },
         navy: {
-          DEFAULT: "#0B2545",
-          //DEFAULT: "#111827",
-          light: "#0F3060", // slightly lighter navy
-          dark: "#111827", // deeper navy for footers/headers
+          DEFAULT: '#0B2545',
+          light:   '#0F3060',
+          dark:    '#071830',
         },
-        //"navy-dark": "#111827",
         sky: {
-          light: "#E8F4FD", // light-blue subsection backgrounds
-          mid: "#B8D4E8", // borders, dividers, icon strokes
-          dark: "#7AAECB", // stronger sky accent if needed
+          light:   '#E8F4FD',
+          mid:     '#B8D4E8',
+          dark:    '#7AAECB',
         },
       },
-
+ 
       fontFamily: {
-        display: ['"Cormorant Garamond"', "serif"],
-        body: ['"Jost"', "sans-serif"],
-        accent: ['"Cinzel"', "serif"],
-        san: ['"Sanchez"', "serif"],
+        display: ['"Cormorant Garamond"', 'serif'],
+        body:    ['"Jost"', 'sans-serif'],
+        accent:  ['"Cinzel"', 'serif'],
       },
-
+ 
       spacing: {
-        18: "4.5rem",
-        88: "22rem",
-        128: "32rem",
+        '18':  '4.5rem',
+        '88':  '22rem',
+        '128': '32rem',
       },
-
+ 
       animation: {
-        "fade-up": "fadeUp 0.6s ease forwards",
-        "silk-shimmer": "silkShimmer 3s ease-in-out infinite",
+        'fade-up':      'fadeUp 0.6s ease forwards',
+        'silk-shimmer': 'silkShimmer 3s ease-in-out infinite',
       },
-
+ 
       keyframes: {
         fadeUp: {
-          "0%": { opacity: 0, transform: "translateY(20px)" },
-          "100%": { opacity: 1, transform: "translateY(0)" },
+          '0%':   { opacity: 0, transform: 'translateY(20px)' },
+          '100%': { opacity: 1, transform: 'translateY(0)' },
         },
         silkShimmer: {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%':      { backgroundPosition: '100% 50%' },
         },
       },
     },
