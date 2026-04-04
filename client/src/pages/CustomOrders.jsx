@@ -131,7 +131,7 @@ const CustomOrders = () => {
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={() => setStep(1)}
-          className="text-navy hover:text-silk-500 transition-colors"
+          className="text-navy hover:text-silk-amber transition-colors"
         >
           ← {t('customOrders.back')}
         </button>
@@ -155,7 +155,7 @@ const CustomOrders = () => {
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
             />
           </div>
           <div>
@@ -168,7 +168,7 @@ const CustomOrders = () => {
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
             />
           </div>
         </div>
@@ -184,7 +184,7 @@ const CustomOrders = () => {
               value={formData.phone}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
             />
           </div>
           {orderType === 'b2b-manufacturing' && (
@@ -198,7 +198,7 @@ const CustomOrders = () => {
                 value={formData.company}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
               />
             </div>
           )}
@@ -216,7 +216,7 @@ const CustomOrders = () => {
               onChange={handleInputChange}
               required
               min="1"
-              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
             />
           </div>
           <div>
@@ -228,7 +228,7 @@ const CustomOrders = () => {
               value={formData.timeline}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
             >
               <option value="">{t('customOrders.form.selectTimeline')}</option>
               {timelines.map(timeline => (
@@ -250,7 +250,7 @@ const CustomOrders = () => {
             onChange={handleInputChange}
             rows={6}
             placeholder={t('customOrders.form.messagePlaceholder')}
-            className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-500 focus:border-transparent transition-all resize-none"
+            className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all resize-none"
           />
         </div>
 
@@ -258,14 +258,14 @@ const CustomOrders = () => {
           <button
             type="button"
             onClick={() => setStep(1)}
-            className="px-6 py-3 text-navy hover:text-silk-500 transition-colors"
+            className="px-6 py-3 text-navy hover:text-silk-amber transition-colors"
           >
             ← {t('customOrders.back')}
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-8 py-3 bg-navy text-white hover:bg-silk-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3 bg-navy text-white hover:bg-silk-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-navy-hover:text-white"
           >
             {isSubmitting ? t('customOrders.submitting') : t('customOrders.submit')}
           </button>
@@ -319,7 +319,7 @@ const CustomOrders = () => {
               });
               setIsSubmitted(false);
             }}
-            className="px-6 py-3 bg-navy text-white hover:bg-silk-500 transition-colors"
+            className="px-6 py-3 bg-navy text-white hover:bg-silk-gold transition-colors"
           >
             {t('customOrders.success.newRequest')}
           </button>
@@ -339,32 +339,32 @@ const CustomOrders = () => {
       <div className="max-w-6xl mx-auto px-6">
         {/* Progress Indicator */}
         <div className="flex justify-center mb-12">
-          <div className="flex items-center space-x-8">
-            <div className={`flex items-center space-x-3 ${step >= 1 ? 'text-navy' : 'text-navy/40'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+          <div className="flex items-center space-x-2 sm:space-x-8 w-full max-w-2xl px-2 sm:px-0">
+            <div className={`flex items-center space-x-2 sm:space-x-3 ${step >= 1 ? 'text-navy' : 'text-navy/40'}`}>
+              <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-sm font-medium ${
                 step >= 1 ? 'bg-navy text-white' : 'bg-navy/20 text-navy'
               }`}>
                 1
               </div>
-              <span>{t('customOrders.progress.step1')}</span>
+              <span className="hidden sm:inline">{t('customOrders.progress.step1')}</span>
             </div>
-            <div className="w-16 h-1 bg-navy/20"></div>
-            <div className={`flex items-center space-x-3 ${step >= 2 ? 'text-navy' : 'text-navy/40'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+            <div className="flex-1 sm:w-16 h-1 bg-navy/20"></div>
+            <div className={`flex items-center space-x-2 sm:space-x-3 ${step >= 2 ? 'text-navy' : 'text-navy/40'}`}>
+              <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-sm font-medium ${
                 step >= 2 ? 'bg-navy text-white' : 'bg-navy/20 text-navy'
               }`}>
                 2
               </div>
-              <span>{t('customOrders.progress.step2')}</span>
+              <span className="hidden sm:inline">{t('customOrders.progress.step2')}</span>
             </div>
-            <div className="w-16 h-1 bg-navy/20"></div>
-            <div className={`flex items-center space-x-3 ${step >= 3 ? 'text-navy' : 'text-navy/40'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+            <div className="flex-1 sm:w-16 h-1 bg-navy/20"></div>
+            <div className={`flex items-center space-x-2 sm:space-x-3 ${step >= 3 ? 'text-navy' : 'text-navy/40'}`}>
+              <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-sm font-medium ${
                 step >= 3 ? 'bg-navy text-white' : 'bg-navy/20 text-navy'
               }`}>
                 3
               </div>
-              <span>{t('customOrders.progress.step3')}</span>
+              <span className="hidden sm:inline">{t('customOrders.progress.step3')}</span>
             </div>
           </div>
         </div>

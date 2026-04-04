@@ -11,19 +11,19 @@
 
 /* ─── CSS Variables ─────────────────────────────────── */
 :root {
-  --color-silk-gold:    #bf7a45;
-  --color-silk-light:   #edd5be;
-  --color-obsidian:     #0d0d0d;
-  --color-obsidian-soft:#1a1a1a;
-  --color-ivory:        #f9f4ee;
-  --color-ivory-warm:   #f2e9dc;
+  --color-silk-gold:    #ffae42;
+  --color-silk-light:   #f0a800;
+  --color-obsidian:     #0B2545;
+  --color-obsidian-soft:#0F3060;
+  --color-ivory:        #ffffff;
+  --color-ivory-warm:   #E8F4FD;
 
   --font-display: 'Cormorant Garamond', serif;
   --font-body:    'Jost', sans-serif;
   --font-accent:  'Cinzel', serif;
 
   --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow-silk: 0 4px 32px rgba(191, 122, 69, 0.12);
+  --shadow-silk: 0 4px 32px rgba(255, 174, 66, 0.12);
 }
 
 /* ─── Base Reset & Defaults ─────────────────────────── */
@@ -36,8 +36,8 @@ html {
 
 body {
   font-family: var(--font-body);
-  background-color: var(--color-ivory);
-  color: var(--color-obsidian);
+  background-color: theme('colors.white');
+  color: theme('colors.navy.DEFAULT');
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;

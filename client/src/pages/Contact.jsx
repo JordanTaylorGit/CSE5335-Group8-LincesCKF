@@ -37,7 +37,7 @@ export default function Contact() {
           </p>
           <button
             onClick={() => setSubmitted(false)}
-            className="px-8 py-3 bg-navy text-white hover:bg-silk-500 transition-colors"
+            className="px-8 py-3 bg-navy text-white hover:bg-silk-gold transition-colors"
           >
             {t('contact.success.sendAnother')}
           </button>
@@ -180,7 +180,7 @@ export default function Contact() {
 
               <button
                 type="submit"
-                className="w-full px-8 py-3 bg-navy text-white hover:bg-silk-500 transition-colors"
+                className="w-full px-8 py-3 bg-navy text-white hover:bg-silk-gold transition-colors"
               >
                 {t('contact.form.submit')}
               </button>

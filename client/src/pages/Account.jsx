@@ -70,15 +70,15 @@ function AccountSettings() {
     }
   }
 
-  const inputCls = 'w-full bg-zinc-100 rounded-md px-4 py-2.5 text-sm text-obsidian outline-none font-body';
-  const labelCls = 'block text-sm font-medium text-obsidian mb-1';
+  const inputCls = 'w-full bg-zinc-100 rounded-md px-4 py-2.5 text-sm text-navy outline-none font-body';
+  const labelCls = 'block text-sm font-medium text-navy mb-1';
 
   return (
     <div className="space-y-12">
 
       {/* Profile Details */}
       <section>
-        <h2 className="font-display text-xl mb-6 text-obsidian">{t('account.profile_details')}</h2>
+        <h2 className="font-display text-xl mb-6 text-navy">{t('account.profile_details')}</h2>
         <form onSubmit={handleProfileSave} className="space-y-4 max-w-md" noValidate>
           {isBrand ? (
             <div>
@@ -108,7 +108,7 @@ function AccountSettings() {
           {profileMsg && (
             <p role="alert" className={`text-sm ${profileMsg === t('account.profile_saved') ? 'text-green-600' : 'text-red-500'}`}>{profileMsg}</p>
           )}
-          <button type="submit" disabled={profileBusy} className="px-6 py-2.5 bg-obsidian text-white text-sm rounded-md font-body disabled:opacity-50 cursor-pointer">
+          <button type="submit" disabled={profileBusy} className="px-6 py-2.5 bg-navy text-white text-sm rounded-md font-body disabled:opacity-50 cursor-pointer">
             {profileBusy ? t('account.saving') : t('account.save_changes')}
           </button>
         </form>
@@ -116,7 +116,7 @@ function AccountSettings() {
 
       {/* Change Password */}
       <section>
-        <h2 className="font-display text-xl mb-6 text-obsidian">{t('account.change_password')}</h2>
+        <h2 className="font-display text-xl mb-6 text-navy">{t('account.change_password')}</h2>
         <form onSubmit={handlePasswordChange} className="space-y-4 max-w-md" noValidate>
           <div>
             <label htmlFor="s-current-pw" className={labelCls}>{t('account.current_password')}</label>
@@ -133,7 +133,7 @@ function AccountSettings() {
           {pwMsg && (
             <p role="alert" className={`text-sm ${pwMsg === t('account.password_changed') ? 'text-green-600' : 'text-red-500'}`}>{pwMsg}</p>
           )}
-          <button type="submit" disabled={pwBusy} className="px-6 py-2.5 bg-obsidian text-white text-sm rounded-md font-body disabled:opacity-50 cursor-pointer">
+          <button type="submit" disabled={pwBusy} className="px-6 py-2.5 bg-navy text-white text-sm rounded-md font-body disabled:opacity-50 cursor-pointer">
             {pwBusy ? t('account.updating') : t('account.update_password')}
           </button>
         </form>
@@ -170,13 +170,13 @@ function AccountNotifications() {
 
   return (
     <div>
-      <h2 className="font-display text-xl mb-6 text-obsidian">{t('account.notification_prefs')}</h2>
+      <h2 className="font-display text-xl mb-6 text-navy">{t('account.notification_prefs')}</h2>
       <div className="max-w-md space-y-1">
         {channels.map(({ key, label, desc }) => (
           <div key={key} className="flex items-center justify-between py-4 border-b border-zinc-100">
             <div>
-              <p className="text-sm font-medium text-obsidian">{label}</p>
-              <p className="text-xs text-obsidian/50 mt-0.5">{desc}</p>
+              <p className="text-sm font-medium text-navy">{label}</p>
+              <p className="text-xs text-navy/50 mt-0.5">{desc}</p>
             </div>
             <button
               type="button"
@@ -184,7 +184,7 @@ function AccountNotifications() {
               aria-checked={prefs[key]}
               aria-label={label}
               onClick={() => toggle(key)}
-              className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ml-4 ${prefs[key] ? 'bg-obsidian' : 'bg-zinc-300'}`}
+              className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ml-4 ${prefs[key] ? 'bg-navy' : 'bg-zinc-300'}`}
             >
               <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${prefs[key] ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
@@ -195,7 +195,7 @@ function AccountNotifications() {
           <p role="alert" className={`text-sm pt-2 ${msg === t('account.prefs_saved') ? 'text-green-600' : 'text-red-500'}`}>{msg}</p>
         )}
         <div className="pt-4">
-          <button onClick={handleSave} disabled={busy} className="px-6 py-2.5 bg-obsidian text-white text-sm rounded-md font-body disabled:opacity-50 cursor-pointer">
+          <button onClick={handleSave} disabled={busy} className="px-6 py-2.5 bg-navy text-white text-sm rounded-md font-body disabled:opacity-50 cursor-pointer">
             {busy ? t('account.saving') : t('account.save_prefs')}
           </button>
         </div>
@@ -218,7 +218,7 @@ export default function Account() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-20">
-      <h1 className="font-display text-4xl md:text-5xl text-obsidian mb-12">{t('account.title')}</h1>
+      <h1 className="font-display text-4xl md:text-5xl text-navy mb-12">{t('account.title')}</h1>
 
       <div className="flex flex-col md:flex-row gap-12">
         {/* Sidebar */}
@@ -231,7 +231,7 @@ export default function Account() {
                 key={tab.path}
                 to={href}
                 className={`block font-body text-sm tracking-wider py-2 border-b border-transparent ${
-                  active ? 'text-silk-600 border-silk-400' : 'text-obsidian/60 hover:text-obsidian'
+                  active ? 'text-silk-amber border-silk-amber' : 'text-navy/60 hover:text-navy'
                 }`}
               >
                 {t(`account.${tab.label}`)}
@@ -240,7 +240,7 @@ export default function Account() {
           })}
           <button
             onClick={logout}
-            className="block w-full text-left font-body text-sm text-obsidian/40 hover:text-red-400 py-2 mt-4 transition-colors"
+            className="block w-full text-left font-body text-sm text-navy/40 hover:text-red-400 py-2 mt-4 transition-colors"
           >
             {t('nav.logout')}
           </button>
