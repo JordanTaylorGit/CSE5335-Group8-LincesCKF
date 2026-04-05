@@ -343,7 +343,6 @@ I have a React + Tailwind component for a multi-step progress indicator that ove
 I replaced custom Tailwind colors (obsidian, ivory, silk-500) with new theme values (navy, silk-amber, silk-gold). How do I ensure consistency across all React components and avoid leftover old styles?
 
 ### Hareesh:
-### Hareesh:
 Describe design for a product catalog with category filtering using React Context API.
 
 For the cart, describe Context to add, update quantity, and remove items, along with cart message.
