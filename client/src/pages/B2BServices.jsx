@@ -55,7 +55,7 @@ function Eyebrow({ text, dark = false }) {
       fontSize: '0.6rem',
       letterSpacing: '0.32em',
       textTransform: 'uppercase',
-      color: dark ? '#B8D4E8' : '#eb9605',
+      color: dark ? '#B8D4E8' : '#0B2545',
       marginBottom: 12,
     }}>
       {text}

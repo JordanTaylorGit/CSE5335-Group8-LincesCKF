@@ -11,7 +11,7 @@ import HeroSection from '../components/home/HeroSection';
 import ProductCard from '../components/shared/ProductCard';
 import { getFeaturedProducts } from '../data/products';
 
-// ─── updated featured products ───────────────────────────────────────────────────
+// ─── Call to get featured products ───────────────────────────────────────────────────
 const FEATURED_PRODUCTS = getFeaturedProducts();
 
 // ─── B2B feature cards ────────────────────────────────────────────────────────
@@ -42,7 +42,7 @@ function Eyebrow({ text, dark = false }) {
       fontSize: '0.6rem',
       letterSpacing: '0.32em',
       textTransform: 'uppercase',
-      color: dark ? '#B8D4E8' : '#C8102E',
+      color: dark ? '#B8D4E8' : '#0B2545',
       marginBottom: 12,
     }}>
       {text}
@@ -110,10 +110,10 @@ export default function HomePage() {
 
   return (
     <main>
-      {/* ══ 1. HERO (silk red) ════════════════════════════════════════════════ */}
+      {/* ══ 1. Hero section ════════════════════════════════════════════════ */}
       <HeroSection />
 
-      {/* ══ 2. FEATURED PRODUCTS (white bg) ══════════════════════════════════ */}
+      {/* ══ 2. Featured products section ══════════════════════════════════ */}
       <section className="py-24 px-6" style={{ background: '#ffffff' }}>
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4">
@@ -152,7 +152,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ 3. B2B OVERVIEW (navy bg) ════════════════════════════════════════ */}
+      {/* ══ 3. B2B section ════════════════════════════════════════ */}
       <section className="py-24 px-6" style={{ background: '#0B2545' }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -202,7 +202,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ 4. QUOTE CTA BANNER (sky-blue bg) ═══════════════════════════════ */}
+      {/* ══ 4. Quote/Cta section ═══════════════════════════════ */}
       <section
         className="py-20 px-6 text-center"
         style={{ background: '#ffffff', borderTop: '1px solid #B8D4E8', borderBottom: '1px solid #B8D4E8' }}
