@@ -3,21 +3,30 @@
 
 A bilingual (English/Spanish) e-commerce platform for a premium silk garment brand, featuring **Direct-to-Consumer** sales and **B2B Manufacturing Services**. Built with React 18 for Phase 2, with a backend API integration planned for Phase 3.
 
+
+---
+## Login Information
+
+Click on the Login Page and Register, if you are a new user. Enter all the details in the form and click Submit. 
+After registering, enter the same details in the Login page. 
+Once logged in, to view the Account details page, click 'My Account' in the Nav Bar.
+This page allows the user to view their account details and change the password if required.
+
 ---
 
-## 👥 Team
+## Team
 
 | # | Student | Responsibilities |
 |---|---------|-----------------|
-| 1 | Velupula, Lakshmi | Authentication (login/register/account), AuthContext, AuthModal, protected routes |
-| 2 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
-| 3 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
-| 4 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, README |
+| 1 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, README |
+| 2 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, protected routes |
+| 3 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
+| 4 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
 | 5 | Poudel, Ishan | Custom orders page, contact page, about page, LanguageContext |
 
 ---
 
-## ☁️ Hosting
+## Hosting
 
 | Phase | Host | URL |
 |-------|------|-----|
@@ -26,7 +35,7 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 
 ---
 
-## 🧵 Project Overview
+## Project Overview
 
 **Linces'CKF** is a luxury silk garment brand serving two customer segments:
 
@@ -38,7 +47,7 @@ The platform is fully bilingual — all UI strings, product names, descriptions,
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
@@ -52,7 +61,7 @@ The platform is fully bilingual — all UI strings, product names, descriptions,
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 lincesckf/
@@ -115,7 +124,7 @@ lincesckf/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js ≥ 18.x
@@ -148,7 +157,7 @@ npm run preview
 
 ## 🌐 Features
 
-### ✅ Phase 2 — React Frontend
+### Phase 2 — React Frontend
 
 - [x] Bilingual UI (EN/ES) with language toggle — persists via localStorage
 - [x] Fully responsive design — mobile, tablet, and desktop layouts
@@ -166,7 +175,7 @@ npm run preview
 - [ ] Account dashboard with order histoy
 - [x] Checkout call to action
 
-### 🔧 Phase 3 — Backend Integration TODOs
+### Phase 3 — Backend Integration TODOs
 
 - [ ] Replace mock `AuthContext` with real API calls (`POST /api/auth/login`, `POST /api/auth/register`)
 - [ ] Replace `data/products.js` static data with API (`GET /api/products`, `GET /api/products/:id`)
@@ -181,7 +190,7 @@ npm run preview
 
 ---
 
-## 🎨 Design System
+## Design System
 
 The design system uses a combination of Tailwind CSS custom tokens (defined in `tailwind.config.js`) and inline styles using the same hex values. Both approaches are in use across the codebase. Teammates should use either consistently within their files.
 
@@ -219,7 +228,7 @@ Pages follow a consistent alternating section pattern:
 
 ---
 
-## 🌍 Internationalization
+## Internationalization
 
 All UI strings are managed in a single file: `src/i18n/translations.js`. Both English and Spanish strings live side by side.
 
@@ -237,7 +246,7 @@ const description = i18n.language === 'es' ? product.descriptionEs : product.des
 
 ---
 
-## 📡 API Contract (Phase 3)
+## API Contract (Phase 3)
 
 ```
 POST   /api/auth/login              Login with email + password
@@ -254,7 +263,7 @@ POST   /api/contact                 Submit contact form message
 
 ---
 
-## 👥 Contributing
+## Contributing
 
 1. Branch from `main` using `feature/`, `fix/`, or `chore/` prefixes
 2. All new UI strings must be added to `translations.js` in both EN and ES
@@ -262,3 +271,19 @@ POST   /api/contact                 Submit contact form message
 4. Test across mobile, tablet, and desktop before merging
 
 ---
+
+## AI Queries Used
+
+Jordan:
+Generate just essential scaffolding for multi phase e-commerce web development project. Phase 1 was planning and design. Phase 2 front-end. Phase 3 back end. Phase 4 integration. Phase 1 is completed by time, we are on phase 2 front-end. Linces'CKF is a bilingual (Spanish/English) e -commerce platform for a premium silk garment brand that offers two main business lines:
+1. Direct-to-Consumer Sales
+2. B2B Manufacturing Services
+Describe best practices for implementing hero section and b2b process steps into Linces'CKF home page and b2b services page respectively. Hero section and process steps must ensure responsive design across platforms
+
+Lakshmi Priya: 
+Suggest guidelines on how to fix vite errors after initial scaffolding
+Describe the best way to design a login page for a Customer and a Brand with validations
+How to make the login page consistent with the color theme?
+
+Ishan:
+have a React + Tailwind component for a multi-step progress indicator that overflows horizontally on mobile (step 3 causes scrolling). How can I make it fully responsive and prevent overflow while keeping steps aligned properly?  I replaced custom Tailwind colors (obsidian, ivory, silk-500) with new theme values (navy, silk-amber, silk-gold). How do I ensure consistency across all React components and avoid leftover old styles?
