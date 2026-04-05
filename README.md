@@ -7,10 +7,10 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 ---
 ## Login Information
 
-Click on the Login Page and Register, if you are a new user. Enter all the details in the form and click Submit. 
-After registering, enter the same details in the Login page. 
-Once logged in, to view the Account details page, click 'My Account' in the Nav Bar.
-This page allows the user to view their account details and change the password if required.
+- Click on the Login Page and Register, if you are a new user. Enter all the details in the form and click Submit. 
+- After registering, enter the same details in the Login page. 
+- Once logged in, to view the Account details page, click 'My Account' in the Nav Bar.
+- This page allows the user to view their account details and change the password if required.
 
 ---
 
@@ -18,7 +18,7 @@ This page allows the user to view their account details and change the password 
 
 | # | Student | Responsibilities |
 |---|---------|-----------------|
-| 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, protected routes |
+| 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, Project Regression Testing, collaborated in drafting README |
 | 2 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
 | 3 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
 | 4 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, README |
@@ -162,21 +162,20 @@ npm run preview
 
 ### Phase 2 — React Frontend
 
-Bilingual UI (EN/ES) with language toggle — persists via localStorage
-Fully responsive design — mobile, tablet, and desktop layouts
-Authentication — login, register, logout with localStorage session persistence
-Shopping cart — add, remove, quantity controls, color/size tracking, toast notifications
-Product catalog — category filters, responsive grid, bilingual product names
-Product detail pages — color swatch selection, size selection, bilingual name and description
-Cart badge — live count reflecting total quantity across all items
-Responsive navigation — desktop nav + mobile hamburger menu
-Home page — hero, featured products, B2B overview, quote CTA
-B2B Services page — service cards, process steps, quote CTA
-Custom Orders page — 3-step order type selection and form flow
-Contact page — contact form with subject selection
-Consistent design system across all pages (see Design System section)
-Account dashboard with order history
-Checkout call to action
+- Bilingual UI (EN/ES) with language toggle — persists via localStorage
+- Fully responsive design — mobile, tablet, and desktop layouts
+- Authentication — login, register, logout with localStorage session persistence
+- Shopping cart — add, remove, quantity controls, color/size tracking, toast notifications
+- Product catalog — category filters, responsive grid, bilingual product names
+- Product detail pages — color swatch selection, size selection, bilingual name and description
+- Cart badge — live count reflecting total quantity across all items
+- Responsive navigation — desktop nav + mobile hamburger menu
+- Home page — hero, featured products, B2B overview, quote CTA
+- B2B Services page — service cards, process steps, quote CTA
+- Custom Orders page — 3-step order type selection and form flow
+- Contact page — contact form with subject selection
+- Consistent design system across all pages (see Design System section)
+- Account Details Page
 
 
 ---
@@ -249,10 +248,6 @@ Tailwind's default breakpoint scale is used throughout:
 
 - Global `:focus-visible` styles are defined in `global.css` using the `silk-gold` token, ensuring keyboard and touch focus indicators are visible on all interactive elements.
 - Minimum tap target sizes are maintained on all buttons and links for touch usability.
-
-### Testing
-
-Per the contributing guidelines, all changes must be tested across mobile, tablet, and desktop before merging. Use browser DevTools device simulation or resize to verify layouts at each breakpoint.
 
 ---
 
