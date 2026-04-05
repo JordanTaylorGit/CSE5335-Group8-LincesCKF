@@ -116,6 +116,8 @@ lincesckf/
 │   │   │   ├── CustomOrders.jsx     # 3-step custom order request flow
 │   │   │   ├── About.jsx            # Brand story, values, team
 │   │   │   └── NotFound.jsx         # 404 page
+│   │   ├── services/
+│   │   │   └── userAuth/            # localstorage of user login for phase 2
 │   │   ├── App.jsx                  # Route definitions
 │   │   └── main.jsx                 # React entry point
 │   ├── index.html
@@ -341,9 +343,10 @@ I have a React + Tailwind component for a multi-step progress indicator that ove
 I replaced custom Tailwind colors (obsidian, ivory, silk-500) with new theme values (navy, silk-amber, silk-gold). How do I ensure consistency across all React components and avoid leftover old styles?
 
 ### Hareesh:
-I am building a React + Vite e-commerce project (Linces’CKF) Product Catalog and Shopping Cart. I want a catalog page with categories on the left and products on the right, including filtering and an “All Products” option. Each product card should have image, name, price, view, and add to cart buttons. The view button should open the correct product details page with description, colors, and sizes.
+### Hareesh:
+Describe design for a product catalog with category filtering using React Context API.
 
-For the cart, use Context API to add items, update quantity if added again, and remove items properly. Also include a small add-to-cart message and make sure the UI is clean, properly aligned, and easy to use.
+For the cart, describe Context to add, update quantity, and remove items, along with cart message.
 
 ### Andy:
 No prompts used for this phase.
