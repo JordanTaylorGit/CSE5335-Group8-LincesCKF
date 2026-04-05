@@ -11,6 +11,8 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 - After registering, enter the same details in the Login page. 
 - Once logged in, to view the Account details page, click 'My Account' in the Nav Bar.
 - This page allows the user to view their account details and change the password if required.
+- Checkout button and call-to-action only work if logged in.
+- Login persists via `localStorage` for phase 2. To be changed in phase 3.
 
 ---
 
@@ -107,7 +109,7 @@ lincesckf/
 │   │   │   ├── Catalog.jsx          # Product grid with category filters
 │   │   │   ├── ProductDetail.jsx    # Product detail with color/size selection + add to cart
 │   │   │   ├── Cart.jsx             # Cart page with CartItem and CartSummary
-│   │   │   ├── Checkout.jsx         # Checkout flow (Phase 3)
+│   │   │   ├── Checkout.jsx         # Checkout call-to-action (requires user login)
 │   │   │   ├── Account.jsx          # User account dashboard
 │   │   │   ├── B2BServices.jsx      # B2B services, process steps, quote CTA
 │   │   │   ├── Contact.jsx          # Contact form and company info
@@ -317,17 +319,31 @@ const description = i18n.language === 'es' ? product.descriptionEs : product.des
 
 ## AI Queries Used
 
-Jordan:
+### Jordan:
 Generate just essential scaffolding for multi phase e-commerce web development project. Phase 1 was planning and design. Phase 2 front-end. Phase 3 back end. Phase 4 integration. Phase 1 is completed by time, we are on phase 2 front-end. Linces'CKF is a bilingual (Spanish/English) e -commerce platform for a premium silk garment brand that offers two main business lines:
 1. Direct-to-Consumer Sales
 2. B2B Manufacturing Services
+
 Describe best practices for implementing hero section and b2b process steps into Linces'CKF home page and b2b services page respectively. Hero section and process steps must ensure responsive design across platforms
 
-Lakshmi Priya: 
+### Lakshmi Priya: 
 Suggest guidelines on how to fix vite errors after initial scaffolding
+
 Describe the best way to design a login and register page for a Customer and a Brand with validations
+
 Suggest how to structure the account details page of a logged in user
+
 How to make the login page consistent with the color theme?
 
-Ishan:
-have a React + Tailwind component for a multi-step progress indicator that overflows horizontally on mobile (step 3 causes scrolling). How can I make it fully responsive and prevent overflow while keeping steps aligned properly?  I replaced custom Tailwind colors (obsidian, ivory, silk-500) with new theme values (navy, silk-amber, silk-gold). How do I ensure consistency across all React components and avoid leftover old styles?
+### Ishan:
+I have a React + Tailwind component for a multi-step progress indicator that overflows horizontally on mobile (step 3 causes scrolling). How can I make it fully responsive and prevent overflow while keeping steps aligned properly?
+
+I replaced custom Tailwind colors (obsidian, ivory, silk-500) with new theme values (navy, silk-amber, silk-gold). How do I ensure consistency across all React components and avoid leftover old styles?
+
+### Hareesh:
+I am building a React + Vite e-commerce project (Linces’CKF) Product Catalog and Shopping Cart. I want a catalog page with categories on the left and products on the right, including filtering and an “All Products” option. Each product card should have image, name, price, view, and add to cart buttons. The view button should open the correct product details page with description, colors, and sizes.
+
+For the cart, use Context API to add items, update quantity if added again, and remove items properly. Also include a small add-to-cart message and make sure the UI is clean, properly aligned, and easy to use.
+
+### Andy:
+No prompts used for this phase.
