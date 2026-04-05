@@ -315,15 +315,6 @@ const description = i18n.language === 'es' ? product.descriptionEs : product.des
 
 ---
 
-## Contributing
-
-1. Branch from `main` using `feature/`, `fix/`, or `chore/` prefixes
-2. All new UI strings must be added to `translations.js` in both EN and ES
-3. Follow the color palette — do not introduce new hex values outside the design system
-4. Test across mobile, tablet, and desktop before merging
-
----
-
 ## AI Queries Used
 
 Jordan:
