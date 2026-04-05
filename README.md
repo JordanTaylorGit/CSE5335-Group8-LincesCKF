@@ -325,7 +325,8 @@ Describe best practices for implementing hero section and b2b process steps into
 
 Lakshmi Priya: 
 Suggest guidelines on how to fix vite errors after initial scaffolding
-Describe the best way to design a login page for a Customer and a Brand with validations
+Describe the best way to design a login and register page for a Customer and a Brand with validations
+Suggest how to structure the account details page of a logged in user
 How to make the login page consistent with the color theme?
 
 Ishan:
