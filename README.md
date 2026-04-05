@@ -18,11 +18,12 @@ This page allows the user to view their account details and change the password 
 
 | # | Student | Responsibilities |
 |---|---------|-----------------|
-| 1 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, README |
-| 2 | Velupula, Lakshmi Priya Priya | Authentication (login/register/account), AuthContext, AuthModal, protected routes |
-| 3 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
-| 4 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
+| 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, protected routes |
+| 2 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
+| 3 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
+| 4 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, README |
 | 5 | Poudel, Ishan | Custom orders page, contact page, about page, LanguageContext |
+
 
 ---
 
@@ -336,7 +337,7 @@ Generate just essential scaffolding for multi phase e-commerce web development p
 2. B2B Manufacturing Services
 Describe best practices for implementing hero section and b2b process steps into Linces'CKF home page and b2b services page respectively. Hero section and process steps must ensure responsive design across platforms
 
-Lakshmi Priya Priya: 
+Lakshmi Priya: 
 Suggest guidelines on how to fix vite errors after initial scaffolding
 Describe the best way to design a login page for a Customer and a Brand with validations
 How to make the login page consistent with the color theme?
