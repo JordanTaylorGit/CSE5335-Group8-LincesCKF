@@ -8,6 +8,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { fetchWithAuth } from "../services/api";
 
 function Checkout() {
   const { cartItems, cartTotal, clearCart } = useCart();
@@ -26,6 +27,7 @@ function Checkout() {
   });
 
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,7 +37,7 @@ function Checkout() {
     }));
   };
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
 
     if (cartItems.length === 0) {
@@ -43,12 +45,32 @@ function Checkout() {
       return;
     }
 
-    setOrderPlaced(true);
-    clearCart();
+    setIsSubmitting(true);
+    try {
+      await fetchWithAuth('/orders', {
+        method: 'POST',
+        body: JSON.stringify({
+          items: cartItems,
+          totalAmount: cartTotal,
+          shippingAddress: {
+            fullName: formData.fullName,
+            address: formData.address,
+            city: formData.city,
+            zipCode: formData.zipCode
+          }
+        })
+      });
 
-    setTimeout(() => {
-      navigate("/");
-    }, 2500);
+      setOrderPlaced(true);
+      clearCart();
+
+      setTimeout(() => {
+        navigate("/");
+      }, 2500);
+    } catch (err) {
+      alert(err.message || 'Error placing order');
+      setIsSubmitting(false);
+    }
   };
 
   if (orderPlaced) {
@@ -175,9 +197,10 @@ function Checkout() {
 
             <button
               type="submit"
-              className="w-full bg-black text-white rounded-lg px-4 py-3 font-medium hover:opacity-90 transition"
+              disabled={isSubmitting}
+              className="w-full bg-black text-white rounded-lg px-4 py-3 font-medium hover:opacity-90 transition disabled:opacity-50"
             >
-              Place Order
+              {isSubmitting ? 'Processing...' : 'Place Order'}
             </button>
           </form>
         </div>
@@ -196,7 +219,7 @@ function Checkout() {
                 >
                   <div className="flex items-center gap-3">
                     <img
-                      src={item.image}
+                      src={item.images ? JSON.parse(item.images)[0] : item.image}
                       alt={item.name}
                       className="w-16 h-16 object-cover rounded-lg"
                     />

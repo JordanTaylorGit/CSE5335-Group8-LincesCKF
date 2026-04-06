@@ -5,14 +5,21 @@
  * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import ProductCard from "../components/shared/ProductCard";
-import products from "../data/products";
+import { fetchWithAuth } from "../services/api";
 
 function Catalog() {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetchWithAuth('/products')
+      .then(data => setProducts(data))
+      .catch(err => console.error("Error fetching products:", err));
+  }, []);
 
   const categories = ["all", ...new Set(products.map((p) => p.category))];
 

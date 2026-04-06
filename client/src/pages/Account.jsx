@@ -6,10 +6,11 @@
  */
 
 // Account Page — authenticated user dashboard
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@context/AuthContext';
+import { fetchWithAuth } from '../services/api';
 
 /* ── Profile ─────────────────────────────────────────────────── */
 function AccountProfile() {
@@ -204,9 +205,45 @@ function AccountNotifications() {
   );
 }
 
+/* ── Orders ──────────────────────────────────────────────────── */
+function AccountOrders() {
+  const { t } = useTranslation();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchWithAuth('/orders/my-orders')
+      .then(data => { setOrders(data); setLoading(false); })
+      .catch(err => { console.error(err); setLoading(false); });
+  }, []);
+
+  if (loading) return <p>Loading orders...</p>;
+
+  return (
+    <div>
+      <h2 className="font-display text-xl mb-6 text-navy">My Orders</h2>
+      {orders.length === 0 ? (
+        <p className="text-navy/60">You have no orders yet.</p>
+      ) : (
+        <div className="space-y-4">
+          {orders.map(order => (
+            <div key={order.id} className="p-4 border border-zinc-200 rounded-md">
+              <p className="font-semibold text-navy">Order #{order.id}</p>
+              <p className="text-sm text-navy/70">Total: ${order.totalAmount.toFixed(2)}</p>
+              <p className="text-sm text-navy/70">Status: {order.status}</p>
+              <p className="text-sm text-navy/70 mt-2">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Page shell ──────────────────────────────────────────────── */
 const tabs = [
   { path: '',               label: 'profile'       },
+  { path: 'orders',        label: 'orders'        },
   { path: 'settings',      label: 'settings'      },
   { path: 'notifications', label: 'notifications' },
 ];
@@ -250,6 +287,7 @@ export default function Account() {
         <div className="flex-1">
           <Routes>
             <Route path="/"              element={<AccountProfile      />} />
+            <Route path="orders"         element={<AccountOrders       />} />
             <Route path="settings"       element={<AccountSettings     />} />
             <Route path="notifications"  element={<AccountNotifications />} />
           </Routes>

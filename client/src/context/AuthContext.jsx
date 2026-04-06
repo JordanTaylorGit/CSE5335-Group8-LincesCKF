@@ -6,27 +6,26 @@
  */
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { loginUser, registerUser, getStoredSession, storeSession, updateUserProfile, updateUserPassword, updateUserNotifications } from '../services/userAuth';
+import { authService } from '../services/userAuth';
+import { fetchWithAuth } from '../services/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => getStoredSession());
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Keep localStorage in sync whenever user changes
   useEffect(() => {
-    storeSession(user);
-  }, [user]);
+    authService.getCurrentUser().then(u => {
+      setUser(u);
+      setLoading(false);
+    });
+  }, []);
 
-  /**
-   * Login with email + password.
-   * @returns {{ success: boolean, message?: string }}
-   */
   async function login({ email, password }) {
     setLoading(true);
     try {
-      const u = await loginUser({ email, password });
+      const u = await authService.login(email, password);
       setUser(u);
       return { success: true, user: u };
     } catch (err) {
@@ -36,27 +35,11 @@ export function AuthProvider({ children }) {
     }
   }
 
-  /**
-   * Register a new account.
-   * @param {{ email, password, accountType, firstName, lastName, companyName, phone, preferredLanguage }}
-   * @returns {{ success: boolean, message?: string }}
-   */
-  async function register({
-    email,
-    password,
-    accountType = 'CUSTOMER',
-    firstName = '',
-    lastName = '',
-    companyName = '',
-    phone = '',
-  }) {
+  async function register({ email, password, accountType = 'CUSTOMER', firstName = '', lastName = '', companyName = '', phone = '' }) {
     setLoading(true);
     try {
-      const u = await registerUser({
-        email, password, accountType,
-        firstName, lastName, companyName, phone,
-      });
-      setUser(u); // auto-login after successful registration
+      const u = await authService.register({ email, password, accountType, firstName, lastName, companyName, phone });
+      setUser(u);
       return { success: true };
     } catch (err) {
       return { success: false, message: err?.message || 'Registration failed. Please try again.' };
@@ -65,40 +48,30 @@ export function AuthProvider({ children }) {
     }
   }
 
-  /** Update profile details. */
   async function updateProfile({ firstName, lastName, companyName, phone, email }) {
     try {
-      const updated = await updateUserProfile({ id: user.id, firstName, lastName, companyName, phone, email });
-      setUser(updated);
+      await fetchWithAuth('/users/profile', {
+        method: 'PUT',
+        body: JSON.stringify({ firstName, lastName, companyName, phone, email })
+      });
+      setUser({ ...user, firstName, lastName, companyName, phone, email });
       return { success: true };
     } catch (err) {
       return { success: false, message: err?.message || 'Failed to update profile.' };
     }
   }
 
-  /** Change password. */
   async function updatePassword({ currentPassword, newPassword }) {
-    try {
-      await updateUserPassword({ id: user.id, currentPassword, newPassword });
-      return { success: true };
-    } catch (err) {
-      return { success: false, message: err?.message || 'Failed to update password.' };
-    }
+    // Requires a PUT /api/users/password endpoint.
+    return { success: false, message: 'Password update not fully implemented in barebones backend.' };
   }
 
-  /** Save notification preferences. */
   async function updateNotifications(notifications) {
-    try {
-      const updated = await updateUserNotifications({ id: user.id, notifications });
-      setUser(updated);
-      return { success: true };
-    } catch (err) {
-      return { success: false, message: err?.message || 'Failed to save preferences.' };
-    }
+    return { success: false, message: 'Notification update not fully implemented in barebones backend.' };
   }
 
-  /** Clear session and log out. */
   function logout() {
+    authService.logout();
     setUser(null);
   }
 

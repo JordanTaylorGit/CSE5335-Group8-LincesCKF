@@ -7,12 +7,10 @@
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import HeroSection from '../components/home/HeroSection';
 import ProductCard from '../components/shared/ProductCard';
-import { getFeaturedProducts } from '../data/products';
-
-// ─── updated featured products ───────────────────────────────────────────────────
-const FEATURED_PRODUCTS = getFeaturedProducts();
+import { fetchWithAuth } from '../services/api';
 
 // ─── B2B feature cards ────────────────────────────────────────────────────────
 const B2B_FEATURES = [
@@ -107,6 +105,13 @@ function B2BFeatureCard({ feature, index }) {
 // ─── Main HomePage ────────────────────────────────────────────────────────────
 export default function HomePage() {
   const { t } = useTranslation();
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+
+  useEffect(() => {
+    fetchWithAuth('/products')
+      .then(data => setFeaturedProducts(data.slice(0, 4)))
+      .catch(err => console.error("Error fetching featured products:", err));
+  }, []);
 
   return (
     <main>
@@ -147,7 +152,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-wrap gap-8">
-            {FEATURED_PRODUCTS.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
+            {featuredProducts.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
           </div>
         </div>
       </section>
