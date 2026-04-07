@@ -9,7 +9,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── CSS Variables ─────────────────────────────────── */
+/* ─── CSS Variables ─────────────────────────────────── 
+// Below are the chosen colors, fonts, and animations for the website theme and CSS Values.
+// COLOR ROLES:
+//   silk-red   : #C8102E hero section BACKGROUND ONLY (never as text)
+//   silk-amber : #d4900a accent on white/light sections (eyebrows, prices, active states)
+//   silk-gold  : #ffae42 accent on dark navy sections (buttons, highlights)
+//   navy       : #0B2545 all body text and dark backgrounds
+//   sky-light  : #E8F4FD light subsection backgrounds
+//   sky-mid    : #B8D4E8 borders, dividers, icon strokes
+//
+// Usage examples:
+//   bg-silk-red          hero bg only
+//   text-silk-amber      eyebrow labels, prices, active navigation on white
+//   bg-silk-gold         CTA button on navy bg
+//   hover:bg-navy        button hover
+//   bg-sky-light         subsection bg
+//   border-sky-mid       card borders
+*/
 :root {
   --color-silk-gold:    #ffae42;
   --color-silk-light:   #f0a800;

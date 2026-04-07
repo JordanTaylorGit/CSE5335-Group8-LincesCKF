@@ -116,8 +116,6 @@ lincesckf/
 │   │   │   ├── CustomOrders.jsx     # 3-step custom order request flow
 │   │   │   ├── About.jsx            # Brand story, values, team
 │   │   │   └── NotFound.jsx         # 404 page
-│   │   ├── services/
-│   │   │   └── userAuth/            # localstorage of user login for phase 2
 │   │   ├── App.jsx                  # Route definitions
 │   │   └── main.jsx                 # React entry point
 │   ├── index.html
@@ -347,5 +345,10 @@ Describe design for a product catalog with category filtering using React Contex
 
 For the cart, describe Context to add, update quantity, and remove items, along with cart message.
 
-### Andy:
+### Andy: 
 No prompts used for this phase.
+
+## External websites referenced
+W3 Schools, GeeksforGeeks, StackOverflow, Mozilla MDN Docs.
+
+https://phrase.com/blog/posts/i18n-a-simple-definition/ for i18n Internationalization
