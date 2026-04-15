@@ -118,11 +118,25 @@ app.get('/api/products/:id', (req, res) => {
   });
 });
 
+app.get('/api/products/brand/my-products', authMiddleware, (req, res) => {
+  if (req.user.accountType !== 'BRAND') {
+    return res.status(403).json({ error: 'Access denied: Only brands can view their products' });
+  }
+  db.all(`SELECT * FROM Products WHERE brandId = ? ORDER BY id DESC`, [req.user.id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
 app.post('/api/products', authMiddleware, (req, res) => {
-  // Normally we would check if req.user.accountType === 'ADMIN'
+  // Brand users can create products
+  if (req.user.accountType !== 'BRAND') {
+    return res.status(403).json({ error: 'Access denied: Only brands can create products' });
+  }
   const { name, description, price, category, material, images, stockQuantity, sizes, colors } = req.body;
-  const sql = `INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  db.run(sql, [name, description, price, category, material, JSON.stringify(images), stockQuantity || 0, JSON.stringify(sizes), JSON.stringify(colors)], function(err) {
+  const brandId = req.user.id;
+  const sql = `INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, brandId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  db.run(sql, [name, description, price, category, material, JSON.stringify(images), stockQuantity || 0, JSON.stringify(sizes), JSON.stringify(colors), brandId], function(err) {
     if (err) return res.status(400).json({ error: err.message });
     res.status(201).json({ message: 'Product created', id: this.lastID });
   });

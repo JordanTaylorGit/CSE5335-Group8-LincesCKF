@@ -40,7 +40,9 @@ function initializeSchema() {
       images TEXT,
       stockQuantity INTEGER DEFAULT 0,
       sizes TEXT,
-      colors TEXT
+      colors TEXT,
+      brandId INTEGER,
+      FOREIGN KEY (brandId) REFERENCES Users(id)
     )`);
 
     // Orders Table
