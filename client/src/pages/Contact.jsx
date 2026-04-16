@@ -19,9 +19,20 @@ export default function Contact() {
     message: '',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        setSubmitted(true);
+      }
+    } catch (err) {
+      alert("Failed to submit contact message.");
+    }
   };
 
   if (submitted) {

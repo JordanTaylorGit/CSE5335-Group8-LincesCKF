@@ -71,13 +71,35 @@ const CustomOrders = () => {
     setIsSubmitting(true);
 
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('http://localhost:5000/api/custom-orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        },
+        body: JSON.stringify({
+          orderType,
+          contactInfo: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            company: formData.company
+          },
+          requirements: {
+            quantity: formData.quantity,
+            timeline: formData.timeline,
+            message: formData.message
+          }
+        })
+      });
+
+      if (!response.ok) throw new Error('Submission failed');
       
       setIsSubmitted(true);
       setStep(3);
     } catch (error) {
       console.error('Error submitting form:', error);
+      alert('Failed to submit order request.');
     } finally {
       setIsSubmitting(false);
     }

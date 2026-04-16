@@ -19,8 +19,12 @@ function ProductCard({ product }) {
   navigate(`/product/${product.id}`);
   };
 
-  const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || null);
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
+  const parsedColors = product.colors ? JSON.parse(product.colors) : [];
+  const parsedSizes = product.sizes ? JSON.parse(product.sizes) : [];
+  const parsedImages = product.images ? JSON.parse(product.images) : [];
+
+  const [selectedColor, setSelectedColor] = useState(parsedColors.length > 0 ? { name: parsedColors[0] } : null);
+  const [selectedSize, setSelectedSize] = useState(parsedSizes.length > 0 ? parsedSizes[0] : "");
 
   const handleAddToCart = () => {
     addToCart(product, selectedColor?.name, selectedSize);
@@ -29,7 +33,7 @@ function ProductCard({ product }) {
   return (
     <div className="overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-sm">
       <img
-        src={product.image}
+        src={parsedImages[0] || ''}
         alt={product.name}
         className="h-[280px] w-full object-contain object-top"
       />
@@ -41,7 +45,7 @@ function ProductCard({ product }) {
         </p>
 
         <h3 className="mt-1 text-[14px] font-medium text-slate-900 line-clamp-1">
-          {i18n.language === 'es' ? product.nameEs : product.nameEn}
+          {product.name}
         </h3>
 
         <p className="mt-1 text-[14px] font-semibold text-slate-900">
@@ -51,23 +55,19 @@ function ProductCard({ product }) {
         <div className="mt-2">
           <p className="mb-1 text-[11px] font-medium text-slate-700">{t('product.color')}</p>
           <div className="flex flex-wrap gap-1">
-            {product.colors?.map((color) => (
+            {parsedColors.map((color) => (
               <button
-                key={color.name}
+                key={color}
                 type="button"
-                onClick={() => setSelectedColor(color)}
+                onClick={() => setSelectedColor({ name: color })}
                 className={`inline-flex cursor-pointer items-center gap-1 rounded-md border px-1.5 py-1 text-[10px] transition active:scale-95 ${
-                  selectedColor?.name === color.name
+                  selectedColor?.name === color
                     ? "border-slate-900 bg-slate-900 text-white"
                     : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
                 }`}
-                title={color.name}
+                title={color}
               >
-                <span
-                  className="h-3 w-3 rounded-full border border-gray-300"
-                  style={{ backgroundColor: color.value }}
-                />
-                <span>{i18n.language === 'es' ? color.nameEs : color.name}</span>
+                <span>{color}</span>
               </button>
             ))}
           </div>
@@ -76,7 +76,7 @@ function ProductCard({ product }) {
         <div className="mt-2">
           <p className="mb-1 text-[11px] font-medium text-slate-700">{t('product.size')}</p>
           <div className="flex flex-wrap gap-1">
-            {product.sizes?.map((size) => (
+            {parsedSizes.map((size) => (
               <button
                 key={size}
                 type="button"

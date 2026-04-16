@@ -52,7 +52,12 @@ export function CartProvider({ children }) {
       }
 
       showMessage("Product added to cart");
-      const colorObj = product.colors?.find(c => c.name === selectedColor);
+      let parsedColors = [];
+      try {
+        parsedColors = typeof product.colors === 'string' ? JSON.parse(product.colors) : (product.colors || []);
+      } catch (e) {}
+      
+      const colorObj = parsedColors.find(c => (c.name || c) === selectedColor);
       return [
         ...prevItems,
         {
