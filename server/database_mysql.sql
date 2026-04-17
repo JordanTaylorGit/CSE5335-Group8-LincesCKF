@@ -1,0 +1,92 @@
+
+CREATE DATABASE IF NOT EXISTS lincesckf CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE lincesckf;
+
+-- ── Users ──────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS Users (
+  id              INT AUTO_INCREMENT PRIMARY KEY,
+  firstName       VARCHAR(100),
+  lastName        VARCHAR(100),
+  email           VARCHAR(255) UNIQUE NOT NULL,
+  passwordHash    VARCHAR(255) NOT NULL,
+  phone           VARCHAR(30),
+  accountType     ENUM('CUSTOMER', 'BRAND') DEFAULT 'CUSTOMER',
+  companyName     VARCHAR(255),
+  addresses       JSON,
+  notificationPreferences JSON,
+  createdAt       DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Products ────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS Products (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  name          VARCHAR(255) NOT NULL,
+  nameEs        VARCHAR(255),
+  description   TEXT,
+  descriptionEs TEXT,
+  price         DECIMAL(10,2) NOT NULL,
+  category      VARCHAR(100),
+  material      VARCHAR(255),
+  images        JSON,
+  stockQuantity INT DEFAULT 0,
+  sizes         JSON,
+  colors        JSON,
+  featured      TINYINT(1) DEFAULT 0,
+  brandId       INT,
+  FOREIGN KEY (brandId) REFERENCES Users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Orders ──────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS Orders (
+  id              INT AUTO_INCREMENT PRIMARY KEY,
+  userId          INT,
+  items           JSON NOT NULL,
+  totalAmount     DECIMAL(10,2) NOT NULL,
+  status          VARCHAR(50) DEFAULT 'Pending',
+  shippingAddress JSON,
+  paymentStatus   VARCHAR(50) DEFAULT 'Pending',
+  createdAt       DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── CustomOrders ────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS CustomOrders (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  userId      INT,
+  orderType   VARCHAR(100) NOT NULL,
+  contactInfo JSON,
+  requirements TEXT,
+  status      VARCHAR(50) DEFAULT 'New',
+  createdAt   DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── ContactMessages ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS ContactMessages (
+  id        INT AUTO_INCREMENT PRIMARY KEY,
+  name      VARCHAR(255) NOT NULL,
+  email     VARCHAR(255) NOT NULL,
+  subject   VARCHAR(255),
+  message   TEXT NOT NULL,
+  status    VARCHAR(50) DEFAULT 'Unread',
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- ── Seed Data: Products ─────────────────────────────────────────
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Classic Silk Blouse', 'Elegant 100% pure silk blouse with a tailored fit, perfect for professional or evening wear.', 120.0, 'blouse', '100% Silk', '["https://images.unsplash.com/photo-1564257631407-4deb1f99d992?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 50, '["XS","S","M","L","XL"]', '["White","Navy","Burgundy"]', 1, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('V-Neck Satin Blouse', 'A smooth satin finish blouse with a relaxed v-neckline for effortless elegance.', 95.0, 'blouse', 'Satin Silk Blend', '["https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 40, '["S","M","L"]', '["Black","Rose","Silver"]', 1, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Ruffled Chiffon Blouse', 'Delicate and sheer chiffon blouse with ruffled detailing along the button placket.', 110.0, 'blouse', '100% Silk Chiffon', '["https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 25, '["XS","S","M","L"]', '["Blush","Ivory"]', 1, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Wrap Style Silk Blouse', 'Flattering wrap silhouette with adjustable waist tie and draped long sleeves.', 135.0, 'blouse', '100% Charmeuse Silk', '["https://images.unsplash.com/photo-1551163943-3f6a855d1153?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 35, '["S","M","L","XL"]', '["Emerald","Midnight Blue"]', 1, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Evening Silk Dress', 'A flowing silk maxi dress featuring a cowl neckline and adjustable straps.', 250.0, 'dress', '95% Silk, 5% Elastane', '["https://images.unsplash.com/photo-1539008835657-9e8e9680c956?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 30, '["S","M","L"]', '["Black","Emerald","Champagne"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Slip Silk Midi Dress', 'Classic 90s-inspired slip dress cut on the bias for a beautiful drape.', 195.0, 'dress', '100% Mulberry Silk', '["https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 45, '["XS","S","M","L","XL"]', '["Ruby","Sapphire","Pearl"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Long Sleeve Wrap Dress', 'Sophisticated wrap dress with buttoned cuffs and a graceful asymmetric hem.', 280.0, 'dress', 'Heavyweight Silk Crepe', '["https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 20, '["S","M","L"]', '["Navy","Plum"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Halter Neck Silk Gown', 'Stunning floor-length gown with an open back and elegant halter neckline.', 350.0, 'dress', '100% Silk Charmeuse', '["https://images.unsplash.com/photo-1518622358385-8ea7d0794bf6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 15, '["XS","S","M"]', '["Crimson","Gold","Black"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Essential Silk Shirt', 'A versatile button-down silk shirt for everyday luxury.', 145.0, 'shirt', '100% Washable Silk', '["https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 75, '["XS","S","M","L","XL","XXL"]', '["Ivory","Charcoal","Blush"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Oversized Silk Button-Up', 'Relaxed, borrowed-from-the-boys fit with a beautifully fluid drape.', 160.0, 'shirt', '100% Silk Crepe de Chine', '["https://images.unsplash.com/photo-1598554747436-c9293d6a588f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 60, '["S","M","L"]', '["White","Light Blue","Olive"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Short Sleeve Silk Shirt', 'Breezy short sleeve button-down with a camp collar for warm days.', 125.0, 'shirt', 'Lightweight Silk Blend', '["https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 50, '["S","M","L","XL"]', '["Sand","Navy","Rust"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Pintuck Detail Silk Shirt', 'Tailored shirt featuring intricate pintuck details down the front.', 175.0, 'shirt', '100% Silk Twill', '["https://images.unsplash.com/photo-1589310621855-d9e6571ab42d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 30, '["XS","S","M","L"]', '["Black","Cream"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Printed Silk Scarf', 'A 36" square silk twill scarf featuring an exclusive geometric print.', 65.0, 'scarf', '100% Silk Twill', '["https://images.unsplash.com/photo-1584916201218-f4242ceb4809?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 100, '["One Size"]', '["Geometric Print","Floral Print"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Classic Skinny Silk Scarf', 'A versatile skinny scarf to tie around the neck, hair, or handbag.', 45.0, 'scarf', '100% Silk Charmeuse', '["https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 120, '["One Size"]', '["Leopard","Polka Dot","Solid Black"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Oversized Silk Wrap', 'Generously sized wrap that can be worn as a shawl or oversized scarf.', 110.0, 'scarf', 'Silk Cashmere Blend', '["https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 40, '["One Size"]', '["Camel","Soft Grey","Navy"]', 0, NULL);
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, featured, brandId) VALUES ('Artisan Hand-Dyed Scarf', 'Each piece is uniquely hand-dyed, making no two scarves exactly alike.', 85.0, 'scarf', '100% Habotai Silk', '["https://images.unsplash.com/photo-1601409000833-a44cc9ea43e6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]', 25, '["One Size"]', '["Ocean Blue","Sunset Orange","Amethyst"]', 0, NULL);

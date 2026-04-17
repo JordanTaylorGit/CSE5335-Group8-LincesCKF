@@ -11,6 +11,7 @@ const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState([]);
   const [message, setMessage] = useState("");
   const timerRef = useRef(null);
 
@@ -122,11 +123,16 @@ export function CartProvider({ children }) {
     [cartItems]
   );
 
+  const clearCart = () => {
+  setCart([]);
+};
+
   return (
     <CartContext.Provider
       value={{
         cartItems,
         addToCart,
+        clearCart,
         removeFromCart,
         increaseQuantity,
         decreaseQuantity,

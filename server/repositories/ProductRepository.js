@@ -1,31 +1,38 @@
 const db = require('../config/db');
 
 class ProductRepository {
+
   static findAll() {
     return new Promise((resolve, reject) => {
-      db.all(`SELECT * FROM Products`, [], (err, rows) => {
+      db.query(`SELECT * FROM Products`, (err, results) => {
         if (err) reject(err);
-        else resolve(rows);
+        else resolve(results);
       });
     });
   }
 
   static findByBrand(brandId) {
     return new Promise((resolve, reject) => {
-      db.all(`SELECT * FROM Products WHERE brandId = ?`, [brandId], (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
+      db.query(
+        `SELECT * FROM Products WHERE brandId = ?`,
+        [brandId],
+        (err, results) => {
+          if (err) reject(err);
+          else resolve(results);
+        }
+      );
     });
   }
 
   static create(product) {
     return new Promise((resolve, reject) => {
       const sql = `
-        INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, brandId)
+        INSERT INTO Products 
+        (name, description, price, category, material, images, stockQuantity, sizes, colors, brandId)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      db.run(sql, [
+
+      db.query(sql, [
         product.name,
         product.description,
         product.price,
@@ -36,9 +43,9 @@ class ProductRepository {
         product.sizes ? JSON.stringify(product.sizes) : '[]',
         product.colors ? JSON.stringify(product.colors) : '[]',
         product.brandId
-      ], function(err) {
+      ], (err, result) => {
         if (err) reject(err);
-        else resolve(this.lastID);
+        else resolve(result.insertId);
       });
     });
   }

@@ -107,11 +107,15 @@ export default function HomePage() {
   const { t } = useTranslation();
   const [featuredProducts, setFeaturedProducts] = useState([]);
 
-  useEffect(() => {
-    fetchWithAuth('/products')
-      .then(data => setFeaturedProducts(data.slice(0, 4)))
-      .catch(err => console.error("Error fetching featured products:", err));
-  }, []);
+useEffect(() => {
+  fetch('http://localhost:5001/api/products')
+    .then(res => res.json())
+    .then(data => {
+      if (!Array.isArray(data)) return;
+      setFeaturedProducts(data.slice(0, 4));
+    })
+    .catch(err => console.error("Error fetching products:", err));
+}, []);
 
   return (
     <main>

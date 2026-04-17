@@ -25,7 +25,7 @@ function CartSummary() {
 
         <div className="flex justify-between font-semibold text-lg border-t pt-3">
           <span>{t('cart.totalPrice')}</span>
-          <span>${cartTotal.toFixed(2)}</span>
+          <span>${Number(cartTotal).toFixed(2)}</span>
         </div>
       </div>
 

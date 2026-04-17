@@ -25,7 +25,7 @@ function CartItem({ item }) {
         <p className="mt-1 text-sm text-slate-500">{t('product.color')}: {i18n.language === 'es' ? item.selectedColorEs : item.selectedColor}</p>
         <p className="mt-1 text-sm text-slate-500">{t('product.size')}: {item.selectedSize}</p>
         <p className="mt-3 text-[18px] font-semibold text-slate-900">
-          ${item.price.toFixed(2)}
+          ${Number(item.price).toFixed(2)}
         </p>
       </div>
 

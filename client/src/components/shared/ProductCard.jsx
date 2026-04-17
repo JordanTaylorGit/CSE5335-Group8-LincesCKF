@@ -19,10 +19,21 @@ function ProductCard({ product }) {
   navigate(`/product/${product.id}`);
   };
 
-  const parsedColors = product.colors ? JSON.parse(product.colors) : [];
-  const parsedSizes = product.sizes ? JSON.parse(product.sizes) : [];
-  const parsedImages = product.images ? JSON.parse(product.images) : [];
+  const parseField = (field) => {
+    if (!field) return [];
+    if (Array.isArray(field)) return field; // Already an array
+    try {
+      return JSON.parse(field); // It's a string, so parse it
+    } catch (e) {
+      return [];
+    }
+  };
 
+  const parsedColors = parseField(product.colors);
+  const parsedSizes = parseField(product.sizes);
+  const parsedImages = parseField(product.images);
+
+  const displayPrice = Number(product.price).toFixed(2);
   const [selectedColor, setSelectedColor] = useState(parsedColors.length > 0 ? { name: parsedColors[0] } : null);
   const [selectedSize, setSelectedSize] = useState(parsedSizes.length > 0 ? parsedSizes[0] : "");
 
@@ -49,7 +60,7 @@ function ProductCard({ product }) {
         </h3>
 
         <p className="mt-1 text-[14px] font-semibold text-slate-900">
-          ${product.price.toFixed(2)}
+          ${displayPrice}
         </p>
 
         <div className="mt-2">

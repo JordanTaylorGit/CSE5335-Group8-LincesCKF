@@ -1,28 +1,44 @@
 const db = require('../config/db');
 
 class UserRepository {
+
   static create(user) {
     return new Promise((resolve, reject) => {
-      const sql = `INSERT INTO Users (firstName, lastName, email, passwordHash, phone, accountType, companyName, addresses, notificationPreferences) 
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      const sql = `
+        INSERT INTO Users 
+        (firstName, lastName, email, passwordHash, phone, accountType, companyName, addresses, notificationPreferences) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
       const params = [
-        user.firstName, user.lastName, user.email, user.passwordHash, 
-        user.phone, user.accountType || 'CUSTOMER', user.companyName, 
-        user.addresses, user.notificationPreferences
+        user.firstName,
+        user.lastName,
+        user.email,
+        user.passwordHash,
+        user.phone,
+        user.accountType || 'CUSTOMER',
+        user.companyName,
+        user.addresses,
+        user.notificationPreferences
       ];
-      db.run(sql, params, function(err) {
+
+      db.query(sql, params, (err, result) => {
         if (err) reject(err);
-        else resolve({ id: this.lastID, ...user });
+        else resolve({ id: result.insertId, ...user });
       });
     });
   }
 
   static findByEmail(email) {
     return new Promise((resolve, reject) => {
-      db.get(`SELECT * FROM Users WHERE email = ?`, [email], (err, row) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
+      db.query(
+        `SELECT * FROM Users WHERE email = ?`,
+        [email],
+        (err, results) => {
+          if (err) reject(err);
+          else resolve(results[0]);
+        }
+      );
     });
   }
 }

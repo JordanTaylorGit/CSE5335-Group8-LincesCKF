@@ -8,11 +8,8 @@
 import React from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import { useCart } from '../../context/CartContext';
 
 export default function Layout({ children }) {
-  const { message } = useCart();
-
   return (
     <div className="min-h-screen flex flex-col relative">
       <Navbar />
@@ -20,11 +17,6 @@ export default function Layout({ children }) {
         {children}
       </main>
       <Footer />
-      {message && (
-        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-md shadow-lg z-50 transition-opacity duration-300">
-          {message}
-        </div>
-      )}
     </div>
   );
 }

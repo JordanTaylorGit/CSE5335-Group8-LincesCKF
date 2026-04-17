@@ -47,7 +47,7 @@ function Catalog() {
       return products;
     }
     return products.filter((product) => product.category === selectedCategory);
-  }, [selectedCategory]);
+  }, [selectedCategory, products]);
 
   return (
     <div>
