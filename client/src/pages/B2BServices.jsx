@@ -6,24 +6,25 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import ProcessSteps from '../components/home/ProcessSteps';
 
 const SERVICES = [
   {
     icon: <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><path d="M17 4L4 11V23L17 30L30 23V11L17 4Z" stroke="currentColor" strokeWidth="1.1"/><path d="M17 4v26M4 11l13 7 13-7" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/></svg>,
-    titleKey: 'services.offer1.title', descKey: 'services.offer1.desc', stat: '50+',   statLabel: 'Min. Units',
+    titleKey: 'services.offer1.title', descKey: 'services.offer1.desc', stat: '50+', statLabelKey: 'services.stats.min_units',
   },
   {
     icon: <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><rect x="4" y="8" width="26" height="20" rx="1" stroke="currentColor" strokeWidth="1.1"/><path d="M4 15h26M12 8V6M22 8V6" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/><path d="M10 22h6M10 26h10" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/></svg>,
-    titleKey: 'services.offer2.title', descKey: 'services.offer2.desc', stat: '2–3',   statLabel: 'Weeks',
+    titleKey: 'services.offer2.title', descKey: 'services.offer2.desc', stat: '2–3', statLabelKey: 'services.stats.weeks',
   },
   {
     icon: <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="13" stroke="currentColor" strokeWidth="1.1"/><path d="M17 10v7l5 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>,
-    titleKey: 'services.offer3.title', descKey: 'services.offer3.desc', stat: '3–6',   statLabel: 'Weeks',
+    titleKey: 'services.offer3.title', descKey: 'services.offer3.desc', stat: '3–6', statLabelKey: 'services.stats.weeks',
   },
   {
     icon: <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><path d="M8 28V16l9-8 9 8v12" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/><path d="M13 28v-8h8v8" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/></svg>,
-    titleKey: 'services.offer4.title', descKey: 'services.offer4.desc', stat: '100%', statLabel: 'Private',
+    titleKey: 'services.offer4.title', descKey: 'services.offer4.desc', stat: '100%', statLabelKey: 'services.stats.private',
   },
 ];
 
@@ -69,7 +70,7 @@ function PageHero() {
 
   return (
     <section
-      className="relative flex items-end px-6 pb-20 overflow-hidden"
+      className="services-page__hero relative flex items-end px-6 pb-20 overflow-hidden"
       style={{
         minHeight: '52vh',
         background: `url('https://images.unsplash.com/photo-1684259499086-93cb3e555803?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaWxrJTIwbWFudWZhY3R1cmluZyUyMGZhY3RvcnklMjBwcm9kdWN0aW9ufGVufDF8fHx8MTc2OTk4OTI0Mnww&ixlib=rb-4.1.0&q=80&w=1080') center/cover no-repeat`,
@@ -127,6 +128,7 @@ function ServiceCard({ service, index }) {
 
   return (
     <div
+      className="services-page__card"
       style={{
         flex: '1 1 240px',
         padding: '32px 28px',
@@ -158,7 +160,7 @@ function ServiceCard({ service, index }) {
           textTransform: 'uppercase',
           fontWeight: 400,
         }}>
-          {service.statLabel}
+          {t(service.statLabelKey)}
         </span>
       </div>
 
@@ -192,6 +194,7 @@ function B2BFeatureCard({ feature, index }) {
 
   return (
     <div
+      className="services-page__feature-card"
       style={{
         flex: '1 1 240px',
         padding: '32px 28px',
@@ -232,12 +235,12 @@ export default function ServicesPage() {
   const { t }      = useTranslation();
 
   return (
-    <main style={{ background: '#ffffff' }}>
+    <div className="services-page" style={{ background: '#ffffff' }}>
       {/* ── 1. Page Hero (navy) ── */}
       <PageHero />
 
       {/* ── 2. What We Offer (white) ── */}
-      <section className="py-24 px-6" style={{ background: '#ffffff' }}>
+      <section className="services-page__offers py-24 px-6" style={{ background: '#ffffff' }}>
         <div className="max-w-6xl mx-auto">
           <div className="mb-14">
             <Eyebrow text={t('services.what.eyebrow')} />
@@ -251,7 +254,7 @@ export default function ServicesPage() {
               {t('services.what.heading')}
             </h2>
           </div>
-          <div className="flex flex-wrap gap-5">
+          <div className="services-page__offer-grid flex flex-wrap gap-5">
             {SERVICES.map((s, i) => <ServiceCard key={i} service={s} index={i} />)}
           </div>
         </div>
@@ -262,7 +265,7 @@ export default function ServicesPage() {
 
       {/* ── 4. CTA Section (white) ── */}
       <section
-        className="relative py-24 px-6 overflow-hidden"
+        className="services-page__cta relative py-24 px-6 overflow-hidden"
         style={{ background: '#ffffff' }}
       >
         <div className="relative z-10 max-w-6xl mx-auto text-center">
@@ -290,7 +293,8 @@ export default function ServicesPage() {
             }}>
               {t('b2b.cta.desc')}
             </p>
-            <a href="/contact"
+            <Link
+              to="/custom-orders"
               style={{
                 display: 'inline-block',
                 padding: '16px 32px',
@@ -310,10 +314,10 @@ export default function ServicesPage() {
               onMouseLeave={e => { e.currentTarget.style.background = '#ffae42'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(11,37,69,0.3)'; }}
             >
               {t('b2b.cta.button')}
-            </a>
+            </Link>
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

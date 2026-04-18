@@ -17,7 +17,7 @@ import AuthModal from "../AuthModal.jsx";
 export default function Navbar() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
-  const { cartItems, cartCount, message } = useCart();
+  const { cartCount, message } = useCart();
   const { language, toggleLanguage } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,21 +34,22 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`site-header fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-white shadow-sm" : "bg-white border-b border-sky-mid"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-18 py-4">
+      <div className="site-header__inner max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-18 py-4">
         {/* Logo */}
         <Link
           to="/"
-          className="font-accent text-xl tracking-[0.2em] text-navy hover:text-silk-red transition-colors"
+          className="site-header__logo font-accent text-xl tracking-[0.2em] text-navy hover:text-silk-red transition-colors"
+          aria-label={t("nav.home_label")}
         >
-          LINCES<span className="text-silk-red">'</span>CKF
+          LINCES<span className="text-silk-red">&rsquo;</span>CKF
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="site-header__desktop-nav hidden md:flex items-center gap-8" aria-label={t("nav.primary_navigation")}>
           <NavLink to="/">{t("nav.home")}</NavLink>
           <NavLink to="/catalog">{t("nav.catalog")}</NavLink>
           <NavLink to="/b2b">{t("nav.b2b")}</NavLink>
@@ -58,12 +59,13 @@ export default function Navbar() {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
+        <div className="site-header__actions flex items-center gap-4">
           {/* Language Toggle */}
           <button
             onClick={toggleLanguage}
             className="font-body text-xs tracking-widest uppercase text-navy/60 hover:text-silk-red transition-colors flex items-center gap-1.5"
-            aria-label="Toggle language"
+            aria-label={language === "es" ? t("nav.switch_to_english") : t("nav.switch_to_spanish")}
+            aria-pressed={language === "es"}
           >
             <Globe size={16} strokeWidth={1.5} />
             {language === "es" ? "EN" : "ES"}
@@ -87,7 +89,7 @@ export default function Navbar() {
           <Link
             to="/cart"
             className="relative text-navy hover:text-silk-red transition-colors"
-            aria-label={t("nav.cart")}
+            aria-label={`${t("nav.cart")} (${cartCount})`}
           >
             <ShoppingBag size={20} strokeWidth={1.5} />
             {cartCount > 0 && (
@@ -100,7 +102,7 @@ export default function Navbar() {
             {/* Added to cart toast */}
             {message && (
               <div
-                className="absolute right-0 top-8 z-50 whitespace-nowrap font-body text-xs text-white bg-navy px-3 py-2 shadow-md"
+                className="site-header__toast absolute right-0 top-8 z-50 whitespace-nowrap font-body text-xs text-white bg-navy px-3 py-2 shadow-md"
                 style={{ borderLeft: '3px solid #C8102E', animation: 'fadeUp 0.3s ease forwards' }}
               >
                 {message}
@@ -109,9 +111,11 @@ export default function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden text-navy"
+            className="site-header__menu-toggle md:hidden text-navy"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
+            aria-label={t("nav.toggle_menu")}
+            aria-controls="mobile-navigation"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -122,8 +126,8 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-sky-mid py-6 px-6">
-          <nav className="flex flex-col gap-5">
+        <div id="mobile-navigation" className="site-header__mobile-panel md:hidden bg-white border-t border-sky-mid py-6 px-6">
+          <nav className="flex flex-col gap-5" aria-label={t("nav.mobile_navigation")}>
             <NavLink to="/" mobile>
               {t("nav.home")}
             </NavLink>
@@ -163,6 +167,7 @@ function NavLink({ to, children, mobile }) {
   return (
     <Link
       to={to}
+      aria-current={active ? "page" : undefined}
       className={`font-body text-sm tracking-wider transition-colors ${
         mobile ? "text-lg" : ""
       } ${active ? "text-silk-red" : "text-navy hover:text-silk-red"}`}

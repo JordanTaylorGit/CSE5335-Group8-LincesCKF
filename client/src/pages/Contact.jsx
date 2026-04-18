@@ -8,9 +8,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, Phone, MapPin, CheckCircle } from 'lucide-react';
+import { fetchWithAuth } from '../services/api';
 
 export default function Contact() {
   const { t } = useTranslation();
+  const mapAddress = '123 Silk Street, New York, NY 10001, United States';
+  const encodedMapAddress = encodeURIComponent(mapAddress);
+  const googleMapEmbedUrl = `https://www.google.com/maps?q=${encodedMapAddress}&output=embed`;
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -22,22 +26,19 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      await fetchWithAuth('/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      if (response.ok) {
-        setSubmitted(true);
-      }
+      setSubmitted(true);
     } catch (err) {
-      alert("Failed to submit contact message.");
+      alert(err.message || t('contact.form.error'));
     }
   };
 
   if (submitted) {
     return (
-      <div className="max-w-3xl mx-auto px-6 lg:px-8 py-16">
+      <div className="contact-page contact-page__success max-w-3xl mx-auto px-6 lg:px-8 py-16">
         <div className="text-center">
           <CheckCircle className="w-20 h-20 text-[#10B981] mx-auto mb-6" />
           <h1 className="text-3xl font-serif font-medium text-navy mb-4">
@@ -58,7 +59,7 @@ export default function Contact() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+    <div className="contact-page max-w-7xl mx-auto px-6 lg:px-8 py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-serif font-medium text-navy mb-4">
           {t('contact.title')}
@@ -68,9 +69,9 @@ export default function Contact() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="contact-page__layout grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Contact Information */}
-        <div className="space-y-6">
+        <div className="contact-page__info space-y-6">
           <div className="bg-white rounded-lg border border-navy/20 p-6">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-navy rounded-lg flex items-center justify-center flex-shrink-0">
@@ -121,8 +122,8 @@ export default function Contact() {
         </div>
 
         {/* Contact Form */}
-        <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-navy/20 p-6 md:p-8">
+        <div className="contact-page__form-column lg:col-span-2">
+          <form onSubmit={handleSubmit} className="contact-page__form bg-white rounded-lg border border-navy/20 p-6 md:p-8">
             <h2 className="text-2xl font-serif font-medium text-navy mb-6">
               {t('contact.form.title')}
             </h2>
@@ -200,48 +201,24 @@ export default function Contact() {
         </div>
 
       {/* Map Placeholder */}
-      <div className="lg:col-span-3 mt-4">
-        <div
-          style={{
-            width: '100%',
-            height: 320,
-            background: '#E8F4FD',
-            border: '1px solid #B8D4E8',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 12,
-          }}
-        >
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style={{ color: '#B8D4E8' }}>
-            <path d="M20 4C13.373 4 8 9.373 8 16c0 9 12 20 12 20s12-11 12-20c0-6.627-5.373-12-12-12z" stroke="currentColor" strokeWidth="1.5"/>
-            <circle cx="20" cy="16" r="4" stroke="currentColor" strokeWidth="1.5"/>
-          </svg>
-          <p style={{
-            fontFamily: 'Cinzel, serif',
-            fontSize: '0.65rem',
-            letterSpacing: '0.25em',
-            textTransform: 'uppercase',
-            color: '#0B2545',
-          }}>
-            Map of Location
-          </p>
-          <p style={{
-            fontFamily: 'Jost, sans-serif',
-            fontSize: '0.85rem',
-            color: 'rgba(11,37,69,0.5)',
-          }}>
-            123 Silk Street, Fashion District, NY 10001
-          </p>
-          <p style={{
-            fontFamily: 'Jost, sans-serif',
-            fontSize: '0.75rem',
-            color: 'rgba(11,37,69,0.35)',
-            fontStyle: 'italic',
-          }}>
-            Demonstration map purpose for phase 2
-          </p>
+      <div className="contact-page__map lg:col-span-3 mt-4">
+        <div className="overflow-hidden rounded-lg border border-sky-mid bg-sky-light">
+          <div className="px-5 py-4">
+            <div>
+              <p className="font-accent text-xs uppercase tracking-[0.25em] text-navy">
+                {t('contact.map.title')}
+              </p>
+              <p className="mt-1 text-sm text-navy/60">{mapAddress}</p>
+            </div>
+          </div>
+          <iframe
+            title={t('contact.map.iframeTitle')}
+            src={googleMapEmbedUrl}
+            className="h-[320px] w-full border-0 md:h-[420px]"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
       </div>
       </div>

@@ -5,14 +5,14 @@
  * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
 
-import { fetchWithAuth, API_URL } from './api';
+import { fetchWithAuth, API_BASE_URL } from './api';
 
 export const authService = {
   async login(email, password) {
-    const response = await fetch(`${API_URL}/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
@@ -20,16 +20,16 @@ export const authService = {
       throw new Error(errorData.error || 'Login failed');
     }
 
-    const data = await response.json();
-    localStorage.setItem('token', data.token);
-    return data.user;
+    const responseData = await response.json();
+    localStorage.setItem('token', responseData.token);
+    return responseData.user;
   },
 
-  async register(userData) {
-    const response = await fetch(`${API_URL}/auth/register`, {
+  async register(registrationData) {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
+      body: JSON.stringify(registrationData),
     });
 
     if (!response.ok) {
@@ -37,10 +37,17 @@ export const authService = {
       throw new Error(errorData.error || 'Registration failed');
     }
 
-    const data = await response.json();
-    localStorage.setItem('token', data.token);
-    // Profile isn't fully returned on register sometimes, we can fetch it or construct it
-    return { id: data.userId, email: userData.email, accountType: userData.accountType || 'CUSTOMER', firstName: userData.firstName, lastName: userData.lastName };
+    const responseData = await response.json();
+    localStorage.setItem('token', responseData.token);
+    return responseData.user || {
+      id: responseData.userId,
+      email: registrationData.email,
+      accountType: registrationData.accountType || 'CUSTOMER',
+      firstName: registrationData.firstName,
+      lastName: registrationData.lastName,
+      companyName: registrationData.companyName,
+      phone: registrationData.phone,
+    };
   },
 
   async getCurrentUser() {

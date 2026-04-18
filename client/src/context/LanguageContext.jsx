@@ -9,10 +9,11 @@ import React, { createContext, useContext, useState } from 'react';
 import i18n from '@i18n/i18n';
 
 const LanguageContext = createContext(null);
+const DEFAULT_LANGUAGE = 'en';
 
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(
-    localStorage.getItem('lincesckf_lang') || 'es'
+    localStorage.getItem('lincesckf_lang') || DEFAULT_LANGUAGE
   );
 
   const toggleLanguage = () => {

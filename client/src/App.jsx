@@ -10,7 +10,10 @@ import { AuthProvider } from '@context/AuthContext';
 import { CartProvider } from '@context/CartContext';
 import { LanguageProvider } from '@context/LanguageContext';
 import ProtectedRoute from '@components/auth/ProtectedRoute';
+import SiteAuthGate from '@components/auth/SiteAuthGate';
 import Layout from '@components/layout/Layout';
+import ScrollToTop from '@components/ScrollToTop';
+import Seo from '@components/Seo';
 
 // Pages — lazy loaded for code splitting
 import Home from '@pages/Home';
@@ -31,45 +34,49 @@ export default function App() {
       <AuthProvider>
         <CartProvider>
           <Router>
-            <Layout>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/catalog" element={<Catalog />} />
-                <Route path="/catalog/:category" element={<Catalog />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/b2b" element={<B2BServices />} />
-                <Route path="/custom-orders" element={<CustomOrders />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<Navigate to="/" replace />} />
-                <Route path="/register" element={<Navigate to="/" replace />} />
+            <ScrollToTop />
+            <Seo />
+            <SiteAuthGate>
+              <Layout>
+                <Routes>
+                  {/* Authenticated Routes */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/catalog" element={<Catalog />} />
+                  <Route path="/catalog/:category" element={<Catalog />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/b2b" element={<B2BServices />} />
+                  <Route path="/custom-orders" element={<CustomOrders />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/login" element={<Navigate to="/" replace />} />
+                  <Route path="/register" element={<Navigate to="/" replace />} />
 
-                {/* Cart — accessible without auth, checkout requires auth */}
-                <Route path="/cart" element={<Cart />} />
-                <Route
-                  path="/checkout"
-                  element={
-                    <ProtectedRoute>
-                      <Checkout />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Cart and checkout */}
+                  <Route path="/cart" element={<Cart />} />
+                  <Route
+                    path="/checkout"
+                    element={
+                      <ProtectedRoute>
+                        <Checkout />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* Protected Account */}
-                <Route
-                  path="/account/*"
-                  element={
-                    <ProtectedRoute>
-                      <Account />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Account */}
+                  <Route
+                    path="/account/*"
+                    element={
+                      <ProtectedRoute>
+                        <Account />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* 404 */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Layout>
+                  {/* 404 */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+            </SiteAuthGate>
           </Router>
         </CartProvider>
       </AuthProvider>

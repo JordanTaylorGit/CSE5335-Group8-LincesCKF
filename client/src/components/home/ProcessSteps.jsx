@@ -6,52 +6,33 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import { CalendarClock, CheckCircle2, ClipboardList, Shirt } from 'lucide-react';
 
 const STEPS = [
   {
     number: '01',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <circle cx="16" cy="16" r="12" stroke="currentColor" strokeWidth="1.2" />
-        <path d="M16 10v6l4 2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      </svg>
-    ),
+    Icon: CalendarClock,
     titleKey:    'process.step1.title',
     subtitleKey: 'process.step1.subtitle',
     descKey:     'process.step1.desc',
   },
   {
     number: '02',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <rect x="4" y="6" width="24" height="22" rx="1" stroke="currentColor" strokeWidth="1.2" />
-        <path d="M8 12h16M8 17h10M8 22h12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-        <path d="M10 6V4M22 6V4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      </svg>
-    ),
+    Icon: ClipboardList,
     titleKey:    'process.step2.title',
     subtitleKey: 'process.step2.subtitle',
     descKey:     'process.step2.desc',
   },
   {
     number: '03',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <path d="M6 26c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-        <circle cx="16" cy="10" r="5" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    ),
+    Icon: Shirt,
     titleKey:    'process.step3.title',
     subtitleKey: 'process.step3.subtitle',
     descKey:     'process.step3.desc',
   },
   {
     number: '04',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <path d="M6 16l7 7L26 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    Icon: CheckCircle2,
     titleKey:    'process.step4.title',
     subtitleKey: 'process.step4.subtitle',
     descKey:     'process.step4.desc',
@@ -60,16 +41,17 @@ const STEPS = [
 
 function StepCard({ step, index }) {
   const { t } = useTranslation();
+  const Icon = step.Icon;
 
   return (
     <div
-      className="relative flex flex-col items-center text-center px-4"
+      className="process-steps__card relative flex flex-col items-center text-center px-4"
       style={{ flex: '1 1 220px' }}
     >
       {/* Connector line (desktop only, not on last) */}
       {index < STEPS.length - 1 && (
         <div
-          className="hidden lg:block absolute top-9 z-0"
+          className="process-steps__connector hidden lg:block absolute top-9 z-0"
           style={{
             left: 'calc(50% + 36px)',
             right: 'calc(-50% + 36px)',
@@ -91,7 +73,7 @@ function StepCard({ step, index }) {
           color: '#B8D4E8',
         }}
       >
-        {step.icon}
+        <Icon size={32} strokeWidth={1.4} aria-hidden="true" />
         {/* Number badge */}
         <span style={{
           position: 'absolute',
@@ -155,7 +137,7 @@ export default function ProcessSteps() {
 
   return (
     <section
-      className="py-24 px-6"
+      className="process-steps py-24 px-6"
       style={{ background: '#0B2545' }}
       aria-labelledby="process-heading"
     >
@@ -201,7 +183,7 @@ export default function ProcessSteps() {
         </div>
 
         {/* Steps */}
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-6 relative">
+        <div className="process-steps__grid flex flex-col lg:flex-row gap-10 lg:gap-6 relative">
           {STEPS.map((step, i) => (
             <StepCard key={step.number} step={step} index={i} />
           ))}

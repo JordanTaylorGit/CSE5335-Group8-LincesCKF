@@ -6,12 +6,13 @@
  */
 
 import { createContext, useContext, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
+  const { t } = useTranslation();
   const [cartItems, setCartItems] = useState([]);
-  const [cart, setCart] = useState([]);
   const [message, setMessage] = useState("");
   const timerRef = useRef(null);
 
@@ -27,9 +28,49 @@ export function CartProvider({ children }) {
     }, 5000);
   };
 
+  const parseListField = (field) => {
+    if (!field) return [];
+    if (Array.isArray(field)) return field;
+    try {
+      return JSON.parse(field);
+    } catch {
+      return [];
+    }
+  };
+
+  const getSizeName = (size) => {
+    if (typeof size === "string") return size;
+    return String(size?.name || size?.size || size?.label || "");
+  };
+
+  const getSizeStock = (size) => {
+    if (!size || typeof size !== "object") return null;
+    const stock = Number(size.stockQuantity ?? size.stock ?? size.quantity);
+    return Number.isFinite(stock) ? stock : null;
+  };
+
+  const getAvailableStock = (product, selectedSize) => {
+    const sizes = parseListField(product.sizes);
+    const size = sizes.find(
+      (entry) => getSizeName(entry).toLowerCase() === String(selectedSize || "").toLowerCase()
+    );
+    const sizeStock = getSizeStock(size);
+
+    if (sizeStock !== null) return sizeStock;
+
+    const stock = Number(product.stockQuantity);
+    return Number.isFinite(stock) ? stock : Infinity;
+  };
+
   const addToCart = (product, selectedColor, selectedSize) => {
     if (!selectedColor || !selectedSize) {
-      showMessage("Please select color and size");
+      showMessage(t('cart.select_color_size'));
+      return;
+    }
+
+    const availableStock = getAvailableStock(product, selectedSize);
+    if (availableStock <= 0) {
+      showMessage(t('product.out_of_stock'));
       return;
     }
 
@@ -42,7 +83,12 @@ export function CartProvider({ children }) {
       );
 
       if (existingItem) {
-        showMessage("Quantity updated in cart");
+        if (existingItem.quantity >= availableStock) {
+          showMessage(t('cart.only_stock_available', { count: availableStock }));
+          return prevItems;
+        }
+
+        showMessage(t('cart.quantity_updated'));
         return prevItems.map((item) =>
           item.id === product.id &&
           item.selectedColor === selectedColor &&
@@ -52,19 +98,21 @@ export function CartProvider({ children }) {
         );
       }
 
-      showMessage("Product added to cart");
+      showMessage(t('cart.product_added'));
       let parsedColors = [];
       try {
         parsedColors = typeof product.colors === 'string' ? JSON.parse(product.colors) : (product.colors || []);
-      } catch (e) {}
+      } catch {
+        parsedColors = [];
+      }
       
-      const colorObj = parsedColors.find(c => (c.name || c) === selectedColor);
+      const selectedColorEntry = parsedColors.find((color) => (color.name || color) === selectedColor);
       return [
         ...prevItems,
         {
           ...product,
           selectedColor,
-          selectedColorEs: colorObj?.nameEs || selectedColor,          
+          selectedColorEs: selectedColorEntry?.nameEs || selectedColor,
           selectedSize,
           quantity: 1,
         },
@@ -84,18 +132,28 @@ export function CartProvider({ children }) {
       )
     );
 
-    showMessage("Product removed from cart");
+    showMessage(t('cart.product_removed'));
   };
 
   const increaseQuantity = (id, selectedColor, selectedSize) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id &&
-        item.selectedColor === selectedColor &&
-        item.selectedSize === selectedSize
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      )
+      prevItems.map((item) => {
+        if (
+          item.id === id &&
+          item.selectedColor === selectedColor &&
+          item.selectedSize === selectedSize
+        ) {
+          const availableStock = getAvailableStock(item, selectedSize);
+          if (item.quantity >= availableStock) {
+            showMessage(t('cart.only_stock_available', { count: availableStock }));
+            return item;
+          }
+
+          return { ...item, quantity: item.quantity + 1 };
+        }
+
+        return item;
+      })
     );
   };
 
@@ -119,13 +177,13 @@ export function CartProvider({ children }) {
   );
 
   const cartTotal = useMemo(
-    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
+    () => cartItems.reduce((total, item) => total + Number(item.price) * item.quantity, 0),
     [cartItems]
   );
 
   const clearCart = () => {
-  setCart([]);
-};
+    setCartItems([]);
+  };
 
   return (
     <CartContext.Provider

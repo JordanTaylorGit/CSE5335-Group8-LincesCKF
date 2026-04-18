@@ -5,6 +5,8 @@
  * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
 
+import { useTranslation } from 'react-i18next';
+
 function CatalogFilters({
   search,
   setSearch,
@@ -13,12 +15,14 @@ function CatalogFilters({
   sort,
   setSort
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white border border-[#e6ded3] rounded-[18px] p-5 shadow-sm mb-8">
       <div className="grid md:grid-cols-3 gap-4">
         <input
           type="text"
-          placeholder="Search silk garments..."
+          placeholder={t('catalog.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-xl border border-[#d8cfc3] px-4 py-3 outline-none focus:border-[#0f172a]"
@@ -29,11 +33,11 @@ function CatalogFilters({
           onChange={(e) => setCategory(e.target.value)}
           className="w-full rounded-xl border border-[#d8cfc3] px-4 py-3 outline-none focus:border-[#0f172a] bg-white"
         >
-          <option value="All">All Categories</option>
-          <option value="blouse">Blouse</option>
-          <option value="dress">Dress</option>
-          <option value="scarf">Scarf</option>
-          <option value="shirt">Shirt</option>
+          <option value="All">{t('catalog.allCategories')}</option>
+          <option value="blouse">{t('catalog.blouses')}</option>
+          <option value="dress">{t('catalog.dresses')}</option>
+          <option value="scarf">{t('catalog.scarves')}</option>
+          <option value="shirt">{t('catalog.shirts')}</option>
         </select>
 
         <select
@@ -41,10 +45,10 @@ function CatalogFilters({
           onChange={(e) => setSort(e.target.value)}
           className="w-full rounded-xl border border-[#d8cfc3] px-4 py-3 outline-none focus:border-[#0f172a] bg-white"
         >
-          <option value="default">Sort By</option>
-          <option value="price-low-high">Price: Low to High</option>
-          <option value="price-high-low">Price: High to Low</option>
-          <option value="name-a-z">Name: A-Z</option>
+          <option value="default">{t('catalog.sortBy')}</option>
+          <option value="price-low-high">{t('catalog.priceLowHigh')}</option>
+          <option value="price-high-low">{t('catalog.priceHighLow')}</option>
+          <option value="name-a-z">{t('catalog.nameAZ')}</option>
         </select>
       </div>
     </div>

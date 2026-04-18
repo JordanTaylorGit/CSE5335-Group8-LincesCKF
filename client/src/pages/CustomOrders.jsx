@@ -8,6 +8,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { Factory, Package, Scissors } from 'lucide-react';
+import { fetchWithAuth } from '../services/api';
 
 const CustomOrders = () => {
   const { t } = useTranslation();
@@ -24,25 +26,26 @@ const CustomOrders = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const orderTypes = [
     {
       id: 'custom-garment',
       title: t('customOrders.types.customGarment.title'),
       description: t('customOrders.types.customGarment.description'),
-      icon: '🧵'
+      Icon: Scissors
     },
     {
       id: 'bulk-order',
       title: t('customOrders.types.bulkOrder.title'),
       description: t('customOrders.types.bulkOrder.description'),
-      icon: '📦'
+      Icon: Package
     },
     {
       id: 'b2b-manufacturing',
       title: t('customOrders.types.b2bManufacturing.title'),
       description: t('customOrders.types.b2bManufacturing.description'),
-      icon: '🏭'
+      Icon: Factory
     }
   ];
 
@@ -60,6 +63,7 @@ const CustomOrders = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (formError) setFormError('');
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -68,21 +72,25 @@ const CustomOrders = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError('');
+
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 10) {
+      setFormError(t('customOrders.form.phoneValidation'));
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/custom-orders', {
+      await fetchWithAuth('/custom-orders', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-        },
         body: JSON.stringify({
           orderType,
           contactInfo: {
             name: formData.name,
             email: formData.email,
-            phone: formData.phone,
+            phone: phoneDigits,
             company: formData.company
           },
           requirements: {
@@ -92,14 +100,12 @@ const CustomOrders = () => {
           }
         })
       });
-
-      if (!response.ok) throw new Error('Submission failed');
       
       setIsSubmitted(true);
       setStep(3);
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Failed to submit order request.');
+      alert(t('customOrders.submitError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -121,24 +127,30 @@ const CustomOrders = () => {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        {orderTypes.map((type, index) => (
-          <motion.button
-            key={type.id}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => handleOrderTypeSelect(type.id)}
-            className="text-left p-6 border-2 border-navy/20 rounded-lg hover:border-navy/50 transition-all duration-300"
-          >
-            <div className="text-4xl mb-4">{type.icon}</div>
-            <h3 className="font-semibold text-navy text-lg mb-2">
-              {type.title}
-            </h3>
-            <p className="text-navy/70 text-sm leading-relaxed">
-              {type.description}
-            </p>
-          </motion.button>
-        ))}
+      <div className="custom-orders-page__type-grid grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        {orderTypes.map((type) => {
+          const Icon = type.Icon;
+
+          return (
+            <motion.button
+              key={type.id}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleOrderTypeSelect(type.id)}
+              className="text-left p-6 border-2 border-navy/20 rounded-lg hover:border-navy/50 transition-all duration-300"
+            >
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-navy text-white">
+                <Icon className="h-6 w-6" strokeWidth={1.7} aria-hidden="true" />
+              </div>
+              <h3 className="font-semibold text-navy text-lg mb-2">
+                {type.title}
+              </h3>
+              <p className="text-navy/70 text-sm leading-relaxed">
+                {type.description}
+              </p>
+            </motion.button>
+          );
+        })}
       </div>
     </motion.div>
   );
@@ -166,7 +178,7 @@ const CustomOrders = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="custom-orders-page__form-grid grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-navy/70 mb-2">
               {t('customOrders.form.name')}
@@ -195,7 +207,7 @@ const CustomOrders = () => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="custom-orders-page__form-grid grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-navy/70 mb-2">
               {t('customOrders.form.phone')}
@@ -206,8 +218,18 @@ const CustomOrders = () => {
               value={formData.phone}
               onChange={handleInputChange}
               required
+              inputMode="numeric"
+              pattern="[0-9]{10}"
+              placeholder="1234567890"
+              aria-invalid={Boolean(formError)}
+              aria-describedby={formError ? 'custom-order-phone-error' : undefined}
               className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
             />
+            {formError && (
+              <p id="custom-order-phone-error" role="alert" className="mt-2 text-sm text-red-600">
+                {formError}
+              </p>
+            )}
           </div>
           {orderType === 'b2b-manufacturing' && (
             <div>
@@ -226,7 +248,7 @@ const CustomOrders = () => {
           )}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="custom-orders-page__form-grid grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-navy/70 mb-2">
               {t('customOrders.form.quantity')}
@@ -276,7 +298,7 @@ const CustomOrders = () => {
           />
         </div>
 
-        <div className="flex justify-between items-center pt-6">
+        <div className="custom-orders-page__form-actions flex justify-between items-center pt-6">
           <button
             type="button"
             onClick={() => setStep(1)}
@@ -325,7 +347,7 @@ const CustomOrders = () => {
             <span className="font-medium">{formData.timeline}</span>
           </div>
         </div>
-        <div className="mt-8 space-x-4">
+        <div className="custom-orders-page__success-actions mt-8 space-x-4">
           <button
             onClick={() => {
               setStep(1);
@@ -346,7 +368,7 @@ const CustomOrders = () => {
             {t('customOrders.success.newRequest')}
           </button>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => window.location.href = '/catalog'}
             className="px-6 py-3 border border-navy text-navy hover:bg-navy hover:text-white transition-colors"
           >
             {t('customOrders.success.continueShopping')}
@@ -357,11 +379,11 @@ const CustomOrders = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white py-16">
+    <div className="custom-orders-page min-h-screen bg-white py-16">
       <div className="max-w-6xl mx-auto px-6">
         {/* Progress Indicator */}
-        <div className="flex justify-center mb-12">
-          <div className="flex items-center space-x-2 sm:space-x-8 w-full max-w-2xl px-2 sm:px-0">
+        <div className="custom-orders-page__progress flex justify-center mb-12">
+          <div className="custom-orders-page__progress-track flex items-center space-x-2 sm:space-x-8 w-full max-w-2xl px-2 sm:px-0">
             <div className={`flex items-center space-x-2 sm:space-x-3 ${step >= 1 ? 'text-navy' : 'text-navy/40'}`}>
               <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-sm font-medium ${
                 step >= 1 ? 'bg-navy text-white' : 'bg-navy/20 text-navy'

@@ -7,13 +7,14 @@
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ArrowRight } from 'lucide-react';
 
 export default function HeroSection() {
   const { t } = useTranslation();
 
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="hero-section relative w-full overflow-hidden"
       style={{ minHeight: '50vh' }}
       aria-label={t('hero.ariaLabel')}
     >
@@ -25,7 +26,7 @@ export default function HeroSection() {
         {/* Hero background image */}
         <img
           src="https://images.unsplash.com/photo-1758551015352-fa735f167422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwc2lsayUyMGZhYnJpYyUyMGZsb3dpbmclMjBsdXh1cnl8ZW58MXx8fHwxNzY5OTg5MTkwfDA&ixlib=rb-4.1.0&q=80&w=1080"
-          alt="Premium silk fabric"
+          alt={t('hero.imageAlt')}
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Silk sheen — lighter diagonal highlight */}
@@ -53,7 +54,7 @@ export default function HeroSection() {
 
       {/* ── Content ── */}
       <div
-        className="relative z-10 flex flex-col items-center justify-center text-center px-6"
+        className="hero-section__content relative z-10 flex flex-col items-center justify-center text-center px-6"
         style={{ minHeight: '50vh' }}
       >
         <div className="max-w-4xl mx-auto">
@@ -121,7 +122,7 @@ export default function HeroSection() {
           </div>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="hero-section__actions flex flex-col sm:flex-row gap-4 justify-center items-center">
             {/* Primary — white filled */}
             <Link
               to="/catalog"
@@ -141,9 +142,7 @@ export default function HeroSection() {
               onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.color = '#C8102E'; }}
             >
               <span>{t('hero.ctaShop')}</span>
-              <svg width="14" height="9" viewBox="0 0 14 9" fill="none">
-                <path d="M0 4.5H12M8.5 1L12 4.5L8.5 8" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
+              <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
             </Link>
 
             {/* Secondary — outlined white */}

@@ -11,15 +11,34 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@context/AuthContext';
 import { fetchWithAuth } from '../services/api';
+import AccountBrandAddItem from './AccountBrandAddItem';
 
 /* ── Profile ─────────────────────────────────────────────────── */
 function AccountProfile() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const primaryAddress = Array.isArray(user?.addresses) ? user.addresses[0] : null;
+  const addressParts = primaryAddress
+    ? [
+        primaryAddress.line1,
+        primaryAddress.line2,
+        primaryAddress.city,
+        primaryAddress.state,
+        primaryAddress.postalCode,
+        primaryAddress.country,
+      ].filter(Boolean)
+    : [];
+
   return (
     <div>
       <p className="font-display text-2xl mb-4">{t('account.greeting', { name: user?.name })}</p>
       <p className="text-obsidian/60">{user?.email}</p>
+      {addressParts.length > 0 && (
+        <div className="mt-6">
+          <p className="text-sm font-medium text-navy mb-1">{t('account.address_details')}</p>
+          <p className="text-sm text-obsidian/60">{addressParts.join(', ')}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -29,12 +48,19 @@ function AccountSettings() {
   const { user, updateProfile, updatePassword } = useAuth();
   const { t } = useTranslation();
   const isBrand = user?.accountType === 'BRAND';
+  const primaryAddress = Array.isArray(user?.addresses) ? user.addresses[0] || {} : {};
 
   const [firstName,   setFirstName]   = useState(user?.firstName   || '');
   const [lastName,    setLastName]    = useState(user?.lastName    || '');
   const [companyName, setCompanyName] = useState(user?.companyName || '');
   const [phone,       setPhone]       = useState(user?.phone       || '');
   const [email,       setEmail]       = useState(user?.email       || '');
+  const [line1,       setLine1]       = useState(primaryAddress.line1      || '');
+  const [line2,       setLine2]       = useState(primaryAddress.line2      || '');
+  const [city,        setCity]        = useState(primaryAddress.city       || '');
+  const [state,       setState]       = useState(primaryAddress.state      || '');
+  const [postalCode,  setPostalCode]  = useState(primaryAddress.postalCode || '');
+  const [country,     setCountry]     = useState(primaryAddress.country    || '');
   const [profileMsg,  setProfileMsg]  = useState('');
   const [profileBusy, setProfileBusy] = useState(false);
 
@@ -47,9 +73,19 @@ function AccountSettings() {
   async function handleProfileSave(e) {
     e.preventDefault();
     setProfileMsg('');
-    if (!email.trim()) return setProfileMsg(t('account.email') + ' is required.');
+    if (!email.trim()) return setProfileMsg(t('account.field_required', { field: t('account.email') }));
+    const address = {
+      line1: line1.trim(),
+      line2: line2.trim(),
+      city: city.trim(),
+      state: state.trim(),
+      postalCode: postalCode.trim(),
+      country: country.trim(),
+    };
+    const addresses = Object.values(address).some(Boolean) ? [address] : [];
+
     setProfileBusy(true);
-    const res = await updateProfile({ firstName, lastName, companyName, phone, email });
+    const res = await updateProfile({ firstName, lastName, companyName, phone, email, addresses });
     setProfileBusy(false);
     setProfileMsg(res.success ? t('account.profile_saved') : res.message);
   }
@@ -57,9 +93,9 @@ function AccountSettings() {
   async function handlePasswordChange(e) {
     e.preventDefault();
     setPwMsg('');
-    if (!currentPw) return setPwMsg(t('account.current_password') + ' is required.');
-    if (newPw.length < 6) return setPwMsg('New password must be at least 6 characters.');
-    if (newPw !== confirmPw) return setPwMsg('Passwords do not match.');
+    if (!currentPw) return setPwMsg(t('account.field_required', { field: t('account.current_password') }));
+    if (newPw.length < 6) return setPwMsg(t('auth.error_password_length'));
+    if (newPw !== confirmPw) return setPwMsg(t('auth.error_passwords_match'));
     setPwBusy(true);
     const res = await updatePassword({ currentPassword: currentPw, newPassword: newPw });
     setPwBusy(false);
@@ -87,7 +123,7 @@ function AccountSettings() {
               <input id="s-company" type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} className={inputCls} autoComplete="organization" />
             </div>
           ) : (
-            <div className="flex gap-3">
+            <div className="account-settings__name-row flex gap-3">
               <div className="flex-1">
                 <label htmlFor="s-first" className={labelCls}>{t('account.first_name')}</label>
                 <input id="s-first" type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className={inputCls} autoComplete="given-name" />
@@ -106,6 +142,41 @@ function AccountSettings() {
             <label htmlFor="s-phone" className={labelCls}>{t('account.phone')}</label>
             <input id="s-phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} className={inputCls} autoComplete="tel" />
           </div>
+
+          <div className="pt-4 border-t border-zinc-100">
+            <h3 className="font-display text-lg mb-4 text-navy">{t('account.address_details')}</h3>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="s-address-line1" className={labelCls}>{t('account.address_line1')}</label>
+                <input id="s-address-line1" type="text" value={line1} onChange={e => setLine1(e.target.value)} className={inputCls} autoComplete="address-line1" />
+              </div>
+              <div>
+                <label htmlFor="s-address-line2" className={labelCls}>{t('account.address_line2')}</label>
+                <input id="s-address-line2" type="text" value={line2} onChange={e => setLine2(e.target.value)} className={inputCls} autoComplete="address-line2" />
+              </div>
+              <div className="account-settings__address-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="s-city" className={labelCls}>{t('account.city')}</label>
+                  <input id="s-city" type="text" value={city} onChange={e => setCity(e.target.value)} className={inputCls} autoComplete="address-level2" />
+                </div>
+                <div>
+                  <label htmlFor="s-state" className={labelCls}>{t('account.state')}</label>
+                  <input id="s-state" type="text" value={state} onChange={e => setState(e.target.value)} className={inputCls} autoComplete="address-level1" />
+                </div>
+              </div>
+              <div className="account-settings__address-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="s-postal" className={labelCls}>{t('account.postal_code')}</label>
+                  <input id="s-postal" type="text" value={postalCode} onChange={e => setPostalCode(e.target.value)} className={inputCls} autoComplete="postal-code" />
+                </div>
+                <div>
+                  <label htmlFor="s-country" className={labelCls}>{t('account.country')}</label>
+                  <input id="s-country" type="text" value={country} onChange={e => setCountry(e.target.value)} className={inputCls} autoComplete="country-name" />
+                </div>
+              </div>
+            </div>
+          </div>
+
           {profileMsg && (
             <p role="alert" className={`text-sm ${profileMsg === t('account.profile_saved') ? 'text-green-600' : 'text-red-500'}`}>{profileMsg}</p>
           )}
@@ -208,30 +279,155 @@ function AccountNotifications() {
 /* ── Orders ──────────────────────────────────────────────────── */
 function AccountOrders() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deliveringKey, setDeliveringKey] = useState('');
+  const [actionMessage, setActionMessage] = useState('');
+  const isBrand = user?.accountType === 'BRAND';
+
+  const getStatusLabel = (status) => {
+    const key = {
+      Processing: 'account.status_processing',
+      Delivered: 'account.status_delivered',
+      'Partially Delivered': 'account.status_partially_delivered',
+    }[String(status || '').trim()];
+
+    return key ? t(key) : status || t('account.not_available');
+  };
 
   useEffect(() => {
-    fetchWithAuth('/orders/my-orders')
-      .then(data => { setOrders(data); setLoading(false); })
-      .catch(err => { console.error(err); setLoading(false); });
-  }, []);
+    const request = isBrand
+      ? Promise.all([fetchWithAuth('/orders/brand/my-orders')])
+      : Promise.all([
+          fetchWithAuth('/orders/my-orders'),
+          fetchWithAuth('/custom-orders/my-requests'),
+        ]);
 
-  if (loading) return <p>Loading orders...</p>;
+    request
+      .then((responses) => {
+        const [regularOrders, customOrders = []] = responses;
+        const combinedOrders = [
+          ...regularOrders.map(order => ({
+            ...order,
+            orderKind: 'regular',
+            sortDate: order.createdAt,
+          })),
+          ...customOrders.map(order => ({
+            ...order,
+            orderKind: 'custom',
+            sortDate: order.createdAt,
+          })),
+        ].sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
+
+        setOrders(combinedOrders);
+        setLoading(false);
+      })
+      .catch(err => { console.error(err); setLoading(false); });
+  }, [isBrand]);
+
+  async function handleDeliver(orderId, itemIndex) {
+    const key = `${orderId}-${itemIndex}`;
+    setDeliveringKey(key);
+    setActionMessage('');
+
+    try {
+      const data = await fetchWithAuth(`/orders/${orderId}/items/${itemIndex}/deliver`, {
+        method: 'PUT',
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) => (
+          order.orderKind === 'regular' && order.id === orderId
+            ? {
+                ...order,
+                ...data.order,
+                orderKind: 'regular',
+                sortDate: order.sortDate || data.order.createdAt,
+              }
+            : order
+        ))
+      );
+    } catch (error) {
+      setActionMessage(error.message || t('account.deliver_error'));
+    } finally {
+      setDeliveringKey('');
+    }
+  }
+
+  if (loading) return <p>{t('account.loading_orders')}</p>;
 
   return (
     <div>
-      <h2 className="font-display text-xl mb-6 text-navy">My Orders</h2>
+      <h2 className="font-display text-xl mb-6 text-navy">{t('account.orders')}</h2>
+      {actionMessage && (
+        <p role="alert" className="mb-4 text-sm text-red-500">{actionMessage}</p>
+      )}
       {orders.length === 0 ? (
-        <p className="text-navy/60">You have no orders yet.</p>
+        <p className="text-navy/60">{t('account.no_orders')}</p>
       ) : (
         <div className="space-y-4">
           {orders.map(order => (
-            <div key={order.id} className="p-4 border border-zinc-200 rounded-md">
-              <p className="font-semibold text-navy">Order #{order.id}</p>
-              <p className="text-sm text-navy/70">Total: ${order.totalAmount.toFixed(2)}</p>
-              <p className="text-sm text-navy/70">Status: {order.status}</p>
-              <p className="text-sm text-navy/70 mt-2">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
+            <div key={`${order.orderKind}-${order.id}`} className="p-4 border border-zinc-200 rounded-md">
+              <p className="font-semibold text-navy">
+                {order.orderKind === 'custom' ? t('account.custom_order') : t('account.order_number', { id: order.id })}
+              </p>
+
+              {order.orderKind === 'custom' ? (
+                <>
+                  <p className="text-sm text-navy/70">{t('account.request_number', { id: order.id })}</p>
+                  <p className="text-sm text-navy/70">{t('account.type')}: {String(order.orderType || '').replaceAll('-', ' ')}</p>
+                  <p className="text-sm text-navy/70">{t('account.timeline')}: {order.requirements?.timeline || t('account.not_specified')}</p>
+                  <p className="text-sm text-navy/70">{t('account.quantity')}: {order.requirements?.quantity || t('account.not_specified')}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-navy/70">{t('account.total')}: ${Number(order.totalAmount).toFixed(2)}</p>
+                  {isBrand && order.shippingAddress?.fullName && (
+                    <p className="text-sm text-navy/70">{t('account.customer')}: {order.shippingAddress.fullName}</p>
+                  )}
+                  <div className="mt-3 space-y-2">
+                    {(order.items || []).map((item, index) => (
+                      <div key={`${order.id}-${item.productId || item.id || index}`} className="rounded-md bg-zinc-50 p-3">
+                        <p className="text-sm font-medium text-navy">
+                          {item.name || item.nameEn || t('account.item_number', { number: index + 1 })}
+                        </p>
+                        {item.brandName && (
+                          <p className="mt-1 text-xs text-navy/70">
+                            {t('product.brand')}: {item.brandName}
+                          </p>
+                        )}
+                        <div className="account-orders__item-grid mt-2 grid grid-cols-1 sm:grid-cols-5 gap-1 text-xs text-navy/60">
+                          <span>{t('account.size')}: {item.selectedSize || t('account.not_available')}</span>
+                          <span>{t('account.color')}: {item.selectedColor || t('account.not_available')}</span>
+                          <span>{t('account.qty')}: {item.quantity || 1}</span>
+                          <span>
+                            {t('account.line_total')}: ${(
+                              Number(item.price || 0) * Number(item.quantity || 1)
+                            ).toFixed(2)}
+                          </span>
+                          <span>{t('account.delivery_status')}: {getStatusLabel(item.deliveryStatus)}</span>
+                        </div>
+                        {isBrand && item.deliveryStatus !== 'Delivered' && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeliver(order.id, item.itemIndex)}
+                            disabled={deliveringKey === `${order.id}-${item.itemIndex}`}
+                            className="mt-3 rounded-md bg-navy px-4 py-2 text-xs font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {deliveringKey === `${order.id}-${item.itemIndex}`
+                              ? t('account.delivering')
+                              : t('account.deliver_product')}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <p className="text-sm text-navy/70">{t('account.status')}: {getStatusLabel(order.status)}</p>
+              <p className="text-sm text-navy/70 mt-2">{t('account.date')}: {new Date(order.createdAt).toLocaleDateString()}</p>
             </div>
           ))}
         </div>
@@ -241,7 +437,7 @@ function AccountOrders() {
 }
 
 /* ── Page shell ──────────────────────────────────────────────── */
-const tabs = [
+const baseTabs = [
   { path: '',               label: 'profile'       },
   { path: 'orders',        label: 'orders'        },
   { path: 'settings',      label: 'settings'      },
@@ -250,17 +446,17 @@ const tabs = [
 
 export default function Account() {
   const { t } = useTranslation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const location = useLocation();
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-20">
+    <div className="account-page max-w-5xl mx-auto px-6 py-20">
       <h1 className="font-display text-4xl md:text-5xl text-navy mb-12">{t('account.title')}</h1>
 
-      <div className="flex flex-col md:flex-row gap-12">
+      <div className="account-page__layout flex flex-col md:flex-row gap-12">
         {/* Sidebar */}
-        <aside className="w-full md:w-48 space-y-2">
-          {tabs.map(tab => {
+        <aside className="account-page__sidebar w-full md:w-48 space-y-2">
+          {baseTabs.map(tab => {
             const href = `/account${tab.path ? `/${tab.path}` : ''}`;
             const active = location.pathname === href;
             return (
@@ -275,6 +471,15 @@ export default function Account() {
               </Link>
             );
           })}
+
+          {/* If user is a brand show product creation link */}
+          {user?.accountType === 'BRAND' && (
+            <Link to="/account/brand/add-item" className={`block font-body text-sm tracking-wider py-2 border-b border-transparent ${location.pathname.startsWith('/account/brand') ? 'text-silk-amber border-silk-amber' : 'text-navy/60 hover:text-navy'}`}>
+              {t('account.add_item')}
+            </Link>
+          )}
+
+          {/* brand tab link (only visible to brand users; rendered later in BrandAreaWrapper) */}
           <button
             onClick={logout}
             className="block w-full text-left font-body text-sm text-navy/40 hover:text-red-400 py-2 mt-4 transition-colors"
@@ -284,15 +489,36 @@ export default function Account() {
         </aside>
 
         {/* Content */}
-        <div className="flex-1">
+        <div className="account-page__content flex-1">
           <Routes>
             <Route path="/"              element={<AccountProfile      />} />
             <Route path="orders"         element={<AccountOrders       />} />
             <Route path="settings"       element={<AccountSettings     />} />
             <Route path="notifications"  element={<AccountNotifications />} />
+            <Route path="brand/*"        element={<BrandAreaWrapper />} />
           </Routes>
         </div>
       </div>
     </div>
+  );
+}
+
+function BrandAreaWrapper() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+
+  if (!user || user.accountType !== 'BRAND') {
+    return (
+      <div className="account-page__brand-only p-6 border rounded-md">
+        <p className="text-navy/70">{t('account.brand_only')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<AccountBrandAddItem />} />
+      <Route path="add-item" element={<AccountBrandAddItem />} />
+    </Routes>
   );
 }
