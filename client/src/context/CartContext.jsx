@@ -102,7 +102,9 @@ export function CartProvider({ children }) {
       let parsedColors = [];
       try {
         parsedColors = typeof product.colors === 'string' ? JSON.parse(product.colors) : (product.colors || []);
-      } catch {}
+      } catch {
+        parsedColors = [];
+      }
       
       const selectedColorEntry = parsedColors.find((color) => (color.name || color) === selectedColor);
       return [

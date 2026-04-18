@@ -973,48 +973,6 @@ app.post('/api/auth/login', async (req, res) => {
 
   if (!isValidEmail(normalizedEmail) || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
-  db.query(
-    `UPDATE Users SET firstName=?, lastName=?, email=?, phone=?, companyName=?, addresses=? WHERE id=?`,
-    [firstName, lastName, email, phone, companyName, JSON.stringify(addresses), req.user.id],
-    (err) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'Profile updated' });
-    }
-  );
-});
-
-// ==========================================
-// 3.2 Products
-// ==========================================
-app.get('/api/products', (req, res) => {
-  db.query(`SELECT * FROM Products`, (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
-  });
-});
-
-app.get('api/products/featured', (req, res) => {
-  const query = 'SELECT * FROM products WHERE featured = 1 LIMIT 4';
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Database error' });
-    }
-    res.json(results);
-  });
-});
-
-app.get('/api/products/:id', (req, res) => {
-  db.query(`SELECT * FROM Products WHERE id = ?`, [req.params.id], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (results.length === 0) return res.status(404).json({ error: 'Product not found' });
-    res.json(results[0]);
-  });
-});
-
-app.post('/api/products', authMiddleware, (req, res) => {
-  if (req.user.accountType !== 'BRAND') {
-    return res.status(403).json({ error: 'Only brands can create products' });
   }
 
   try {
@@ -1204,6 +1162,24 @@ app.get('/api/products/brand/my-products', requireAccountTypes('BRAND', 'ADMIN')
     const rows = req.user.accountType === 'ADMIN'
       ? await dbQuery(`${PRODUCT_SELECT_SQL} ORDER BY p.product_id DESC`)
       : await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.brand_user_id = ? ORDER BY p.product_id DESC`, [req.user.id]);
+
+    res.json(rows.map(serializeProduct));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/products/featured', async (req, res) => {
+  const requestedLimit = Number(req.query.limit);
+  const limit = Number.isInteger(requestedLimit) && requestedLimit > 0
+    ? Math.min(requestedLimit, 12)
+    : 4;
+
+  try {
+    const rows = await dbQuery(
+      `${PRODUCT_SELECT_SQL} WHERE p.is_featured = 1 ORDER BY p.product_id ASC LIMIT ?`,
+      [limit]
+    );
 
     res.json(rows.map(serializeProduct));
   } catch (error) {

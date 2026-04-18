@@ -217,7 +217,7 @@ const translations = {
       eyebrow: "Servicios B2B · B2B Services",
       heading: "Manufacturing for Fashion Brands",
       desc: "Professional silk manufacturing services for designers and fashion brands.",
-      cta: "Explore Manufacturing Services",
+      cta_label: "Explore Manufacturing Services",
       feature1: {
         title: "Scalable Production",
         desc: "From 50 to 10,000 garments per season with consistent quality.",
@@ -828,7 +828,7 @@ const translations = {
       eyebrow: "Servicios B2B · B2B Services",
       heading: "Manufactura para Marcas de Moda",
       desc: "Ofrecemos servicios de confección profesional en seda para diseñadores y marcas.",
-      cta: "Conocer Servicios de Manufactura",
+      cta_label: "Conocer Servicios de Manufactura",
       feature1: {
         title: "Producción a Escala",
         desc: "Desde 50 hasta 10,000 prendas por temporada con calidad consistente.",

@@ -38,7 +38,7 @@ export default function SiteAuthGate({ children }) {
       <main className="auth-gate min-h-screen flex items-center justify-center bg-transparent px-6">
         <section className="auth-gate__panel max-w-md text-center">
           <p className="font-accent text-xs tracking-[0.28em] uppercase text-silk-amber mb-4">
-            Linces'CKF
+            Linces&apos;CKF
           </p>
           <h1 className="font-display text-4xl text-navy mb-4">
             {t('auth.sign_in_to_continue')}

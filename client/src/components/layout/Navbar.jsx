@@ -45,7 +45,7 @@ export default function Navbar() {
           className="site-header__logo font-accent text-xl tracking-[0.2em] text-navy hover:text-silk-red transition-colors"
           aria-label={t("nav.home_label")}
         >
-          LINCES<span className="text-silk-red">'</span>CKF
+          LINCES<span className="text-silk-red">&rsquo;</span>CKF
         </Link>
 
         {/* Desktop Nav */}

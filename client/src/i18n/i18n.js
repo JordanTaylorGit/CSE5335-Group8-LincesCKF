@@ -9,12 +9,18 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import translations from './translations';
 
+const DEFAULT_LANGUAGE = 'en';
+const savedLanguage = localStorage.getItem('lincesckf_lang');
+const initialLanguage = savedLanguage === 'en' || savedLanguage === 'es'
+  ? savedLanguage
+  : DEFAULT_LANGUAGE;
+
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: translations.en },
     es: { translation: translations.es },
   },
-  lng: localStorage.getItem('lincesckf_lang') || 'es',
+  lng: initialLanguage,
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
 });

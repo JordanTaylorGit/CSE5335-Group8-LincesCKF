@@ -108,10 +108,10 @@ export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
 
   useEffect(() => {
-    fetchWithAuth('/products')
+    fetchWithAuth('/products/featured')
       .then(data => {
         if (!Array.isArray(data)) return;
-        setFeaturedProducts(data.slice(0, 4));
+        setFeaturedProducts(data);
       })
       .catch(err => console.error("Error fetching featured products:", err));
   }, []);

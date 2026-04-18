@@ -21,7 +21,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
               <p className="font-accent text-xl tracking-[0.2em] text-white mb-4">
-              LINCES<span className="text-silk-amber">'</span>CKF
+              LINCES<span className="text-silk-amber">&rsquo;</span>CKF
             </p>
             <p className="text-sm leading-relaxed text-white/60 max-w-xs">
               {t("footer.brand_desc")}
@@ -199,7 +199,7 @@ export default function Footer() {
         <div className="border-t border-white/10 mt-12 mb-6" />
 
         <p className="text-center text-xs text-white/30 tracking-wider">
-          © {year} Linces'CKF. {t("footer.rights")}.
+          © {year} Linces&rsquo;CKF. {t("footer.rights")}.
         </p>
       </div>
     </footer>
