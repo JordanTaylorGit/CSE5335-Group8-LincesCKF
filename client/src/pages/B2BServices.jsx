@@ -232,7 +232,7 @@ export default function ServicesPage() {
   const { t }      = useTranslation();
 
   return (
-    <main style={{ background: '#ffffff' }}>
+    <div style={{ background: '#ffffff' }}>
       {/* ── 1. Page Hero (navy) ── */}
       <PageHero />
 
@@ -314,6 +314,6 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -17,7 +17,7 @@ import AuthModal from "../AuthModal.jsx";
 export default function Navbar() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
-  const { cartItems, cartCount, message } = useCart();
+  const { cartCount, message } = useCart();
   const { language, toggleLanguage } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -43,12 +43,13 @@ export default function Navbar() {
         <Link
           to="/"
           className="font-accent text-xl tracking-[0.2em] text-navy hover:text-silk-red transition-colors"
+          aria-label="Linces'CKF home"
         >
           LINCES<span className="text-silk-red">'</span>CKF
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-8" aria-label="Primary navigation">
           <NavLink to="/">{t("nav.home")}</NavLink>
           <NavLink to="/catalog">{t("nav.catalog")}</NavLink>
           <NavLink to="/b2b">{t("nav.b2b")}</NavLink>
@@ -63,7 +64,8 @@ export default function Navbar() {
           <button
             onClick={toggleLanguage}
             className="font-body text-xs tracking-widest uppercase text-navy/60 hover:text-silk-red transition-colors flex items-center gap-1.5"
-            aria-label="Toggle language"
+            aria-label={language === "es" ? "Switch language to English" : "Cambiar idioma a espanol"}
+            aria-pressed={language === "es"}
           >
             <Globe size={16} strokeWidth={1.5} />
             {language === "es" ? "EN" : "ES"}
@@ -87,7 +89,7 @@ export default function Navbar() {
           <Link
             to="/cart"
             className="relative text-navy hover:text-silk-red transition-colors"
-            aria-label={t("nav.cart")}
+            aria-label={`${t("nav.cart")} (${cartCount})`}
           >
             <ShoppingBag size={20} strokeWidth={1.5} />
             {cartCount > 0 && (
@@ -112,6 +114,8 @@ export default function Navbar() {
             className="md:hidden text-navy"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
+            aria-controls="mobile-navigation"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -122,8 +126,8 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-sky-mid py-6 px-6">
-          <nav className="flex flex-col gap-5">
+        <div id="mobile-navigation" className="md:hidden bg-white border-t border-sky-mid py-6 px-6">
+          <nav className="flex flex-col gap-5" aria-label="Mobile navigation">
             <NavLink to="/" mobile>
               {t("nav.home")}
             </NavLink>
@@ -163,6 +167,7 @@ function NavLink({ to, children, mobile }) {
   return (
     <Link
       to={to}
+      aria-current={active ? "page" : undefined}
       className={`font-body text-sm tracking-wider transition-colors ${
         mobile ? "text-lg" : ""
       } ${active ? "text-silk-red" : "text-navy hover:text-silk-red"}`}

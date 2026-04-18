@@ -11,15 +11,34 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@context/AuthContext';
 import { fetchWithAuth } from '../services/api';
+import AccountBrandAddItem from './AccountBrandAddItem';
 
 /* ── Profile ─────────────────────────────────────────────────── */
 function AccountProfile() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const primaryAddress = Array.isArray(user?.addresses) ? user.addresses[0] : null;
+  const addressParts = primaryAddress
+    ? [
+        primaryAddress.line1,
+        primaryAddress.line2,
+        primaryAddress.city,
+        primaryAddress.state,
+        primaryAddress.postalCode,
+        primaryAddress.country,
+      ].filter(Boolean)
+    : [];
+
   return (
     <div>
       <p className="font-display text-2xl mb-4">{t('account.greeting', { name: user?.name })}</p>
       <p className="text-obsidian/60">{user?.email}</p>
+      {addressParts.length > 0 && (
+        <div className="mt-6">
+          <p className="text-sm font-medium text-navy mb-1">{t('account.address_details')}</p>
+          <p className="text-sm text-obsidian/60">{addressParts.join(', ')}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -29,12 +48,19 @@ function AccountSettings() {
   const { user, updateProfile, updatePassword } = useAuth();
   const { t } = useTranslation();
   const isBrand = user?.accountType === 'BRAND';
+  const primaryAddress = Array.isArray(user?.addresses) ? user.addresses[0] || {} : {};
 
   const [firstName,   setFirstName]   = useState(user?.firstName   || '');
   const [lastName,    setLastName]    = useState(user?.lastName    || '');
   const [companyName, setCompanyName] = useState(user?.companyName || '');
   const [phone,       setPhone]       = useState(user?.phone       || '');
   const [email,       setEmail]       = useState(user?.email       || '');
+  const [line1,       setLine1]       = useState(primaryAddress.line1      || '');
+  const [line2,       setLine2]       = useState(primaryAddress.line2      || '');
+  const [city,        setCity]        = useState(primaryAddress.city       || '');
+  const [state,       setState]       = useState(primaryAddress.state      || '');
+  const [postalCode,  setPostalCode]  = useState(primaryAddress.postalCode || '');
+  const [country,     setCountry]     = useState(primaryAddress.country    || '');
   const [profileMsg,  setProfileMsg]  = useState('');
   const [profileBusy, setProfileBusy] = useState(false);
 
@@ -48,8 +74,18 @@ function AccountSettings() {
     e.preventDefault();
     setProfileMsg('');
     if (!email.trim()) return setProfileMsg(t('account.email') + ' is required.');
+    const address = {
+      line1: line1.trim(),
+      line2: line2.trim(),
+      city: city.trim(),
+      state: state.trim(),
+      postalCode: postalCode.trim(),
+      country: country.trim(),
+    };
+    const addresses = Object.values(address).some(Boolean) ? [address] : [];
+
     setProfileBusy(true);
-    const res = await updateProfile({ firstName, lastName, companyName, phone, email });
+    const res = await updateProfile({ firstName, lastName, companyName, phone, email, addresses });
     setProfileBusy(false);
     setProfileMsg(res.success ? t('account.profile_saved') : res.message);
   }
@@ -106,6 +142,41 @@ function AccountSettings() {
             <label htmlFor="s-phone" className={labelCls}>{t('account.phone')}</label>
             <input id="s-phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} className={inputCls} autoComplete="tel" />
           </div>
+
+          <div className="pt-4 border-t border-zinc-100">
+            <h3 className="font-display text-lg mb-4 text-navy">{t('account.address_details')}</h3>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="s-address-line1" className={labelCls}>{t('account.address_line1')}</label>
+                <input id="s-address-line1" type="text" value={line1} onChange={e => setLine1(e.target.value)} className={inputCls} autoComplete="address-line1" />
+              </div>
+              <div>
+                <label htmlFor="s-address-line2" className={labelCls}>{t('account.address_line2')}</label>
+                <input id="s-address-line2" type="text" value={line2} onChange={e => setLine2(e.target.value)} className={inputCls} autoComplete="address-line2" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="s-city" className={labelCls}>{t('account.city')}</label>
+                  <input id="s-city" type="text" value={city} onChange={e => setCity(e.target.value)} className={inputCls} autoComplete="address-level2" />
+                </div>
+                <div>
+                  <label htmlFor="s-state" className={labelCls}>{t('account.state')}</label>
+                  <input id="s-state" type="text" value={state} onChange={e => setState(e.target.value)} className={inputCls} autoComplete="address-level1" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="s-postal" className={labelCls}>{t('account.postal_code')}</label>
+                  <input id="s-postal" type="text" value={postalCode} onChange={e => setPostalCode(e.target.value)} className={inputCls} autoComplete="postal-code" />
+                </div>
+                <div>
+                  <label htmlFor="s-country" className={labelCls}>{t('account.country')}</label>
+                  <input id="s-country" type="text" value={country} onChange={e => setCountry(e.target.value)} className={inputCls} autoComplete="country-name" />
+                </div>
+              </div>
+            </div>
+          </div>
+
           {profileMsg && (
             <p role="alert" className={`text-sm ${profileMsg === t('account.profile_saved') ? 'text-green-600' : 'text-red-500'}`}>{profileMsg}</p>
           )}
@@ -241,7 +312,7 @@ function AccountOrders() {
 }
 
 /* ── Page shell ──────────────────────────────────────────────── */
-const tabs = [
+const baseTabs = [
   { path: '',               label: 'profile'       },
   { path: 'orders',        label: 'orders'        },
   { path: 'settings',      label: 'settings'      },
@@ -250,7 +321,7 @@ const tabs = [
 
 export default function Account() {
   const { t } = useTranslation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const location = useLocation();
 
   return (
@@ -260,7 +331,7 @@ export default function Account() {
       <div className="flex flex-col md:flex-row gap-12">
         {/* Sidebar */}
         <aside className="w-full md:w-48 space-y-2">
-          {tabs.map(tab => {
+          {baseTabs.map(tab => {
             const href = `/account${tab.path ? `/${tab.path}` : ''}`;
             const active = location.pathname === href;
             return (
@@ -275,6 +346,15 @@ export default function Account() {
               </Link>
             );
           })}
+
+          {/* If user is a brand show product creation link */}
+          {user?.accountType === 'BRAND' && (
+            <Link to="/account/brand/add-item" className={`block font-body text-sm tracking-wider py-2 border-b border-transparent ${location.pathname.startsWith('/account/brand') ? 'text-silk-amber border-silk-amber' : 'text-navy/60 hover:text-navy'}`}>
+              Add Item
+            </Link>
+          )}
+
+          {/* brand tab link (only visible to brand users; rendered later in BrandAreaWrapper) */}
           <button
             onClick={logout}
             className="block w-full text-left font-body text-sm text-navy/40 hover:text-red-400 py-2 mt-4 transition-colors"
@@ -290,9 +370,29 @@ export default function Account() {
             <Route path="orders"         element={<AccountOrders       />} />
             <Route path="settings"       element={<AccountSettings     />} />
             <Route path="notifications"  element={<AccountNotifications />} />
+            <Route path="brand/*"        element={<BrandAreaWrapper />} />
           </Routes>
         </div>
       </div>
     </div>
+  );
+}
+
+function BrandAreaWrapper() {
+  const { user } = useAuth();
+
+  if (!user || user.accountType !== 'BRAND') {
+    return (
+      <div className="p-6 border rounded-md">
+        <p className="text-navy/70">This section is available for Brand accounts only.</p>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<AccountBrandAddItem />} />
+      <Route path="add-item" element={<AccountBrandAddItem />} />
+    </Routes>
   );
 }

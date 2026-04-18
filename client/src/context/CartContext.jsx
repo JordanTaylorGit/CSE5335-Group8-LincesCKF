@@ -11,7 +11,6 @@ const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
-  const [cart, setCart] = useState([]);
   const [message, setMessage] = useState("");
   const timerRef = useRef(null);
 
@@ -119,13 +118,13 @@ export function CartProvider({ children }) {
   );
 
   const cartTotal = useMemo(
-    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
+    () => cartItems.reduce((total, item) => total + Number(item.price) * item.quantity, 0),
     [cartItems]
   );
 
   const clearCart = () => {
-  setCart([]);
-};
+    setCartItems([]);
+  };
 
   return (
     <CartContext.Provider

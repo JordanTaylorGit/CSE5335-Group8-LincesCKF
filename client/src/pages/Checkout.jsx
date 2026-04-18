@@ -29,6 +29,21 @@ function Checkout() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const parseField = (field) => {
+    if (!field) return [];
+    if (Array.isArray(field)) return field;
+    try {
+      return JSON.parse(field);
+    } catch {
+      return [];
+    }
+  };
+
+  const getItemImage = (item) => {
+    const images = parseField(item.images);
+    return images[0] || item.image || '';
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -93,7 +108,7 @@ function Checkout() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f4f1] px-4 py-8">
+    <div className="min-h-screen bg-[#f6f4f1] px-4 py-8">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
         <div className="bg-white rounded-2xl shadow-md p-6">
           <h1 className="text-2xl font-bold mb-6">Checkout</h1>
@@ -219,7 +234,7 @@ function Checkout() {
                 >
                   <div className="flex items-center gap-3">
                     <img
-                      src={item.images ? JSON.parse(item.images)[0] : item.image}
+                      src={getItemImage(item)}
                       alt={item.name}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
@@ -232,20 +247,20 @@ function Checkout() {
                   </div>
 
                   <p className="font-medium">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ${(Number(item.price) * item.quantity).toFixed(2)}
                   </p>
                 </div>
               ))}
 
               <div className="flex justify-between pt-4 text-lg font-bold">
                 <span>Total</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>${Number(cartTotal).toFixed(2)}</span>
               </div>
             </div>
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

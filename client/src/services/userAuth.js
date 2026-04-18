@@ -39,8 +39,15 @@ export const authService = {
 
     const data = await response.json();
     localStorage.setItem('token', data.token);
-    // Profile isn't fully returned on register sometimes, we can fetch it or construct it
-    return { id: data.userId, email: userData.email, accountType: userData.accountType || 'CUSTOMER', firstName: userData.firstName, lastName: userData.lastName };
+    return data.user || {
+      id: data.userId,
+      email: userData.email,
+      accountType: userData.accountType || 'CUSTOMER',
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      companyName: userData.companyName,
+      phone: userData.phone
+    };
   },
 
   async getCurrentUser() {

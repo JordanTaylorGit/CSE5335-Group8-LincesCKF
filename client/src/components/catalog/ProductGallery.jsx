@@ -20,12 +20,15 @@ function ProductGallery({ images, selectedImage, setSelectedImage, name }) {
         {images.map((img, index) => (
           <button
             key={index}
+            type="button"
             onClick={() => setSelectedImage(img)}
             className={`border-2 ${selectedImage === img ? "border-[#111a2f]" : "border-[#e8dfd4]"}`}
+            aria-label={`View image ${index + 1} for ${name}`}
+            aria-pressed={selectedImage === img}
           >
             <img
               src={img}
-              alt={`${name}-${index}`}
+              alt={`${name} thumbnail ${index + 1}`}
               className="w-full h-24 object-cover"
             />
           </button>

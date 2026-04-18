@@ -1,4 +1,4 @@
-export const API_URL = 'http://localhost:5001/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 export const fetchWithAuth = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
@@ -22,5 +22,5 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
   }
 
-  return response.json();
+  return response.status === 204 ? null : response.json();
 };

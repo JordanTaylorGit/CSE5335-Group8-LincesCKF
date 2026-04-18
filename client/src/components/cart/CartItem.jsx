@@ -37,6 +37,7 @@ function CartItem({ item }) {
               decreaseQuantity(item.id, item.selectedColor, item.selectedSize)
             }
             className="h-9 w-9 rounded-md border border-gray-300 bg-white text-lg font-medium text-slate-700"
+            aria-label={`Decrease quantity for ${item.name}`}
           >
             -
           </button>
@@ -51,6 +52,7 @@ function CartItem({ item }) {
               increaseQuantity(item.id, item.selectedColor, item.selectedSize)
             }
             className="h-9 w-9 rounded-md border border-gray-300 bg-white text-lg font-medium text-slate-700"
+            aria-label={`Increase quantity for ${item.name}`}
           >
             +
           </button>
@@ -62,6 +64,7 @@ function CartItem({ item }) {
             removeFromCart(item.id, item.selectedColor, item.selectedSize)
           }
           className="rounded-md bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+          aria-label={`Remove ${item.name} from cart`}
         >
           {t('cart.remove')}
         </button>

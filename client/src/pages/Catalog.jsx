@@ -74,7 +74,9 @@ function Catalog() {
           {categories.map((category) => (
             <button
               key={category}
+              type="button"
               onClick={() => handleCategoryChange(category)}
+              aria-pressed={selectedCategory === category}
               style={{
                 padding: "10px 16px",
                 borderRadius: "8px",
@@ -119,6 +121,7 @@ function Catalog() {
             {t('catalog.results', { count: filteredProducts.length })}
           </p>
           <button
+            type="button"
             onClick={() => setVisibleCount(v => v + 3)}
             style={{
               fontFamily: 'Cinzel, serif',

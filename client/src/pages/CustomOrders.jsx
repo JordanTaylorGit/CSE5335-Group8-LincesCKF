@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { fetchWithAuth } from '../services/api';
 
 const CustomOrders = () => {
   const { t } = useTranslation();
@@ -71,12 +72,8 @@ const CustomOrders = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/custom-orders', {
+      await fetchWithAuth('/custom-orders', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-        },
         body: JSON.stringify({
           orderType,
           contactInfo: {
@@ -92,8 +89,6 @@ const CustomOrders = () => {
           }
         })
       });
-
-      if (!response.ok) throw new Error('Submission failed');
       
       setIsSubmitted(true);
       setStep(3);

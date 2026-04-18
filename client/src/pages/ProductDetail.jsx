@@ -21,22 +21,25 @@ function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
 
+  const parseField = (field) => {
+    if (!field) return [];
+    if (Array.isArray(field)) return field;
+    try {
+      return JSON.parse(field);
+    } catch {
+      return [];
+    }
+  };
+
   useEffect(() => {
     fetchWithAuth(`/products/${id}`)
       .then(data => {
         setProduct(data);
-        if (data.colors) {
-          try {
-            const parsedColors = JSON.parse(data.colors);
-            if (parsedColors.length > 0) setSelectedColor({ name: parsedColors[0] });
-          } catch(e) {}
-        }
-        if (data.sizes) {
-          try {
-            const parsedSizes = JSON.parse(data.sizes);
-            if (parsedSizes.length > 0) setSelectedSize(parsedSizes[0]);
-          } catch(e) {}
-        }
+        const parsedColors = parseField(data.colors);
+        const parsedSizes = parseField(data.sizes);
+
+        if (parsedColors.length > 0) setSelectedColor({ name: parsedColors[0] });
+        if (parsedSizes.length > 0) setSelectedSize(parsedSizes[0]);
         setLoading(false);
       })
       .catch(err => {
@@ -56,13 +59,14 @@ function ProductDetails() {
     return <div className="p-10 text-lg">{t('product.productNotFound')}</div>;
   }
 
-  const parsedImages = product.images ? JSON.parse(product.images) : [];
+  const parsedImages = parseField(product.images);
   const imageUrl = parsedImages[0] || '';
-  const parsedColors = product.colors ? JSON.parse(product.colors) : [];
-  const parsedSizes = product.sizes ? JSON.parse(product.sizes) : [];
+  const parsedColors = parseField(product.colors);
+  const parsedSizes = parseField(product.sizes);
+  const displayPrice = Number(product.price).toFixed(2);
 
   return (
-    <main className="min-h-screen bg-[#f5f5f5] py-10">
+    <div className="min-h-screen bg-[#f5f5f5] py-10">
 
       <div className="mx-auto grid max-w-[1400px] gap-10 px-8 lg:grid-cols-2">
         <div className="overflow-hidden rounded-[18px] bg-white shadow-sm">
@@ -84,7 +88,7 @@ function ProductDetails() {
           </h1>
 
           <p className="mt-4 text-[28px] font-bold text-slate-900">
-            ${product.price.toFixed(2)}
+            ${displayPrice}
           </p>
 
           <p className="mt-6 text-[16px] leading-7 text-slate-600">
@@ -107,6 +111,7 @@ function ProductDetails() {
                       ? "border-slate-900 bg-slate-900 text-white"
                       : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
                   }`}
+                  aria-pressed={selectedColor?.name === color}
                 >
                   <span>{color}</span>
                 </button>
@@ -130,6 +135,7 @@ function ProductDetails() {
                       ? "border-slate-900 bg-slate-900 text-white"
                       : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
                   }`}
+                  aria-pressed={selectedSize === size}
                 >
                   {size}
                 </button>
@@ -145,7 +151,7 @@ function ProductDetails() {
           </button>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

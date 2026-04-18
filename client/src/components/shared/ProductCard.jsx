@@ -77,6 +77,7 @@ function ProductCard({ product }) {
                     : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
                 }`}
                 title={color}
+                aria-pressed={selectedColor?.name === color}
               >
                 <span>{color}</span>
               </button>
@@ -97,6 +98,7 @@ function ProductCard({ product }) {
                     ? "border-slate-900 bg-slate-900 text-white"
                     : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
                 }`}
+                aria-pressed={selectedSize === size}
               >
                 {size}
               </button>

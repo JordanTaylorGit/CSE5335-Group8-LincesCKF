@@ -48,13 +48,13 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function updateProfile({ firstName, lastName, companyName, phone, email }) {
+  async function updateProfile({ firstName, lastName, companyName, phone, email, addresses }) {
     try {
-      await fetchWithAuth('/users/profile', {
+      const data = await fetchWithAuth('/users/profile', {
         method: 'PUT',
-        body: JSON.stringify({ firstName, lastName, companyName, phone, email })
+        body: JSON.stringify({ firstName, lastName, companyName, phone, email, addresses })
       });
-      setUser({ ...user, firstName, lastName, companyName, phone, email });
+      setUser(data.user || { ...user, firstName, lastName, companyName, phone, email, addresses });
       return { success: true };
     } catch (err) {
       return { success: false, message: err?.message || 'Failed to update profile.' };
@@ -62,12 +62,28 @@ export function AuthProvider({ children }) {
   }
 
   async function updatePassword({ currentPassword, newPassword }) {
-    // Requires a PUT /api/users/password endpoint.
-    return { success: false, message: 'Password update not fully implemented in barebones backend.' };
+    try {
+      await fetchWithAuth('/users/password', {
+        method: 'PUT',
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Failed to update password.' };
+    }
   }
 
   async function updateNotifications(notifications) {
-    return { success: false, message: 'Notification update not fully implemented in barebones backend.' };
+    try {
+      const data = await fetchWithAuth('/users/notifications', {
+        method: 'PUT',
+        body: JSON.stringify(notifications)
+      });
+      setUser(data.user || { ...user, notifications });
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Failed to update notification preferences.' };
+    }
   }
 
   function logout() {

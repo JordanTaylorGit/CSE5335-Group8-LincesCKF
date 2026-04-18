@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, Phone, MapPin, CheckCircle } from 'lucide-react';
+import { fetchWithAuth } from '../services/api';
 
 export default function Contact() {
   const { t } = useTranslation();
@@ -22,16 +23,13 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      await fetchWithAuth('/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      if (response.ok) {
-        setSubmitted(true);
-      }
+      setSubmitted(true);
     } catch (err) {
-      alert("Failed to submit contact message.");
+      alert(err.message || "Failed to submit contact message.");
     }
   };
 
