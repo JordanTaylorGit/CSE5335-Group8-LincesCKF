@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -7,7 +9,10 @@ const db = require('./config/db');
 // App setup
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: ['https://dctdo5snio73e.cloudfront.net', 'http://localhost:5173'],
+  credentials: true
+}));
 app.use(express.json());
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_for_lincesckf';
@@ -17,6 +22,8 @@ const VALID_ACCOUNT_TYPES = new Set(['CUSTOMER', 'BRAND', 'ADMIN']);
 const VALID_LANGUAGES = new Set(['EN', 'ES']);
 const DEFAULT_COUNTRY = 'United States';
 const DEFAULT_PAYMENT_METHOD = 'CARD';
+
+
 
 // Small helpers
 function dbQuery(sql, params = []) {
@@ -966,6 +973,48 @@ app.post('/api/auth/login', async (req, res) => {
 
   if (!isValidEmail(normalizedEmail) || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
+  db.query(
+    `UPDATE Users SET firstName=?, lastName=?, email=?, phone=?, companyName=?, addresses=? WHERE id=?`,
+    [firstName, lastName, email, phone, companyName, JSON.stringify(addresses), req.user.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Profile updated' });
+    }
+  );
+});
+
+// ==========================================
+// 3.2 Products
+// ==========================================
+app.get('/api/products', (req, res) => {
+  db.query(`SELECT * FROM Products`, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+app.get('api/products/featured', (req, res) => {
+  const query = 'SELECT * FROM products WHERE featured = 1 LIMIT 4';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(results);
+  });
+});
+
+app.get('/api/products/:id', (req, res) => {
+  db.query(`SELECT * FROM Products WHERE id = ?`, [req.params.id], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Product not found' });
+    res.json(results[0]);
+  });
+});
+
+app.post('/api/products', authMiddleware, (req, res) => {
+  if (req.user.accountType !== 'BRAND') {
+    return res.status(403).json({ error: 'Only brands can create products' });
   }
 
   try {
