@@ -23,6 +23,7 @@ function Catalog() {
     typeof window === "undefined" ? 4 : getColumnCount(window.innerWidth)
   );
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedBrand, setSelectedBrand] = useState("all");
   const [products, setProducts] = useState([]);
   const [visibleCount, setVisibleCount] = useState(() =>
     typeof window === "undefined" ? 4 : getColumnCount(window.innerWidth)
@@ -30,6 +31,11 @@ function Catalog() {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
+    setVisibleCount(columnCount);
+  };
+
+  const handleBrandChange = (event) => {
+    setSelectedBrand(event.target.value);
     setVisibleCount(columnCount);
   };
 
@@ -48,6 +54,12 @@ function Catalog() {
 
 
   const categories = ["all", ...new Set(products.map((p) => p.category))];
+  const brands = useMemo(
+    () =>
+      [...new Set(products.map((p) => String(p.brandName || "").trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b)),
+    [products]
+  );
 
   const categoryLabels = {
     all:    'catalog.allCategories',
@@ -62,11 +74,15 @@ function Catalog() {
   const getLabel = (key) => t(categoryLabels[key]) || key;
 
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === "all") {
-      return products;
-    }
-    return products.filter((product) => product.category === selectedCategory);
-  }, [selectedCategory, products]);
+    return products.filter((product) => {
+      const categoryMatch =
+        selectedCategory === "all" || product.category === selectedCategory;
+      const brandMatch =
+        selectedBrand === "all" || product.brandName === selectedBrand;
+
+      return categoryMatch && brandMatch;
+    });
+  }, [selectedCategory, selectedBrand, products]);
 
   useEffect(() => {
     setVisibleCount((prev) => {
@@ -132,6 +148,43 @@ function Catalog() {
                 {getLabel(category)}
               </button>
             ))}
+
+            <label
+              htmlFor="catalog-brand-filter"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "10px 14px",
+                borderRadius: "8px",
+                border: "1px solid #d1d5db",
+                backgroundColor: "#ffffff",
+                color: "#111827",
+                fontWeight: 500,
+              }}
+            >
+              <span>{t('catalog.brandFilter')}</span>
+              <select
+                id="catalog-brand-filter"
+                value={selectedBrand}
+                onChange={handleBrandChange}
+                style={{
+                  border: "none",
+                  backgroundColor: "transparent",
+                  color: "#111827",
+                  fontWeight: 500,
+                  outline: "none",
+                  paddingRight: "6px",
+                }}
+              >
+                <option value="all">{t('catalog.allBrands')}</option>
+                {brands.map((brand) => (
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
 
           <p style={{ color: "#6b7280" }}>

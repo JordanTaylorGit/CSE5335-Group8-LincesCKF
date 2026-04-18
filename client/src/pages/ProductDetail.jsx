@@ -125,6 +125,12 @@ function ProductDetails() {
             {productName}
           </h1>
 
+          {product.brandName && (
+            <p className="mt-3 text-[16px] text-slate-600">
+              <span className="font-medium text-slate-800">{t('product.brand')}:</span> {product.brandName}
+            </p>
+          )}
+
           <p className="mt-4 text-[28px] font-bold text-slate-900">
             ${displayPrice}
           </p>

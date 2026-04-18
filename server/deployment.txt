@@ -80,14 +80,34 @@ CREATE TABLE IF NOT EXISTS ContactMessages (
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert Default Products
-INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors) VALUES 
-('Classic Silk Blouse', 'Elegant 100% pure silk blouse with a tailored fit, perfect for professional or evening wear.', 120.00, 'blouse', '100% Silk', '["https://images.pexels.com/photos/19895950/pexels-photo-19895950.jpeg?cs=srgb&dl=pexels-marceloverfe-19895950.jpg&fm=jpg"]', 50, '["XS", "S", "M", "L", "XL"]', '["White", "Navy", "Burgundy"]'),
-('V-Neck Satin Blouse', 'A smooth satin finish blouse with a relaxed v-neckline for effortless elegance.', 95.00, 'blouse', 'Satin Silk Blend', '["https://images.pexels.com/photos/19895954/pexels-photo-19895954.jpeg?cs=srgb&dl=pexels-marceloverfe-19895954.jpg&fm=jpg"]', 40, '["S", "M", "L"]', '["Black", "Rose", "Silver"]'),
-('Ruffled Chiffon Blouse', 'Delicate and sheer chiffon blouse with ruffled detailing along the button placket.', 110.00, 'blouse', '100% Silk Chiffon', '["https://images.pexels.com/photos/22441278/pexels-photo-22441278.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441278.jpg&fm=jpg"]', 25, '["XS", "S", "M", "L"]', '["Blush", "Ivory"]'),
-('Evening Silk Dress', 'A flowing silk maxi dress featuring a cowl neckline and adjustable straps.', 250.00, 'dress', '95% Silk, 5% Elastane', '["https://images.pexels.com/photos/11813835/pexels-photo-11813835.jpeg?cs=srgb&dl=pexels-vladimir-konoplev-155326297-11813835.jpg&fm=jpg"]', 30, '["S", "M", "L"]', '["Black", "Emerald", "Champagne"]'),
-('Essential Silk Shirt', 'A versatile button-down silk shirt for everyday luxury.', 145.00, 'shirt', '100% Washable Silk', '["https://images.pexels.com/photos/10131161/pexels-photo-10131161.jpeg?cs=srgb&dl=pexels-ron-lach-10131161.jpg&fm=jpg"]', 75, '["XS", "S", "M", "L", "XL", "XXL"]', '["Ivory", "Charcoal", "Blush"]'),
-('Printed Silk Scarf', 'A 36" square silk twill scarf featuring an exclusive geometric print.', 65.00, 'scarf', '100% Silk Twill', '["https://images.pexels.com/photos/3844856/pexels-photo-3844856.jpeg?cs=srgb&dl=pexels-nuy-nuy-2192969-3844856.jpg&fm=jpg"]', 100, '["One Size"]', '["Geometric Print", "Floral Print"]');
+INSERT INTO Users (firstName, lastName, email, passwordHash, phone, accountType, companyName, addresses, notificationPreferences)
+VALUES ('', '', 'seda.atelier@lincesckf.com', '$2b$10$cVaiNEUxjRs0vAN/dwlp5O9ExYUHdEBN8.7HfB9ohNDyAwMuM6EMy', '+1 000 111 0001', 'BRAND', 'Seda Atelier', '[]', '{"email": true, "sms": false}')
+ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), accountType = 'BRAND', companyName = 'Seda Atelier', phone = '+1 000 111 0001';
+SET @brand1Id = LAST_INSERT_ID();
+
+INSERT INTO Users (firstName, lastName, email, passwordHash, phone, accountType, companyName, addresses, notificationPreferences)
+VALUES ('', '', 'casa.lunaria@lincesckf.com', '$2b$10$cVaiNEUxjRs0vAN/dwlp5O9ExYUHdEBN8.7HfB9ohNDyAwMuM6EMy', '+1 000 111 0002', 'BRAND', 'Casa Lunaria', '[]', '{"email": true, "sms": false}')
+ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), accountType = 'BRAND', companyName = 'Casa Lunaria', phone = '+1 000 111 0002';
+SET @brand2Id = LAST_INSERT_ID();
+
+INSERT INTO Users (firstName, lastName, email, passwordHash, phone, accountType, companyName, addresses, notificationPreferences)
+VALUES ('', '', 'brisa.silk@lincesckf.com', '$2b$10$cVaiNEUxjRs0vAN/dwlp5O9ExYUHdEBN8.7HfB9ohNDyAwMuM6EMy', '+1 000 111 0003', 'BRAND', 'Brisa Silk House', '[]', '{"email": true, "sms": false}')
+ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), accountType = 'BRAND', companyName = 'Brisa Silk House', phone = '+1 000 111 0003';
+SET @brand3Id = LAST_INSERT_ID();
+
+INSERT INTO Users (firstName, lastName, email, passwordHash, phone, accountType, companyName, addresses, notificationPreferences)
+VALUES ('', '', 'atelier.marfil@lincesckf.com', '$2b$10$cVaiNEUxjRs0vAN/dwlp5O9ExYUHdEBN8.7HfB9ohNDyAwMuM6EMy', '+1 000 111 0004', 'BRAND', 'Atelier Marfil', '[]', '{"email": true, "sms": false}')
+ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), accountType = 'BRAND', companyName = 'Atelier Marfil', phone = '+1 000 111 0004';
+SET @brand4Id = LAST_INSERT_ID();
+
+-- Insert Catalog Products
+INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors, brandId) VALUES 
+('Classic Silk Blouse', 'Elegant 100% pure silk blouse with a tailored fit, perfect for professional or evening wear.', 120.00, 'blouse', '100% Silk', '["https://images.pexels.com/photos/19895950/pexels-photo-19895950.jpeg?cs=srgb&dl=pexels-marceloverfe-19895950.jpg&fm=jpg"]', 50, '["XS", "S", "M", "L", "XL"]', '["White", "Navy", "Burgundy"]', @brand1Id),
+('V-Neck Satin Blouse', 'A smooth satin finish blouse with a relaxed v-neckline for effortless elegance.', 95.00, 'blouse', 'Satin Silk Blend', '["https://images.pexels.com/photos/19895954/pexels-photo-19895954.jpeg?cs=srgb&dl=pexels-marceloverfe-19895954.jpg&fm=jpg"]', 40, '["S", "M", "L"]', '["Black", "Rose", "Silver"]', @brand2Id),
+('Ruffled Chiffon Blouse', 'Delicate and sheer chiffon blouse with ruffled detailing along the button placket.', 110.00, 'blouse', '100% Silk Chiffon', '["https://images.pexels.com/photos/22441278/pexels-photo-22441278.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441278.jpg&fm=jpg"]', 25, '["XS", "S", "M", "L"]', '["Blush", "Ivory"]', @brand3Id),
+('Evening Silk Dress', 'A flowing silk maxi dress featuring a cowl neckline and adjustable straps.', 250.00, 'dress', '95% Silk, 5% Elastane', '["https://images.pexels.com/photos/11813835/pexels-photo-11813835.jpeg?cs=srgb&dl=pexels-vladimir-konoplev-155326297-11813835.jpg&fm=jpg"]', 30, '["S", "M", "L"]', '["Black", "Emerald", "Champagne"]', @brand1Id),
+('Essential Silk Shirt', 'A versatile button-down silk shirt for everyday luxury.', 145.00, 'shirt', '100% Washable Silk', '["https://images.pexels.com/photos/10131161/pexels-photo-10131161.jpeg?cs=srgb&dl=pexels-ron-lach-10131161.jpg&fm=jpg"]', 75, '["XS", "S", "M", "L", "XL", "XXL"]', '["Ivory", "Charcoal", "Blush"]', @brand1Id),
+('Printed Silk Scarf', 'A 36" square silk twill scarf featuring an exclusive geometric print.', 65.00, 'scarf', '100% Silk Twill', '["https://images.pexels.com/photos/3844856/pexels-photo-3844856.jpeg?cs=srgb&dl=pexels-nuy-nuy-2192969-3844856.jpg&fm=jpg"]', 100, '["One Size"]', '["Geometric Print", "Floral Print"]', @brand1Id);
 ```
 
 ---

@@ -158,6 +158,19 @@ async function getUserById(id) {
   return rows[0] || null;
 }
 
+const PRODUCT_SELECT_SQL = `
+  SELECT
+    p.*,
+    COALESCE(
+      NULLIF(u.companyName, ''),
+      NULLIF(TRIM(CONCAT_WS(' ', u.firstName, u.lastName)), ''),
+      u.email,
+      ''
+    ) AS brandName
+  FROM Products p
+  LEFT JOIN Users u ON p.brandId = u.id
+`;
+
 function serializeProduct(row) {
   const images = parseJson(row.images, []);
 
@@ -170,6 +183,7 @@ function serializeProduct(row) {
     nameEs: row.name,
     descriptionEn: row.description,
     descriptionEs: row.description,
+    brandName: row.brandName || '',
   };
 }
 
@@ -609,8 +623,8 @@ app.get('/api/products', async (req, res) => {
   try {
     const { category } = req.query;
     const rows = category && category !== 'all'
-      ? await dbQuery(`SELECT * FROM Products WHERE category = ? ORDER BY id ASC`, [category])
-      : await dbQuery(`SELECT * FROM Products ORDER BY id ASC`);
+      ? await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.category = ? ORDER BY p.id ASC`, [category])
+      : await dbQuery(`${PRODUCT_SELECT_SQL} ORDER BY p.id ASC`);
 
     res.json(rows.map(serializeProduct));
   } catch (error) {
@@ -621,8 +635,8 @@ app.get('/api/products', async (req, res) => {
 app.get('/api/products/brand/my-products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res) => {
   try {
     const rows = req.user.accountType === 'ADMIN'
-      ? await dbQuery(`SELECT * FROM Products ORDER BY id DESC`)
-      : await dbQuery(`SELECT * FROM Products WHERE brandId = ? ORDER BY id DESC`, [req.user.id]);
+      ? await dbQuery(`${PRODUCT_SELECT_SQL} ORDER BY p.id DESC`)
+      : await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.brandId = ? ORDER BY p.id DESC`, [req.user.id]);
 
     res.json(rows.map(serializeProduct));
   } catch (error) {
@@ -632,7 +646,7 @@ app.get('/api/products/brand/my-products', requireAccountTypes('BRAND', 'ADMIN')
 
 app.get('/api/products/:id', async (req, res) => {
   try {
-    const rows = await dbQuery(`SELECT * FROM Products WHERE id = ?`, [req.params.id]);
+    const rows = await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.id = ?`, [req.params.id]);
     const product = rows[0];
     if (!product) return res.status(404).json({ error: 'Product not found' });
     res.json(serializeProduct(product));
@@ -649,7 +663,29 @@ app.post('/api/products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res
   }
 
   try {
-    const brandId = req.user.accountType === 'BRAND' ? req.user.id : req.body.brandId || null;
+    let brandId;
+
+    if (req.user.accountType === 'BRAND') {
+      brandId = req.user.id;
+    } else {
+      const requestedBrandId = Number(req.body.brandId);
+
+      if (!Number.isInteger(requestedBrandId) || requestedBrandId <= 0) {
+        return res.status(400).json({ error: 'A valid brand id is required' });
+      }
+
+      const brandRows = await dbQuery(
+        `SELECT id FROM Users WHERE id = ? AND accountType = 'BRAND'`,
+        [requestedBrandId]
+      );
+
+      if (brandRows.length === 0) {
+        return res.status(400).json({ error: 'Selected brand does not exist' });
+      }
+
+      brandId = requestedBrandId;
+    }
+
     const result = await dbQuery(
       `INSERT INTO Products (
         name,
@@ -677,7 +713,7 @@ app.post('/api/products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res
       ]
     );
 
-    const rows = await dbQuery(`SELECT * FROM Products WHERE id = ?`, [result.insertId]);
+    const rows = await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.id = ?`, [result.insertId]);
     res.status(201).json({
       message: 'Product created',
       product: serializeProduct(rows[0]),

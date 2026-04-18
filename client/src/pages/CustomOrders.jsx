@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { Factory, Package, Scissors } from 'lucide-react';
 import { fetchWithAuth } from '../services/api';
 
 const CustomOrders = () => {
@@ -32,19 +33,19 @@ const CustomOrders = () => {
       id: 'custom-garment',
       title: t('customOrders.types.customGarment.title'),
       description: t('customOrders.types.customGarment.description'),
-      icon: '🧵'
+      Icon: Scissors
     },
     {
       id: 'bulk-order',
       title: t('customOrders.types.bulkOrder.title'),
       description: t('customOrders.types.bulkOrder.description'),
-      icon: '📦'
+      Icon: Package
     },
     {
       id: 'b2b-manufacturing',
       title: t('customOrders.types.b2bManufacturing.title'),
       description: t('customOrders.types.b2bManufacturing.description'),
-      icon: '🏭'
+      Icon: Factory
     }
   ];
 
@@ -127,23 +128,29 @@ const CustomOrders = () => {
       </div>
 
       <div className="custom-orders-page__type-grid grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        {orderTypes.map((type, index) => (
-          <motion.button
-            key={type.id}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => handleOrderTypeSelect(type.id)}
-            className="text-left p-6 border-2 border-navy/20 rounded-lg hover:border-navy/50 transition-all duration-300"
-          >
-            <div className="text-4xl mb-4">{type.icon}</div>
-            <h3 className="font-semibold text-navy text-lg mb-2">
-              {type.title}
-            </h3>
-            <p className="text-navy/70 text-sm leading-relaxed">
-              {type.description}
-            </p>
-          </motion.button>
-        ))}
+        {orderTypes.map((type) => {
+          const Icon = type.Icon;
+
+          return (
+            <motion.button
+              key={type.id}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleOrderTypeSelect(type.id)}
+              className="text-left p-6 border-2 border-navy/20 rounded-lg hover:border-navy/50 transition-all duration-300"
+            >
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-navy text-white">
+                <Icon className="h-6 w-6" strokeWidth={1.7} aria-hidden="true" />
+              </div>
+              <h3 className="font-semibold text-navy text-lg mb-2">
+                {type.title}
+              </h3>
+              <p className="text-navy/70 text-sm leading-relaxed">
+                {type.description}
+              </p>
+            </motion.button>
+          );
+        })}
       </div>
     </motion.div>
   );

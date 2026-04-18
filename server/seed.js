@@ -1,4 +1,29 @@
+const bcrypt = require('bcryptjs');
 const db = require('./config/db');
+
+const SEEDED_BRAND_PASSWORD = 'BrandSeed123!';
+const SEEDED_BRANDS = [
+  {
+    email: 'seda.atelier@lincesckf.com',
+    companyName: 'Seda Atelier',
+    phone: '+1 000 111 0001',
+  },
+  {
+    email: 'casa.lunaria@lincesckf.com',
+    companyName: 'Casa Lunaria',
+    phone: '+1 000 111 0002',
+  },
+  {
+    email: 'brisa.silk@lincesckf.com',
+    companyName: 'Brisa Silk House',
+    phone: '+1 000 111 0003',
+  },
+  {
+    email: 'atelier.marfil@lincesckf.com',
+    companyName: 'Atelier Marfil',
+    phone: '+1 000 111 0004',
+  },
+];
 
 const initialProducts = [
   // BLOUSES
@@ -11,7 +36,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/19895950/pexels-photo-19895950.jpeg?cs=srgb&dl=pexels-marceloverfe-19895950.jpg&fm=jpg'],
     stockQuantity: 50,
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    colors: ['White', 'Navy', 'Burgundy']
+    colors: ['White', 'Navy', 'Burgundy'],
+    featured: 1
   },
   {
     name: 'V-Neck Satin Blouse',
@@ -22,7 +48,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/19895954/pexels-photo-19895954.jpeg?cs=srgb&dl=pexels-marceloverfe-19895954.jpg&fm=jpg'],
     stockQuantity: 40,
     sizes: ['S', 'M', 'L'],
-    colors: ['Black', 'Rose', 'Silver']
+    colors: ['Black', 'Rose', 'Silver'],
+    featured: 1
   },
   {
     name: 'Ruffled Chiffon Blouse',
@@ -33,7 +60,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/22441278/pexels-photo-22441278.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441278.jpg&fm=jpg'],
     stockQuantity: 25,
     sizes: ['XS', 'S', 'M', 'L'],
-    colors: ['Blush', 'Ivory']
+    colors: ['Blush', 'Ivory'],
+    featured: 1
   },
   {
     name: 'Wrap Style Silk Blouse',
@@ -44,7 +72,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/22441291/pexels-photo-22441291.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441291.jpg&fm=jpg'],
     stockQuantity: 35,
     sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Emerald', 'Midnight Blue']
+    colors: ['Emerald', 'Midnight Blue'],
+    featured: 1
   },
  
   // DRESSES
@@ -57,7 +86,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/11813835/pexels-photo-11813835.jpeg?cs=srgb&dl=pexels-vladimir-konoplev-155326297-11813835.jpg&fm=jpg'],
     stockQuantity: 30,
     sizes: ['S', 'M', 'L'],
-    colors: ['Black', 'Emerald', 'Champagne']
+    colors: ['Black', 'Emerald', 'Champagne'],
+    featured: 0
   },
   {
     name: 'Slip Silk Midi Dress',
@@ -68,7 +98,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/8916598/pexels-photo-8916598.jpeg?cs=srgb&dl=pexels-leeloothefirst-8916598.jpg&fm=jpg'],
     stockQuantity: 45,
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    colors: ['Ruby', 'Sapphire', 'Pearl']
+    colors: ['Ruby', 'Sapphire', 'Pearl'],
+    featured: 0
   },
   {
     name: 'Long Sleeve Wrap Dress',
@@ -79,7 +110,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/19895965/pexels-photo-19895965.jpeg?cs=srgb&dl=pexels-marceloverfe-19895965.jpg&fm=jpg'],
     stockQuantity: 20,
     sizes: ['S', 'M', 'L'],
-    colors: ['Navy', 'Plum']
+    colors: ['Navy', 'Plum'],
+    featured: 0
   },
   {
     name: 'Halter Neck Silk Gown',
@@ -90,7 +122,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/12290104/pexels-photo-12290104.jpeg?cs=srgb&dl=pexels-keynotez-12290104.jpg&fm=jpg'],
     stockQuantity: 15,
     sizes: ['XS', 'S', 'M'],
-    colors: ['Crimson', 'Gold', 'Black']
+    colors: ['Crimson', 'Gold', 'Black'],
+    featured: 0
   },
  
   // SHIRTS
@@ -103,7 +136,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/10131161/pexels-photo-10131161.jpeg?cs=srgb&dl=pexels-ron-lach-10131161.jpg&fm=jpg'],
     stockQuantity: 75,
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    colors: ['Ivory', 'Charcoal', 'Blush']
+    colors: ['Ivory', 'Charcoal', 'Blush'],
+    featured: 0
   },
   {
     name: 'Oversized Silk Button-Up',
@@ -114,7 +148,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/14459666/pexels-photo-14459666.jpeg?cs=srgb&dl=pexels-feyzayildirimphoto-14459666.jpg&fm=jpg'],
     stockQuantity: 60,
     sizes: ['S', 'M', 'L'],
-    colors: ['White', 'Light Blue', 'Olive']
+    colors: ['White', 'Light Blue', 'Olive'],
+    featured: 0
   },
   {
     name: 'Short Sleeve Silk Shirt',
@@ -125,7 +160,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/22441295/pexels-photo-22441295.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441295.jpg&fm=jpg'],
     stockQuantity: 50,
     sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Sand', 'Navy', 'Rust']
+    colors: ['Sand', 'Navy', 'Rust'],
+    featured: 0
   },
   {
     name: 'Pintuck Detail Silk Shirt',
@@ -136,7 +172,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/22441317/pexels-photo-22441317.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441317.jpg&fm=jpg'],
     stockQuantity: 30,
     sizes: ['XS', 'S', 'M', 'L'],
-    colors: ['Black', 'Cream']
+    colors: ['Black', 'Cream'],
+    featured: 0
   },
  
   // SCARVES
@@ -149,7 +186,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/3844856/pexels-photo-3844856.jpeg?cs=srgb&dl=pexels-nuy-nuy-2192969-3844856.jpg&fm=jpg'],
     stockQuantity: 100,
     sizes: ['One Size'],
-    colors: ['Geometric Print', 'Floral Print']
+    colors: ['Geometric Print', 'Floral Print'],
+    featured: 0
   },
   {
     name: 'Classic Skinny Silk Scarf',
@@ -160,7 +198,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/36455709/pexels-photo-36455709.jpeg?cs=srgb&dl=pexels-dauphotographer-36455709.jpg&fm=jpg'],
     stockQuantity: 120,
     sizes: ['One Size'],
-    colors: ['Leopard', 'Polka Dot', 'Solid Black']
+    colors: ['Leopard', 'Polka Dot', 'Solid Black'],
+    featured: 0
   },
   {
     name: 'Oversized Silk Wrap',
@@ -171,7 +210,8 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/36455711/pexels-photo-36455711.jpeg?cs=srgb&dl=pexels-dauphotographer-36455711.jpg&fm=jpg'],
     stockQuantity: 40,
     sizes: ['One Size'],
-    colors: ['Camel', 'Soft Grey', 'Navy']
+    colors: ['Camel', 'Soft Grey', 'Navy'],
+    featured: 0
   },
   {
     name: 'Artisan Hand-Dyed Scarf',
@@ -182,37 +222,114 @@ const initialProducts = [
     images: ['https://images.pexels.com/photos/36455718/pexels-photo-36455718.jpeg?cs=srgb&dl=pexels-dauphotographer-36455718.jpg&fm=jpg'],
     stockQuantity: 25,
     sizes: ['One Size'],
-    colors: ['Ocean Blue', 'Sunset Orange', 'Amethyst']
+    colors: ['Ocean Blue', 'Sunset Orange', 'Amethyst'],
+    featured: 0
   }
 ];
 
-function seedProducts() {
-  db.get(`SELECT COUNT(*) as count FROM Products`, [], (err, row) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    
-    // Always clear and re-seed for this update
-    console.log('Clearing old products and seeding new ones...');
-    db.run(`DELETE FROM Products`, (err) => {
-      if (err) console.error(err);
-      
-      const stmt = db.prepare(`INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-      
-      initialProducts.forEach(p => {
-        stmt.run([
-          p.name, p.description, p.price, p.category, p.material, 
-          JSON.stringify(p.images), p.stockQuantity, 
-          JSON.stringify(p.sizes), JSON.stringify(p.colors)
-        ]);
-      });
-      
-      stmt.finalize();
-      console.log('Products seeded successfully.');
+function dbQuery(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, params, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
     });
   });
 }
 
-// Wait a bit for DB to initialize before seeding
-setTimeout(seedProducts, 1000);
+async function ensureSeedBrands() {
+  const passwordHash = bcrypt.hashSync(SEEDED_BRAND_PASSWORD, 10);
+  const brandIds = [];
+
+  for (const brand of SEEDED_BRANDS) {
+    const result = await dbQuery(
+      `INSERT INTO Users (
+        firstName,
+        lastName,
+        email,
+        passwordHash,
+        phone,
+        accountType,
+        companyName,
+        addresses,
+        notificationPreferences
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        id = LAST_INSERT_ID(id),
+        accountType = 'BRAND',
+        companyName = ?,
+        phone = ?,
+        passwordHash = ?`,
+      [
+        '',
+        '',
+        brand.email,
+        passwordHash,
+        brand.phone,
+        'BRAND',
+        brand.companyName,
+        JSON.stringify([]),
+        JSON.stringify({ email: true, sms: false }),
+        brand.companyName,
+        brand.phone,
+        passwordHash,
+      ]
+    );
+
+    brandIds.push(result.insertId);
+  }
+
+  return brandIds;
+}
+
+async function seedProducts() {
+  const brandIds = await ensureSeedBrands();
+
+  console.log('Clearing old products and seeding new ones...');
+  await dbQuery(`DELETE FROM Products`);
+
+  for (const [index, product] of initialProducts.entries()) {
+    await dbQuery(
+      `INSERT INTO Products (
+        name,
+        description,
+        price,
+        category,
+        material,
+        images,
+        stockQuantity,
+        sizes,
+        colors,
+        featured,
+        brandId
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        product.name,
+        product.description,
+        product.price,
+        product.category,
+        product.material,
+        JSON.stringify(product.images),
+        product.stockQuantity,
+        JSON.stringify(product.sizes),
+        JSON.stringify(product.colors),
+        product.featured || 0,
+        brandIds[index % brandIds.length],
+      ]
+    );
+  }
+
+  console.log('Products seeded successfully.');
+  console.log('Seeded brands:');
+  SEEDED_BRANDS.forEach((brand) => {
+    console.log(`- ${brand.companyName} (${brand.email}) / ${SEEDED_BRAND_PASSWORD}`);
+  });
+}
+
+seedProducts()
+  .catch((error) => {
+    console.error('Failed to seed products:', error);
+    process.exitCode = 1;
+  })
+  .finally(() => {
+    db.end();
+  });

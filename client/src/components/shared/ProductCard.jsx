@@ -96,6 +96,12 @@ function ProductCard({ product }) {
           scarf: 'catalog.scarves', skirt: 'catalog.skirt', robe: 'catalog.robe' }[product.category] || product.category)}
         </p>
 
+        {product.brandName && (
+          <p className="product-card__brand mt-1 text-sm text-slate-600">
+            {t('product.brand')}: {product.brandName}
+          </p>
+        )}
+
         <h3 className="product-card__title mt-1 font-medium text-slate-900 line-clamp-2">
           {product.name}
         </h3>

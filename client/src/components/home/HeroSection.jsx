@@ -7,6 +7,7 @@
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ArrowRight } from 'lucide-react';
 
 export default function HeroSection() {
   const { t } = useTranslation();
@@ -141,9 +142,7 @@ export default function HeroSection() {
               onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.color = '#C8102E'; }}
             >
               <span>{t('hero.ctaShop')}</span>
-              <svg width="14" height="9" viewBox="0 0 14 9" fill="none">
-                <path d="M0 4.5H12M8.5 1L12 4.5L8.5 8" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
+              <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
             </Link>
 
             {/* Secondary — outlined white */}
