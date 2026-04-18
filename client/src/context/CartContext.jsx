@@ -28,7 +28,7 @@ export function CartProvider({ children }) {
     }, 5000);
   };
 
-  const parseField = (field) => {
+  const parseListField = (field) => {
     if (!field) return [];
     if (Array.isArray(field)) return field;
     try {
@@ -50,7 +50,7 @@ export function CartProvider({ children }) {
   };
 
   const getAvailableStock = (product, selectedSize) => {
-    const sizes = parseField(product.sizes);
+    const sizes = parseListField(product.sizes);
     const size = sizes.find(
       (entry) => getSizeName(entry).toLowerCase() === String(selectedSize || "").toLowerCase()
     );
@@ -102,15 +102,15 @@ export function CartProvider({ children }) {
       let parsedColors = [];
       try {
         parsedColors = typeof product.colors === 'string' ? JSON.parse(product.colors) : (product.colors || []);
-      } catch (e) {}
+      } catch {}
       
-      const colorObj = parsedColors.find(c => (c.name || c) === selectedColor);
+      const selectedColorEntry = parsedColors.find((color) => (color.name || color) === selectedColor);
       return [
         ...prevItems,
         {
           ...product,
           selectedColor,
-          selectedColorEs: colorObj?.nameEs || selectedColor,          
+          selectedColorEs: selectedColorEntry?.nameEs || selectedColor,
           selectedSize,
           quantity: 1,
         },

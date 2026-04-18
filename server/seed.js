@@ -1,7 +1,15 @@
 const bcrypt = require('bcryptjs');
 const db = require('./config/db');
 
+// Seed data used for local development
 const SEEDED_BRAND_PASSWORD = 'BrandSeed123!';
+const SEEDED_CUSTOMER_PASSWORD = 'CustomerSeed123!';
+const SEEDED_CUSTOMER = {
+  email: 'customer.demo@lincesckf.com',
+  firstName: 'Demo',
+  lastName: 'Customer',
+  phone: '+1 000 222 0001',
+};
 const SEEDED_BRANDS = [
   {
     email: 'seda.atelier@lincesckf.com',
@@ -236,89 +244,264 @@ function dbQuery(sql, params = []) {
   });
 }
 
+// Small helpers for categories and products
+const CATEGORY_METADATA = {
+  blouse: {
+    nameEs: 'blusa',
+    descriptionEn: 'Silk blouse collection',
+    descriptionEs: 'Coleccion de blusas de seda',
+  },
+  dress: {
+    nameEs: 'vestido',
+    descriptionEn: 'Silk dress collection',
+    descriptionEs: 'Coleccion de vestidos de seda',
+  },
+  shirt: {
+    nameEs: 'camisa',
+    descriptionEn: 'Silk shirt collection',
+    descriptionEs: 'Coleccion de camisas de seda',
+  },
+  scarf: {
+    nameEs: 'panuelo',
+    descriptionEn: 'Silk scarf collection',
+    descriptionEs: 'Coleccion de panuelos de seda',
+  },
+};
+
+function buildSeedSku(category, indexWithinCategory) {
+  const prefix = String(category || 'item')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 4)
+    .padEnd(4, 'X');
+
+  return `${prefix}-${String(indexWithinCategory).padStart(3, '0')}`;
+}
+
+function distributeSizeStock(sizes, totalStock) {
+  if (!Array.isArray(sizes) || sizes.length === 0) {
+    return [];
+  }
+
+  const safeTotal = Math.max(0, Number(totalStock) || 0);
+  const base = Math.floor(safeTotal / sizes.length);
+  let remainder = safeTotal % sizes.length;
+
+  return sizes.map((size) => {
+    const normalizedSize = String(size || '').trim() || 'One Size';
+    const stockQuantity = base + (remainder > 0 ? 1 : 0);
+
+    if (remainder > 0) {
+      remainder -= 1;
+    }
+
+    return {
+      name: normalizedSize,
+      stockQuantity,
+    };
+  });
+}
+
+async function ensureCategory(categoryName) {
+  const normalizedCategory = String(categoryName || 'other').trim().toLowerCase() || 'other';
+  const metadata = CATEGORY_METADATA[normalizedCategory] || {
+    nameEs: normalizedCategory,
+    descriptionEn: `${normalizedCategory} collection`,
+    descriptionEs: `${normalizedCategory} collection`,
+  };
+
+  const result = await dbQuery(
+    `INSERT INTO categories (
+      name_en,
+      name_es,
+      description_en,
+      description_es,
+      is_active
+    ) VALUES (?, ?, ?, ?, TRUE)
+    ON DUPLICATE KEY UPDATE
+      category_id = LAST_INSERT_ID(category_id),
+      name_es = VALUES(name_es),
+      description_en = VALUES(description_en),
+      description_es = VALUES(description_es),
+      is_active = VALUES(is_active)`,
+    [
+      normalizedCategory,
+      metadata.nameEs,
+      metadata.descriptionEn,
+      metadata.descriptionEs,
+    ]
+  );
+
+  return result.insertId;
+}
+
+async function ensureDefaultCustomer() {
+  const passwordHash = bcrypt.hashSync(SEEDED_CUSTOMER_PASSWORD, 10);
+
+  await dbQuery(
+    `INSERT INTO users (
+      email,
+      password_hash,
+      account_type,
+      first_name,
+      last_name,
+      company_name,
+      phone,
+      preferred_language,
+      is_active,
+      notification_preferences
+    ) VALUES (?, ?, 'CUSTOMER', ?, ?, '', ?, 'EN', TRUE, ?)
+    ON DUPLICATE KEY UPDATE
+      user_id = LAST_INSERT_ID(user_id),
+      password_hash = VALUES(password_hash),
+      account_type = VALUES(account_type),
+      first_name = VALUES(first_name),
+      last_name = VALUES(last_name),
+      company_name = VALUES(company_name),
+      phone = VALUES(phone),
+      preferred_language = VALUES(preferred_language),
+      is_active = VALUES(is_active),
+      notification_preferences = VALUES(notification_preferences)`,
+    [
+      SEEDED_CUSTOMER.email,
+      passwordHash,
+      SEEDED_CUSTOMER.firstName,
+      SEEDED_CUSTOMER.lastName,
+      SEEDED_CUSTOMER.phone,
+      JSON.stringify({ email: true, sms: false }),
+    ]
+  );
+}
+
 async function ensureSeedBrands() {
   const passwordHash = bcrypt.hashSync(SEEDED_BRAND_PASSWORD, 10);
-  const brandIds = [];
+  const brandIdByEmail = new Map();
 
   for (const brand of SEEDED_BRANDS) {
     const result = await dbQuery(
-      `INSERT INTO Users (
-        firstName,
-        lastName,
+      `INSERT INTO users (
         email,
-        passwordHash,
+        password_hash,
+        account_type,
+        first_name,
+        last_name,
+        company_name,
         phone,
-        accountType,
-        companyName,
-        addresses,
-        notificationPreferences
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        preferred_language,
+        is_active,
+        notification_preferences
+      ) VALUES (?, ?, 'BRAND', ?, ?, ?, ?, 'EN', TRUE, ?)
       ON DUPLICATE KEY UPDATE
-        id = LAST_INSERT_ID(id),
-        accountType = 'BRAND',
-        companyName = ?,
-        phone = ?,
-        passwordHash = ?`,
+        user_id = LAST_INSERT_ID(user_id),
+        password_hash = VALUES(password_hash),
+        account_type = VALUES(account_type),
+        company_name = VALUES(company_name),
+        phone = VALUES(phone),
+        preferred_language = VALUES(preferred_language),
+        is_active = VALUES(is_active),
+        notification_preferences = VALUES(notification_preferences)`,
       [
-        '',
-        '',
         brand.email,
         passwordHash,
-        brand.phone,
-        'BRAND',
+        '',
+        '',
         brand.companyName,
-        JSON.stringify([]),
+        brand.phone,
         JSON.stringify({ email: true, sms: false }),
-        brand.companyName,
-        brand.phone,
-        passwordHash,
       ]
     );
 
-    brandIds.push(result.insertId);
+    brandIdByEmail.set(brand.email, result.insertId);
   }
 
-  return brandIds;
+  return brandIdByEmail;
 }
 
-async function seedProducts() {
-  const brandIds = await ensureSeedBrands();
+// Save or update a product in the catalog
+async function upsertProduct(product, sku, brandUserId) {
+  const categoryId = await ensureCategory(product.category);
+  const sizeInventory = distributeSizeStock(product.sizes, product.stockQuantity);
 
-  console.log('Clearing old products and seeding new ones...');
-  await dbQuery(`DELETE FROM Products`);
+  await dbQuery(
+    `INSERT INTO products (
+      category_id,
+      brand_user_id,
+      sku,
+      name_en,
+      name_es,
+      description_en,
+      description_es,
+      image,
+      image_urls,
+      price,
+      stock_quantity,
+      product_type,
+      material,
+      weight,
+      is_featured,
+      sizes_json,
+      colors_json
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PHYSICAL', ?, NULL, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+      category_id = VALUES(category_id),
+      brand_user_id = VALUES(brand_user_id),
+      name_en = VALUES(name_en),
+      name_es = VALUES(name_es),
+      description_en = VALUES(description_en),
+      description_es = VALUES(description_es),
+      image = VALUES(image),
+      image_urls = VALUES(image_urls),
+      price = VALUES(price),
+      stock_quantity = VALUES(stock_quantity),
+      product_type = VALUES(product_type),
+      material = VALUES(material),
+      weight = VALUES(weight),
+      is_featured = VALUES(is_featured),
+      sizes_json = VALUES(sizes_json),
+      colors_json = VALUES(colors_json)`,
+    [
+      categoryId,
+      brandUserId,
+      sku,
+      product.name,
+      product.name,
+      product.description,
+      product.description,
+      product.images[0] || '',
+      JSON.stringify(product.images),
+      Number(product.price),
+      Number(product.stockQuantity || 0),
+      product.material,
+      product.featured ? 1 : 0,
+      JSON.stringify(sizeInventory),
+      JSON.stringify(product.colors || []),
+    ]
+  );
+}
+
+// Main seed runner
+async function seedProducts() {
+  await ensureDefaultCustomer();
+  const brandIdByEmail = await ensureSeedBrands();
+  const categoryCounters = new Map();
+
+  console.log('Seeding products into normalized schema...');
 
   for (const [index, product] of initialProducts.entries()) {
-    await dbQuery(
-      `INSERT INTO Products (
-        name,
-        description,
-        price,
-        category,
-        material,
-        images,
-        stockQuantity,
-        sizes,
-        colors,
-        featured,
-        brandId
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        product.name,
-        product.description,
-        product.price,
-        product.category,
-        product.material,
-        JSON.stringify(product.images),
-        product.stockQuantity,
-        JSON.stringify(product.sizes),
-        JSON.stringify(product.colors),
-        product.featured || 0,
-        brandIds[index % brandIds.length],
-      ]
-    );
+    const categoryCount = (categoryCounters.get(product.category) || 0) + 1;
+    categoryCounters.set(product.category, categoryCount);
+
+    const sku = buildSeedSku(product.category, categoryCount);
+    const brand = SEEDED_BRANDS[index % SEEDED_BRANDS.length];
+    const brandUserId = brandIdByEmail.get(brand.email);
+
+    await upsertProduct(product, sku, brandUserId);
   }
 
   console.log('Products seeded successfully.');
+  console.log('Seeded customer:');
+  console.log(`- ${SEEDED_CUSTOMER.firstName} ${SEEDED_CUSTOMER.lastName} (${SEEDED_CUSTOMER.email}) / ${SEEDED_CUSTOMER_PASSWORD}`);
   console.log('Seeded brands:');
   SEEDED_BRANDS.forEach((brand) => {
     console.log(`- ${brand.companyName} (${brand.email}) / ${SEEDED_BRAND_PASSWORD}`);

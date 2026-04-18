@@ -20,7 +20,7 @@ function CartItem({ item }) {
         className="cart-item__image h-[120px] w-full rounded-lg object-cover md:w-[120px]"
       />
 
-      <div>
+      <div className="cart-item__content min-w-0">
         <h3 className="text-[18px] font-medium text-slate-900">{i18n.language === 'es' ? item.nameEs : item.nameEn}</h3>
         <p className="mt-1 text-sm text-slate-500">{t('product.color')}: {i18n.language === 'es' ? item.selectedColorEs : item.selectedColor}</p>
         <p className="mt-1 text-sm text-slate-500">{t('product.size')}: {item.selectedSize}</p>
@@ -63,7 +63,7 @@ function CartItem({ item }) {
           onClick={() =>
             removeFromCart(item.id, item.selectedColor, item.selectedSize)
           }
-          className="rounded-md bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+          className="cart-item__remove rounded-md bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
           aria-label={`Remove ${item.name} from cart`}
         >
           {t('cart.remove')}

@@ -67,6 +67,8 @@ function Checkout() {
       productId: Number(item.productId || item.id),
       id: item.id,
       name: item.name,
+      brandId: item.brandId || null,
+      brandName: item.brandName || '',
       price: Number(item.price),
       quantity: Number(item.quantity),
       selectedColor: item.selectedColor,
@@ -90,7 +92,7 @@ function Checkout() {
         })
       });
 
-      if (!Array.isArray(data.stockUpdates)) {
+      if (data.inventoryUpdated !== true || !Array.isArray(data.stockUpdates)) {
         setOrderMessage(t('checkout.inventory_unconfirmed'));
       } else {
         setOrderMessage(t('checkout.inventory_confirmed'));

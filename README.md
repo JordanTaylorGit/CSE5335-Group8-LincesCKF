@@ -1,7 +1,7 @@
 # Linces'CKF — Premium Silk E-Commerce Platform
 ### UTA CSE 5335 Web Data Management · Group 8
 
-A bilingual (English/Spanish) e-commerce platform for a premium silk garment brand, featuring **Direct-to-Consumer** sales and **B2B Manufacturing Services**. Built with React 18 for Phase 2, with a backend API integration planned for Phase 3.
+A bilingual (English/Spanish) e-commerce platform for a premium silk garment brand, featuring **Direct-to-Consumer** sales and **B2B Manufacturing Services**. The project now includes a React frontend, an Express API, and a MySQL database schema for authentication, products, orders, and custom manufacturing requests.
 
 
 ---
@@ -13,6 +13,19 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 - This page allows the user to view their account details and change the password if required.
 - Checkout button and call-to-action only work if logged in.
 - Login persists via `localStorage` for phase 2. To be changed in phase 3.
+
+### Seeded Test Accounts
+
+- **Default customer**
+  - Email: `customer.demo@lincesckf.com`
+  - Password: `CustomerSeed123!`
+- **Default brand accounts**
+  - Password for all seeded brands: `BrandSeed123!`
+  - Emails:
+    - `seda.atelier@lincesckf.com`
+    - `casa.lunaria@lincesckf.com`
+    - `brisa.silk@lincesckf.com`
+    - `atelier.marfil@lincesckf.com`
 
 ---
 
@@ -125,7 +138,7 @@ lincesckf/
 │   └── vite.config.js
 ```
 
-> **Note for Phase 3:** A `server/` directory will be added for the Express backend, and a `database/` directory for schema and migrations.
+> **Current project note:** The repository includes both the React client and the Express/MySQL backend used for authentication, catalog data, orders, and custom orders.
 
 ---
 
@@ -150,6 +163,46 @@ npm run dev
 ```
 
 The app runs at **http://localhost:5173**
+
+### Full Stack Run Steps
+
+```bash
+# 1. Run the schema in MySQL first
+#    Use DBeaver or the mysql CLI to execute server/database_mysql.sql
+
+# 2. Start the backend
+cd server
+npm install
+npm run seed
+npm start
+
+# 3. Start the frontend in a second terminal
+cd ../client
+npm install
+npm run dev
+```
+
+Backend runs at **http://localhost:5001**  
+Frontend runs at **http://localhost:5173**
+
+---
+
+## Naming Conventions
+
+To keep the project consistent across frontend, backend, and database files, use these naming rules:
+
+- **React components:** `PascalCase`
+  - Examples: `AuthModal.jsx`, `ProductDetail.jsx`, `CartSummary.jsx`
+- **JavaScript variables, functions, and state:** `camelCase`
+  - Examples: `buildUserResponse`, `selectedSize`, `orderNumber`
+- **Constants:** `UPPER_SNAKE_CASE`
+  - Examples: `JWT_SECRET`, `DEFAULT_PAYMENT_METHOD`, `SEEDED_BRAND_PASSWORD`
+- **Database tables and columns:** `snake_case`
+  - Examples: `users`, `order_items`, `preferred_language`, `stock_quantity`
+- **SQL files and route helper files:** descriptive lowercase names when possible
+  - Examples: `database_mysql.sql`, `seed.js`
+
+When backend code reads database rows, SQL column names stay in `snake_case`, but JavaScript response objects sent to the frontend should use `camelCase`.
 
 ### Build for Production
 

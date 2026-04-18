@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('./config/db');
 
+// App setup
 const app = express();
 
 app.use(cors());
@@ -11,9 +12,13 @@ app.use(express.json());
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_for_lincesckf';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
-const VALID_ACCOUNT_TYPES = new Set(['CUSTOMER', 'BRAND', 'ADMIN']);
 const DEFAULT_NOTIFICATIONS = { email: true, sms: false };
+const VALID_ACCOUNT_TYPES = new Set(['CUSTOMER', 'BRAND', 'ADMIN']);
+const VALID_LANGUAGES = new Set(['EN', 'ES']);
+const DEFAULT_COUNTRY = 'United States';
+const DEFAULT_PAYMENT_METHOD = 'CARD';
 
+// Small helpers
 function dbQuery(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.query(sql, params, (err, results) => {
@@ -50,13 +55,13 @@ function rollbackTransaction() {
   });
 }
 
-function httpError(status, message) {
+function makeError(status, message) {
   const error = new Error(message);
   error.status = status;
   return error;
 }
 
-function parseJson(value, fallback) {
+function readJson(value, fallback) {
   if (value === null || value === undefined || value === '') return fallback;
   if (typeof value !== 'string') return value;
 
@@ -67,7 +72,7 @@ function parseJson(value, fallback) {
   }
 }
 
-function toJsonText(value, fallback) {
+function toJsonString(value, fallback) {
   if (value === undefined) return JSON.stringify(fallback);
   if (typeof value === 'string') {
     try {
@@ -84,34 +89,107 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
 }
 
+function slugify(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'item';
+}
+
 function normalizeAccountType(accountType) {
   const normalized = String(accountType || 'CUSTOMER').trim().toUpperCase();
   return VALID_ACCOUNT_TYPES.has(normalized) ? normalized : null;
 }
 
-function buildUserName(user) {
-  if (user.accountType === 'BRAND' && user.companyName) return user.companyName;
-  return [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email;
+function normalizePreferredLanguage(language) {
+  const normalized = String(language || 'EN').trim().toUpperCase();
+  return VALID_LANGUAGES.has(normalized) ? normalized : 'EN';
 }
 
-function publicUser(user) {
-  if (!user) return null;
+function normalizeNotifications(value) {
+  const current = readJson(value, DEFAULT_NOTIFICATIONS);
+  return {
+    email: current.email === undefined ? DEFAULT_NOTIFICATIONS.email : Boolean(current.email),
+    sms: current.sms === undefined ? DEFAULT_NOTIFICATIONS.sms : Boolean(current.sms),
+  };
+}
 
-  const notificationPreferences = parseJson(
-    user.notificationPreferences,
-    DEFAULT_NOTIFICATIONS
-  );
+// User helpers
+function buildUserName(user) {
+  if ((user.account_type || user.accountType) === 'BRAND' && (user.company_name || user.companyName)) {
+    return user.company_name || user.companyName;
+  }
+
+  return [
+    user.first_name || user.firstName,
+    user.last_name || user.lastName,
+  ].filter(Boolean).join(' ') || user.email;
+}
+
+function mapAddressRow(row) {
+  if (!row) return null;
 
   return {
-    id: user.id,
-    firstName: user.firstName || '',
-    lastName: user.lastName || '',
+    id: row.address_id,
+    line1: row.street_address || '',
+    line2: row.street_address_line2 || '',
+    city: row.city || '',
+    state: row.state_region || '',
+    postalCode: row.postal_code || '',
+    country: row.country || '',
+    phone: row.phone || '',
+    addressType: row.address_type || 'SHIPPING',
+    isDefault: Boolean(row.is_default),
+    recipientName: row.recipient_name || '',
+  };
+}
+
+async function getUserAddresses(userId) {
+  const rows = await dbQuery(
+    `SELECT * FROM addresses WHERE user_id = ? ORDER BY is_default DESC, address_id ASC`,
+    [userId]
+  );
+
+  return rows.map(mapAddressRow);
+}
+
+async function getUserById(id) {
+  const rows = await dbQuery(`SELECT * FROM users WHERE user_id = ?`, [id]);
+  const user = rows[0];
+
+  if (!user) return null;
+
+  user.addresses = await getUserAddresses(user.user_id);
+  return user;
+}
+
+async function getUserByEmail(email) {
+  const rows = await dbQuery(`SELECT * FROM users WHERE email = ?`, [email]);
+  const user = rows[0];
+
+  if (!user) return null;
+
+  user.addresses = await getUserAddresses(user.user_id);
+  return user;
+}
+
+function buildUserResponse(user) {
+  if (!user) return null;
+
+  const notificationPreferences = normalizeNotifications(user.notification_preferences);
+
+  return {
+    id: user.user_id,
+    firstName: user.first_name || '',
+    lastName: user.last_name || '',
     name: buildUserName(user),
     email: user.email,
     phone: user.phone || '',
-    accountType: user.accountType || 'CUSTOMER',
-    companyName: user.companyName || '',
-    addresses: parseJson(user.addresses, []),
+    accountType: user.account_type || 'CUSTOMER',
+    companyName: user.company_name || '',
+    preferredLanguage: user.preferred_language || 'EN',
+    addresses: user.addresses || [],
     notificationPreferences,
     notifications: notificationPreferences,
   };
@@ -120,9 +198,9 @@ function publicUser(user) {
 function createToken(user) {
   return jwt.sign(
     {
-      id: user.id,
+      id: user.user_id,
       email: user.email,
-      accountType: user.accountType || 'CUSTOMER',
+      accountType: user.account_type || 'CUSTOMER',
     },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
@@ -131,11 +209,13 @@ function createToken(user) {
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized: No token provided' });
   }
 
   const token = authHeader.split(' ')[1];
+
   try {
     req.user = jwt.verify(token, JWT_SECRET);
     next();
@@ -149,63 +229,163 @@ function requireAccountTypes(...allowedTypes) {
     if (!allowedTypes.includes(req.user.accountType)) {
       return res.status(403).json({ error: 'Access denied' });
     }
+
     next();
   };
 }
 
-async function getUserById(id) {
-  const rows = await dbQuery(`SELECT * FROM Users WHERE id = ?`, [id]);
-  return rows[0] || null;
+function hasMeaningfulAddress(address) {
+  if (!address || typeof address !== 'object') return false;
+
+  return [
+    address.line1,
+    address.line2,
+    address.city,
+    address.state,
+    address.postalCode,
+    address.country,
+  ].some((value) => String(value || '').trim());
 }
 
-const PRODUCT_SELECT_SQL = `
-  SELECT
-    p.*,
-    COALESCE(
-      NULLIF(u.companyName, ''),
-      NULLIF(TRIM(CONCAT_WS(' ', u.firstName, u.lastName)), ''),
-      u.email,
-      ''
-    ) AS brandName
-  FROM Products p
-  LEFT JOIN Users u ON p.brandId = u.id
-`;
+async function syncPrimaryAddress(userId, addresses) {
+  const primaryAddress = Array.isArray(addresses) ? addresses[0] : null;
 
-function serializeProduct(row) {
-  const images = parseJson(row.images, []);
+  if (!hasMeaningfulAddress(primaryAddress)) {
+    return getUserAddresses(userId);
+  }
 
-  return {
-    ...row,
-    price: Number(row.price),
-    stockQuantity: Number(row.stockQuantity || 0),
-    image: images[0] || '',
-    nameEn: row.name,
-    nameEs: row.name,
-    descriptionEn: row.description,
-    descriptionEs: row.description,
-    brandName: row.brandName || '',
-  };
+  const existingRows = await dbQuery(
+    `SELECT * FROM addresses
+     WHERE user_id = ? AND address_type = 'SHIPPING'
+     ORDER BY is_default DESC, address_id ASC
+     LIMIT 1`,
+    [userId]
+  );
+
+  const params = [
+    String(primaryAddress.line1 || '').trim(),
+    String(primaryAddress.line2 || '').trim(),
+    String(primaryAddress.city || '').trim(),
+    String(primaryAddress.state || '').trim(),
+    String(primaryAddress.postalCode || '').trim(),
+    String(primaryAddress.country || DEFAULT_COUNTRY).trim() || DEFAULT_COUNTRY,
+    String(primaryAddress.phone || '').trim(),
+    String(primaryAddress.recipientName || '').trim(),
+  ];
+
+  if (existingRows[0]) {
+    await dbQuery(
+      `UPDATE addresses
+       SET street_address = ?,
+           street_address_line2 = ?,
+           city = ?,
+           state_region = ?,
+           postal_code = ?,
+           country = ?,
+           phone = ?,
+           recipient_name = ?,
+           is_default = TRUE
+       WHERE address_id = ?`,
+      [...params, existingRows[0].address_id]
+    );
+  } else {
+    await dbQuery(
+      `INSERT INTO addresses (
+        user_id,
+        address_type,
+        street_address,
+        street_address_line2,
+        city,
+        state_region,
+        postal_code,
+        country,
+        phone,
+        recipient_name,
+        is_default
+      ) VALUES (?, 'SHIPPING', ?, ?, ?, ?, ?, ?, ?, ?, TRUE)`,
+      [userId, ...params]
+    );
+  }
+
+  await dbQuery(
+    `UPDATE addresses
+     SET is_default = FALSE
+     WHERE user_id = ? AND address_type = 'SHIPPING' AND address_id <> (
+       SELECT address_id FROM (
+         SELECT address_id
+         FROM addresses
+         WHERE user_id = ? AND address_type = 'SHIPPING'
+         ORDER BY is_default DESC, address_id ASC
+         LIMIT 1
+       ) AS default_address
+     )`,
+    [userId, userId]
+  );
+
+  return getUserAddresses(userId);
 }
 
-function normalizeProductBody(body) {
-  const sizes = normalizeSizes(body.sizes);
-  const sizeStockTotal = getSizeStockTotal(sizes);
+async function getOrCreateCategoryId(categoryName) {
+  const normalized = String(categoryName || 'other').trim().toLowerCase() || 'other';
+  const existingRows = await dbQuery(
+    `SELECT category_id FROM categories WHERE LOWER(name_en) = ? LIMIT 1`,
+    [normalized]
+  );
 
-  return {
-    name: String(body.name || '').trim(),
-    description: String(body.description || '').trim(),
-    price: Number(body.price),
-    category: String(body.category || '').trim(),
-    material: String(body.material || '').trim(),
-    images: toJsonText(body.images, []),
-    stockQuantity: sizeStockTotal ?? Number(body.stockQuantity || 0),
-    sizes: JSON.stringify(sizes),
-    colors: toJsonText(body.colors, []),
-  };
+  if (existingRows[0]) {
+    return existingRows[0].category_id;
+  }
+
+  const result = await dbQuery(
+    `INSERT INTO categories (name_en, name_es, description_en, description_es, is_active)
+     VALUES (?, ?, ?, ?, TRUE)`,
+    [
+      normalized,
+      normalized,
+      `${normalized} category`,
+      `${normalized} category`,
+    ]
+  );
+
+  return result.insertId;
+}
+
+// Product helpers
+function normalizeImageList(value) {
+  const images = readJson(value, Array.isArray(value) ? value : []);
+
+  if (Array.isArray(images)) {
+    return images.map((image) => String(image || '').trim()).filter(Boolean);
+  }
+
+  if (typeof value === 'string') {
+    return value.split(',').map((image) => image.trim()).filter(Boolean);
+  }
+
+  return [];
+}
+
+function normalizeColorList(value) {
+  const colors = readJson(value, Array.isArray(value) ? value : []);
+
+  if (Array.isArray(colors)) {
+    return colors
+      .map((color) => {
+        if (typeof color === 'string') return color.trim();
+        return String(color?.name || color?.label || '').trim();
+      })
+      .filter(Boolean);
+  }
+
+  if (typeof value === 'string') {
+    return value.split(',').map((color) => color.trim()).filter(Boolean);
+  }
+
+  return [];
 }
 
 function normalizeSizes(value) {
-  const rawSizes = parseJson(value, Array.isArray(value) ? value : []);
+  const rawSizes = readJson(value, Array.isArray(value) ? value : []);
 
   if (!Array.isArray(rawSizes)) return [];
 
@@ -256,6 +436,191 @@ function getSizeStockTotal(sizes) {
   return stockedSizes.reduce((total, size) => total + getSizeStock(size), 0);
 }
 
+function normalizeProductBody(body) {
+  const sizes = normalizeSizes(body.sizes);
+  const colors = normalizeColorList(body.colors);
+  const images = normalizeImageList(body.images);
+  const sizeStockTotal = getSizeStockTotal(sizes);
+
+  return {
+    categoryName: String(body.category || 'other').trim().toLowerCase() || 'other',
+    sku: String(body.sku || '').trim(),
+    nameEn: String(body.name || body.nameEn || '').trim(),
+    nameEs: String(body.nameEs || body.name || '').trim(),
+    descriptionEn: String(body.description || body.descriptionEn || '').trim(),
+    descriptionEs: String(body.descriptionEs || body.description || '').trim(),
+    image: images[0] || '',
+    imagesJson: toJsonString(images, []),
+    price: Number(body.price),
+    stockQuantity: sizeStockTotal ?? Number(body.stockQuantity || 0),
+    productType: String(body.productType || 'PHYSICAL').trim().toUpperCase() || 'PHYSICAL',
+    material: String(body.material || '').trim(),
+    weight: body.weight === undefined || body.weight === '' ? null : Number(body.weight),
+    isFeatured: body.featured ? 1 : 0,
+    sizesJson: JSON.stringify(sizes),
+    colorsJson: JSON.stringify(colors),
+  };
+}
+
+async function ensureUniqueSku(baseSku) {
+  let candidate = baseSku || `SKU-${Date.now()}`;
+  let suffix = 1;
+
+  while (true) {
+    const rows = await dbQuery(`SELECT product_id FROM products WHERE sku = ? LIMIT 1`, [candidate]);
+    if (rows.length === 0) return candidate;
+    candidate = `${baseSku || `SKU-${Date.now()}`}-${suffix++}`;
+  }
+}
+
+const PRODUCT_SELECT_SQL = `
+  SELECT
+    p.product_id,
+    p.category_id,
+    p.brand_user_id,
+    p.sku,
+    p.name_en,
+    p.name_es,
+    p.description_en,
+    p.description_es,
+    p.image,
+    p.image_urls,
+    p.price,
+    p.stock_quantity,
+    p.product_type,
+    p.material,
+    p.weight,
+    p.is_featured,
+    p.sizes_json,
+    p.colors_json,
+    c.name_en AS category_name_en,
+    c.name_es AS category_name_es,
+    COALESCE(
+      NULLIF(u.company_name, ''),
+      NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''),
+      u.email,
+      ''
+    ) AS brand_name
+  FROM products p
+  JOIN categories c ON c.category_id = p.category_id
+  LEFT JOIN users u ON u.user_id = p.brand_user_id
+`;
+
+function serializeProduct(row) {
+  const images = readJson(row.image_urls, row.image ? [row.image] : []);
+  const sizes = readJson(row.sizes_json, []);
+  const colors = readJson(row.colors_json, []);
+
+  return {
+    id: row.product_id,
+    productId: row.product_id,
+    categoryId: row.category_id,
+    sku: row.sku,
+    name: row.name_en,
+    nameEn: row.name_en,
+    nameEs: row.name_es || row.name_en,
+    description: row.description_en || '',
+    descriptionEn: row.description_en || '',
+    descriptionEs: row.description_es || row.description_en || '',
+    image: images[0] || row.image || '',
+    images,
+    price: Number(row.price),
+    stockQuantity: Number(row.stock_quantity || 0),
+    category: row.category_name_en || '',
+    categoryEs: row.category_name_es || row.category_name_en || '',
+    material: row.material || '',
+    weight: row.weight === null || row.weight === undefined ? null : Number(row.weight),
+    sizes,
+    colors,
+    featured: Boolean(row.is_featured),
+    brandId: row.brand_user_id || null,
+    brandName: row.brand_name || '',
+  };
+}
+
+function normalizeDeliveryStatus(value) {
+  return String(value || '').trim().toUpperCase() === 'DELIVERED' ? 'Delivered' : 'Processing';
+}
+
+function deriveOrderDisplayStatus(orderStatus, items) {
+  if (Array.isArray(items) && items.length > 0) {
+    const deliveredCount = items.filter(
+      (item) => normalizeDeliveryStatus(item.deliveryStatus || item.status) === 'Delivered'
+    ).length;
+
+    if (deliveredCount === items.length) return 'Delivered';
+    if (deliveredCount > 0) return 'Partially Delivered';
+  }
+
+  if (String(orderStatus || '').trim().toUpperCase() === 'DELIVERED') {
+    return 'Delivered';
+  }
+
+  return 'Processing';
+}
+
+function deriveDbOrderStatus(items) {
+  if (!Array.isArray(items) || items.length === 0) return 'PENDING';
+
+  const deliveredCount = items.filter(
+    (item) => String(item.deliveryStatus || item.delivery_status || '').trim().toUpperCase() === 'DELIVERED'
+  ).length;
+
+  if (deliveredCount === items.length) return 'DELIVERED';
+  if (deliveredCount > 0) return 'SHIPPED';
+  return 'CONFIRMED';
+}
+
+// Order helpers
+async function enrichOrderItems(items) {
+  const parsedItems = readJson(items, []);
+
+  if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
+    return [];
+  }
+
+  const productIds = [...new Set(
+    parsedItems
+      .map((item) => Number(item.productId || item.id))
+      .filter((id) => Number.isInteger(id) && id > 0)
+  )];
+
+  let productMap = new Map();
+
+  if (productIds.length > 0) {
+    const placeholders = productIds.map(() => '?').join(', ');
+    const rows = await dbQuery(
+      `${PRODUCT_SELECT_SQL} WHERE p.product_id IN (${placeholders})`,
+      productIds
+    );
+    productMap = new Map(
+      rows.map((row) => {
+        const product = serializeProduct(row);
+        return [Number(product.id), product];
+      })
+    );
+  }
+
+  return parsedItems.map((item) => {
+    const productId = Number(item.productId || item.id);
+    const product = productMap.get(productId);
+    const brandId = Number(item.brandId ?? product?.brandId);
+
+    return {
+      ...item,
+      productId: Number.isInteger(productId) ? productId : null,
+      brandId: Number.isInteger(brandId) && brandId > 0 ? brandId : null,
+      brandName: String(item.brandName || product?.brandName || '').trim(),
+      name: item.name || product?.name || '',
+      nameEn: item.nameEn || product?.nameEn || item.name || '',
+      nameEs: item.nameEs || product?.nameEs || item.name || '',
+      image: item.image || product?.image || '',
+      deliveryStatus: normalizeDeliveryStatus(item.deliveryStatus || item.delivery_status),
+      deliveredAt: item.deliveredAt || item.delivered_at || null,
+    };
+  });
+}
+
 function getOrderQuantitiesByProduct(items) {
   return items.reduce((orders, item) => {
     const productId = Number(item.productId || item.id);
@@ -263,15 +628,15 @@ function getOrderQuantitiesByProduct(items) {
     const selectedSize = String(item.selectedSize || item.size || '').trim();
 
     if (!Number.isInteger(productId) || productId <= 0) {
-      throw httpError(400, 'Each order item must include a valid product id');
+      throw makeError(400, 'Each order item must include a valid product id');
     }
 
     if (!Number.isInteger(quantity) || quantity <= 0) {
-      throw httpError(400, 'Each order item must include a valid quantity');
+      throw makeError(400, 'Each order item must include a valid quantity');
     }
 
     if (!selectedSize) {
-      throw httpError(400, 'Each order item must include a selected size');
+      throw makeError(400, 'Each order item must include a selected size');
     }
 
     const order = orders.get(productId) || { total: 0, sizes: new Map() };
@@ -288,17 +653,17 @@ async function decrementProductStock(orderQuantities) {
 
   for (const [productId, order] of orderQuantities.entries()) {
     const rows = await dbQuery(
-      `SELECT id, name, sizes, stockQuantity FROM Products WHERE id = ? FOR UPDATE`,
+      `SELECT product_id, name_en, sizes_json, stock_quantity FROM products WHERE product_id = ? FOR UPDATE`,
       [productId]
     );
     const product = rows[0];
 
     if (!product) {
-      throw httpError(404, `Product ${productId} was not found`);
+      throw makeError(404, `Product ${productId} was not found`);
     }
 
-    const currentStock = Number(product.stockQuantity || 0);
-    const sizes = normalizeSizes(product.sizes);
+    const currentStock = Number(product.stock_quantity || 0);
+    const sizes = normalizeSizes(product.sizes_json);
     const hasSizeStock = sizes.some((size) => getSizeStock(size) !== null);
 
     if (hasSizeStock) {
@@ -312,14 +677,14 @@ async function decrementProductStock(orderQuantities) {
         );
 
         if (sizeIndex === -1) {
-          throw httpError(400, `${product.name} does not have size ${selectedSize}`);
+          throw makeError(400, `${product.name_en} does not have size ${selectedSize}`);
         }
 
         const availableStock = getSizeStock(updatedSizes[sizeIndex]) ?? 0;
         if (availableStock < quantity) {
-          throw httpError(
+          throw makeError(
             409,
-            `${product.name} size ${selectedSize} has only ${availableStock} item(s) left in stock`
+            `${product.name_en} size ${selectedSize} has only ${availableStock} item(s) left in stock`
           );
         }
 
@@ -330,7 +695,7 @@ async function decrementProductStock(orderQuantities) {
 
         stockUpdates.push({
           productId,
-          name: product.name,
+          name: product.name_en,
           size: selectedSize,
           quantityOrdered: quantity,
           stockRemaining: availableStock - quantity,
@@ -339,28 +704,28 @@ async function decrementProductStock(orderQuantities) {
 
       const nextTotalStock = getSizeStockTotal(updatedSizes) ?? 0;
       await dbQuery(
-        `UPDATE Products SET stockQuantity = ?, sizes = ? WHERE id = ?`,
+        `UPDATE products SET stock_quantity = ?, sizes_json = ? WHERE product_id = ?`,
         [nextTotalStock, JSON.stringify(updatedSizes), productId]
       );
       continue;
     }
 
     if (currentStock < order.total) {
-      throw httpError(
+      throw makeError(
         409,
-        `${product.name} has only ${currentStock} item(s) left in stock`
+        `${product.name_en} has only ${currentStock} item(s) left in stock`
       );
     }
 
     await dbQuery(
-      `UPDATE Products SET stockQuantity = stockQuantity - ? WHERE id = ?`,
+      `UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?`,
       [order.total, productId]
     );
 
     for (const [selectedSize, quantity] of order.sizes.entries()) {
       stockUpdates.push({
         productId,
-        name: product.name,
+        name: product.name_en,
         size: selectedSize,
         quantityOrdered: quantity,
         stockRemaining: currentStock - order.total,
@@ -371,13 +736,149 @@ async function decrementProductStock(orderQuantities) {
   return stockUpdates;
 }
 
+async function getOrCreateServiceType(orderType) {
+  const normalized = String(orderType || 'other').trim().toLowerCase() || 'other';
+  const rows = await dbQuery(
+    `SELECT service_type_id FROM service_types WHERE LOWER(name_en) = ? LIMIT 1`,
+    [normalized]
+  );
+
+  if (rows[0]) {
+    return rows[0].service_type_id;
+  }
+
+  const result = await dbQuery(
+    `INSERT INTO service_types (name_en, name_es, description_en, description_es, is_active)
+     VALUES (?, ?, ?, ?, TRUE)`,
+    [
+      normalized,
+      normalized,
+      `${normalized} service`,
+      `${normalized} service`,
+    ]
+  );
+
+  return result.insertId;
+}
+
+// Custom order and contact helpers
+function mapSubjectToInquiryType(subject) {
+  const normalized = String(subject || '').trim().toLowerCase();
+
+  if (normalized === 'custom-order' || normalized === 'product-inquiry') return 'ORDER';
+  if (normalized === 'b2b-partnership') return 'SERVICE';
+  if (normalized === 'support') return 'GENERAL';
+  return 'OTHER';
+}
+
+function generateOrderNumber() {
+  return `INV-${Date.now()}-${Math.floor(Math.random() * 900 + 100)}`;
+}
+
+function generateRequestNumber() {
+  return `REQ-${Date.now()}-${Math.floor(Math.random() * 900 + 100)}`;
+}
+
+async function getOrderAddress(addressId) {
+  if (!addressId) {
+    return {};
+  }
+
+  const rows = await dbQuery(`SELECT * FROM addresses WHERE address_id = ?`, [addressId]);
+  const address = rows[0];
+
+  if (!address) {
+    return {};
+  }
+
+  return {
+    fullName: address.recipient_name || '',
+    address: [address.street_address, address.street_address_line2].filter(Boolean).join(', '),
+    line1: address.street_address || '',
+    line2: address.street_address_line2 || '',
+    city: address.city || '',
+    state: address.state_region || '',
+    zipCode: address.postal_code || '',
+    country: address.country || '',
+    phone: address.phone || '',
+  };
+}
+
+async function getOrderItems(orderId, brandUserId = null) {
+  const params = [orderId];
+  const brandFilter = brandUserId ? ' AND oi.brand_user_id = ?' : '';
+
+  if (brandUserId) {
+    params.push(brandUserId);
+  }
+
+  const rows = await dbQuery(
+    `SELECT
+      oi.*,
+      COALESCE(
+        NULLIF(oi.brand_name_snapshot, ''),
+        NULLIF(u.company_name, ''),
+        NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''),
+        u.email,
+        ''
+      ) AS resolved_brand_name,
+      COALESCE(oi.product_name_en, p.name_en) AS resolved_name_en,
+      COALESCE(oi.product_name_es, p.name_es, p.name_en) AS resolved_name_es,
+      COALESCE(oi.product_image, p.image) AS resolved_image
+     FROM order_items oi
+     LEFT JOIN products p ON p.product_id = oi.product_id
+     LEFT JOIN users u ON u.user_id = COALESCE(oi.brand_user_id, p.brand_user_id)
+     WHERE oi.order_id = ?${brandFilter}
+     ORDER BY oi.order_item_id ASC`,
+    params
+  );
+
+  return rows.map((row) => ({
+    itemIndex: row.order_item_id,
+    id: row.product_id,
+    productId: row.product_id,
+    brandId: row.brand_user_id || null,
+    brandName: row.resolved_brand_name || '',
+    name: row.resolved_name_en || '',
+    nameEn: row.resolved_name_en || '',
+    nameEs: row.resolved_name_es || row.resolved_name_en || '',
+    image: row.resolved_image || '',
+    price: Number(row.unit_price || 0),
+    quantity: Number(row.quantity || 0),
+    selectedColor: row.selected_color || '',
+    selectedSize: row.selected_size || '',
+    deliveryStatus: normalizeDeliveryStatus(row.delivery_status),
+    deliveredAt: row.delivered_at || null,
+  }));
+}
+
+async function buildOrderResponse(order, brandUserId = null) {
+  const items = await getOrderItems(order.order_id, brandUserId);
+  const shippingAddress = await getOrderAddress(order.shipping_address_id);
+  const totalAmount = brandUserId
+    ? items.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 0), 0)
+    : Number(order.total_amount || 0);
+
+  return {
+    id: order.order_id,
+    orderNumber: order.order_number,
+    userId: order.user_id,
+    totalAmount,
+    status: deriveOrderDisplayStatus(order.order_status, items),
+    paymentStatus: order.payment_status,
+    paymentMethod: order.payment_method,
+    createdAt: order.order_date,
+    shippingAddress,
+    items,
+  };
+}
+
+// Public routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// ==========================================
-// Authentication & User Management
-// ==========================================
+// Auth routes
 app.post('/api/auth/register', async (req, res) => {
   const {
     firstName = '',
@@ -387,10 +888,12 @@ app.post('/api/auth/register', async (req, res) => {
     phone = '',
     accountType,
     companyName = '',
+    preferredLanguage = 'EN',
   } = req.body;
 
   const normalizedEmail = String(email).trim().toLowerCase();
   const normalizedAccountType = normalizeAccountType(accountType);
+  const normalizedLanguage = normalizePreferredLanguage(preferredLanguage);
 
   if (!isValidEmail(normalizedEmail)) {
     return res.status(400).json({ error: 'A valid email is required' });
@@ -415,43 +918,44 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     const result = await dbQuery(
-      `INSERT INTO Users (
-        firstName,
-        lastName,
+      `INSERT INTO users (
         email,
-        passwordHash,
+        password_hash,
+        account_type,
+        first_name,
+        last_name,
+        company_name,
         phone,
-        accountType,
-        companyName,
-        addresses,
-        notificationPreferences
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        preferred_language,
+        is_active,
+        notification_preferences
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE, ?)`,
       [
-        firstName.trim(),
-        lastName.trim(),
         normalizedEmail,
         passwordHash,
-        String(phone).trim(),
         normalizedAccountType,
+        firstName.trim(),
+        lastName.trim(),
         companyName.trim(),
-        JSON.stringify([]),
+        String(phone).trim(),
+        normalizedLanguage,
         JSON.stringify(DEFAULT_NOTIFICATIONS),
       ]
     );
 
     const createdUser = await getUserById(result.insertId);
-    const token = createToken(createdUser);
 
     res.status(201).json({
       message: 'User registered successfully',
-      userId: createdUser.id,
-      token,
-      user: publicUser(createdUser),
+      userId: createdUser.user_id,
+      token: createToken(createdUser),
+      user: buildUserResponse(createdUser),
     });
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(400).json({ error: 'Email already exists' });
     }
+
     res.status(500).json({ error: error.message });
   }
 });
@@ -465,14 +969,18 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   try {
-    const rows = await dbQuery(`SELECT * FROM Users WHERE email = ?`, [normalizedEmail]);
-    const user = rows[0];
+    const user = await getUserByEmail(normalizedEmail);
 
     if (!user) {
+      return res.status(404).json({ error: 'User does not exist' });
+    }
+
+    if (!user.is_active) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -480,21 +988,23 @@ app.post('/api/auth/login', async (req, res) => {
     res.json({
       message: 'Login successful',
       token: createToken(user),
-      user: publicUser(user),
+      user: buildUserResponse(user),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Everything below this line requires a valid JWT.
 app.use('/api', authMiddleware);
 
+// User routes
 app.get('/api/auth/session', async (req, res) => {
   try {
     const user = await getUserById(req.user.id);
+
     if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json({ user: publicUser(user) });
+
+    res.json({ user: buildUserResponse(user) });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -507,8 +1017,10 @@ app.post('/api/auth/logout', (req, res) => {
 app.get('/api/users/profile', async (req, res) => {
   try {
     const user = await getUserById(req.user.id);
+
     if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json(publicUser(user));
+
+    res.json(buildUserResponse(user));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -517,6 +1029,7 @@ app.get('/api/users/profile', async (req, res) => {
 app.put('/api/users/profile', async (req, res) => {
   try {
     const currentUser = await getUserById(req.user.id);
+
     if (!currentUser) return res.status(404).json({ error: 'User not found' });
 
     const nextEmail = req.body.email === undefined
@@ -527,36 +1040,39 @@ app.put('/api/users/profile', async (req, res) => {
       return res.status(400).json({ error: 'A valid email is required' });
     }
 
-    const nextAddresses = req.body.addresses === undefined
-      ? currentUser.addresses
-      : JSON.stringify(req.body.addresses);
+    const nextPreferredLanguage = req.body.preferredLanguage === undefined
+      ? currentUser.preferred_language
+      : normalizePreferredLanguage(req.body.preferredLanguage);
 
     await dbQuery(
-      `UPDATE Users
-       SET firstName = ?,
-           lastName = ?,
+      `UPDATE users
+       SET first_name = ?,
+           last_name = ?,
            email = ?,
            phone = ?,
-           companyName = ?,
-           addresses = ?
-       WHERE id = ?`,
+           company_name = ?,
+           preferred_language = ?
+       WHERE user_id = ?`,
       [
-        req.body.firstName === undefined ? currentUser.firstName : String(req.body.firstName).trim(),
-        req.body.lastName === undefined ? currentUser.lastName : String(req.body.lastName).trim(),
+        req.body.firstName === undefined ? currentUser.first_name : String(req.body.firstName).trim(),
+        req.body.lastName === undefined ? currentUser.last_name : String(req.body.lastName).trim(),
         nextEmail,
         req.body.phone === undefined ? currentUser.phone : String(req.body.phone).trim(),
-        req.body.companyName === undefined ? currentUser.companyName : String(req.body.companyName).trim(),
-        nextAddresses,
+        req.body.companyName === undefined ? currentUser.company_name : String(req.body.companyName).trim(),
+        nextPreferredLanguage,
         req.user.id,
       ]
     );
 
+    await syncPrimaryAddress(req.user.id, req.body.addresses);
+
     const updatedUser = await getUserById(req.user.id);
-    res.json({ message: 'Profile updated successfully', user: publicUser(updatedUser) });
+    res.json({ message: 'Profile updated successfully', user: buildUserResponse(updatedUser) });
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(400).json({ error: 'Email already exists' });
     }
+
     res.status(500).json({ error: error.message });
   }
 });
@@ -572,15 +1088,17 @@ app.put('/api/users/password', async (req, res) => {
 
   try {
     const user = await getUserById(req.user.id);
+
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+    const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+
     if (!isMatch) {
       return res.status(401).json({ error: 'Current password is incorrect' });
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
-    await dbQuery(`UPDATE Users SET passwordHash = ? WHERE id = ?`, [passwordHash, req.user.id]);
+    await dbQuery(`UPDATE users SET password_hash = ? WHERE user_id = ?`, [passwordHash, req.user.id]);
 
     res.json({ message: 'Password changed successfully' });
   } catch (error) {
@@ -591,10 +1109,11 @@ app.put('/api/users/password', async (req, res) => {
 app.put('/api/users/notifications', async (req, res) => {
   try {
     const user = await getUserById(req.user.id);
+
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const incoming = req.body.notifications || req.body.notificationPreferences || req.body;
-    const currentPreferences = parseJson(user.notificationPreferences, DEFAULT_NOTIFICATIONS);
+    const currentPreferences = normalizeNotifications(user.notification_preferences);
     const notificationPreferences = {
       ...currentPreferences,
       email: incoming.email === undefined ? currentPreferences.email : Boolean(incoming.email),
@@ -602,29 +1121,28 @@ app.put('/api/users/notifications', async (req, res) => {
     };
 
     await dbQuery(
-      `UPDATE Users SET notificationPreferences = ? WHERE id = ?`,
+      `UPDATE users SET notification_preferences = ? WHERE user_id = ?`,
       [JSON.stringify(notificationPreferences), req.user.id]
     );
 
     const updatedUser = await getUserById(req.user.id);
     res.json({
       message: 'Notification preferences updated successfully',
-      user: publicUser(updatedUser),
+      user: buildUserResponse(updatedUser),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// ==========================================
-// Product Catalog
-// ==========================================
+// Product routes
 app.get('/api/products', async (req, res) => {
   try {
     const { category } = req.query;
-    const rows = category && category !== 'all'
-      ? await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.category = ? ORDER BY p.id ASC`, [category])
-      : await dbQuery(`${PRODUCT_SELECT_SQL} ORDER BY p.id ASC`);
+    const normalizedCategory = String(category || '').trim().toLowerCase();
+    const rows = normalizedCategory && normalizedCategory !== 'all'
+      ? await dbQuery(`${PRODUCT_SELECT_SQL} WHERE LOWER(c.name_en) = ? ORDER BY p.product_id ASC`, [normalizedCategory])
+      : await dbQuery(`${PRODUCT_SELECT_SQL} ORDER BY p.product_id ASC`);
 
     res.json(rows.map(serializeProduct));
   } catch (error) {
@@ -635,8 +1153,8 @@ app.get('/api/products', async (req, res) => {
 app.get('/api/products/brand/my-products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res) => {
   try {
     const rows = req.user.accountType === 'ADMIN'
-      ? await dbQuery(`${PRODUCT_SELECT_SQL} ORDER BY p.id DESC`)
-      : await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.brandId = ? ORDER BY p.id DESC`, [req.user.id]);
+      ? await dbQuery(`${PRODUCT_SELECT_SQL} ORDER BY p.product_id DESC`)
+      : await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.brand_user_id = ? ORDER BY p.product_id DESC`, [req.user.id]);
 
     res.json(rows.map(serializeProduct));
   } catch (error) {
@@ -646,9 +1164,11 @@ app.get('/api/products/brand/my-products', requireAccountTypes('BRAND', 'ADMIN')
 
 app.get('/api/products/:id', async (req, res) => {
   try {
-    const rows = await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.id = ?`, [req.params.id]);
+    const rows = await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.product_id = ?`, [req.params.id]);
     const product = rows[0];
+
     if (!product) return res.status(404).json({ error: 'Product not found' });
+
     res.json(serializeProduct(product));
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -658,16 +1178,14 @@ app.get('/api/products/:id', async (req, res) => {
 app.post('/api/products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res) => {
   const product = normalizeProductBody(req.body);
 
-  if (!product.name || !Number.isFinite(product.price) || product.price < 0) {
+  if (!product.nameEn || !Number.isFinite(product.price) || product.price < 0) {
     return res.status(400).json({ error: 'Product name and valid price are required' });
   }
 
   try {
-    let brandId;
+    let brandUserId = req.user.id;
 
-    if (req.user.accountType === 'BRAND') {
-      brandId = req.user.id;
-    } else {
+    if (req.user.accountType === 'ADMIN' && req.body.brandId !== undefined) {
       const requestedBrandId = Number(req.body.brandId);
 
       if (!Number.isInteger(requestedBrandId) || requestedBrandId <= 0) {
@@ -675,7 +1193,7 @@ app.post('/api/products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res
       }
 
       const brandRows = await dbQuery(
-        `SELECT id FROM Users WHERE id = ? AND accountType = 'BRAND'`,
+        `SELECT user_id FROM users WHERE user_id = ? AND account_type = 'BRAND'`,
         [requestedBrandId]
       );
 
@@ -683,37 +1201,55 @@ app.post('/api/products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res
         return res.status(400).json({ error: 'Selected brand does not exist' });
       }
 
-      brandId = requestedBrandId;
+      brandUserId = requestedBrandId;
     }
 
+    const categoryId = await getOrCreateCategoryId(product.categoryName);
+    const skuBase = product.sku || `${slugify(product.categoryName).slice(0, 4).toUpperCase()}-${slugify(product.nameEn).slice(0, 8).toUpperCase()}`;
+    const sku = await ensureUniqueSku(skuBase);
+
     const result = await dbQuery(
-      `INSERT INTO Products (
-        name,
-        description,
+      `INSERT INTO products (
+        category_id,
+        brand_user_id,
+        sku,
+        name_en,
+        name_es,
+        description_en,
+        description_es,
+        image,
+        image_urls,
         price,
-        category,
+        stock_quantity,
+        product_type,
         material,
-        images,
-        stockQuantity,
-        sizes,
-        colors,
-        brandId
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        weight,
+        is_featured,
+        sizes_json,
+        colors_json
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        product.name,
-        product.description,
+        categoryId,
+        brandUserId,
+        sku,
+        product.nameEn,
+        product.nameEs,
+        product.descriptionEn,
+        product.descriptionEs,
+        product.image,
+        product.imagesJson,
         product.price,
-        product.category,
-        product.material,
-        product.images,
         product.stockQuantity,
-        product.sizes,
-        product.colors,
-        brandId,
+        product.productType,
+        product.material,
+        product.weight,
+        product.isFeatured,
+        product.sizesJson,
+        product.colorsJson,
       ]
     );
 
-    const rows = await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.id = ?`, [result.insertId]);
+    const rows = await dbQuery(`${PRODUCT_SELECT_SQL} WHERE p.product_id = ?`, [result.insertId]);
     res.status(201).json({
       message: 'Product created',
       product: serializeProduct(rows[0]),
@@ -723,9 +1259,7 @@ app.post('/api/products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res
   }
 });
 
-// ==========================================
-// Shopping Cart & Orders
-// ==========================================
+// Order routes
 app.post('/api/orders', async (req, res) => {
   const { items, totalAmount, shippingAddress } = req.body;
 
@@ -737,82 +1271,310 @@ app.post('/api/orders', async (req, res) => {
     return res.status(400).json({ error: 'A valid total amount is required' });
   }
 
+  let transactionStarted = false;
+
   try {
-    const result = await dbQuery(
-      `INSERT INTO Orders (
-        userId,
-        items,
-        totalAmount,
-        shippingAddress,
-        paymentStatus,
-        status
-      ) VALUES (?, ?, ?, ?, ?, ?)`,
+    const orderItems = await enrichOrderItems(items);
+    const orderQuantities = getOrderQuantitiesByProduct(orderItems);
+    const computedTotalAmount = orderItems.reduce(
+      (total, item) => total + Number(item.price || 0) * Number(item.quantity || 0),
+      0
+    );
+
+    if (Number(totalAmount) > 0 && Math.abs(Number(totalAmount) - computedTotalAmount) > 0.01) {
+      return res.status(400).json({ error: 'Order total does not match current product pricing' });
+    }
+
+    await beginTransaction();
+    transactionStarted = true;
+
+    const stockUpdates = await decrementProductStock(orderQuantities);
+
+    const shippingResult = await dbQuery(
+      `INSERT INTO addresses (
+        user_id,
+        address_type,
+        street_address,
+        street_address_line2,
+        city,
+        state_region,
+        postal_code,
+        country,
+        phone,
+        recipient_name,
+        is_default
+      ) VALUES (?, 'SHIPPING', ?, ?, ?, ?, ?, ?, ?, ?, FALSE)`,
       [
         req.user.id,
-        JSON.stringify(items),
-        Number(totalAmount),
-        JSON.stringify(shippingAddress || {}),
-        'Paid (Dummy)',
-        'Processing',
+        String(shippingAddress?.address || '').trim(),
+        '',
+        String(shippingAddress?.city || '').trim(),
+        '',
+        String(shippingAddress?.zipCode || '').trim(),
+        String(shippingAddress?.country || DEFAULT_COUNTRY).trim() || DEFAULT_COUNTRY,
+        String(shippingAddress?.phone || '').trim(),
+        String(shippingAddress?.fullName || '').trim(),
       ]
     );
 
+    const orderNumber = generateOrderNumber();
+    const orderResult = await dbQuery(
+      `INSERT INTO orders (
+        user_id,
+        order_number,
+        total_amount,
+        order_status,
+        payment_method,
+        payment_status,
+        shipping_address_id,
+        billing_address_id
+      ) VALUES (?, ?, ?, 'CONFIRMED', ?, 'PAID', ?, NULL)`,
+      [
+        req.user.id,
+        orderNumber,
+        computedTotalAmount,
+        DEFAULT_PAYMENT_METHOD,
+        shippingResult.insertId,
+      ]
+    );
+
+    for (const item of orderItems) {
+      await dbQuery(
+        `INSERT INTO order_items (
+          order_id,
+          product_id,
+          brand_user_id,
+          product_name_en,
+          product_name_es,
+          product_image,
+          brand_name_snapshot,
+          quantity,
+          unit_price,
+          selected_size,
+          selected_color,
+          delivery_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PROCESSING')`,
+        [
+          orderResult.insertId,
+          item.productId,
+          item.brandId,
+          item.nameEn || item.name || '',
+          item.nameEs || item.nameEn || item.name || '',
+          item.image || '',
+          item.brandName || '',
+          Number(item.quantity),
+          Number(item.price),
+          String(item.selectedSize || '').trim(),
+          String(item.selectedColor || '').trim(),
+        ]
+      );
+    }
+
+    await dbQuery(
+      `INSERT INTO payments (order_id, payment_method, amount, payment_status, paid_at)
+       VALUES (?, ?, ?, 'PAID', CURRENT_TIMESTAMP)`,
+      [orderResult.insertId, DEFAULT_PAYMENT_METHOD, computedTotalAmount]
+    );
+
+    await commitTransaction();
+    transactionStarted = false;
+
     res.status(201).json({
       message: 'Order created successfully',
-      orderId: result.insertId,
+      orderId: orderResult.insertId,
+      orderNumber,
+      inventoryUpdated: true,
+      stockUpdates,
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (transactionStarted) {
+      try {
+        await rollbackTransaction();
+      } catch (rollbackError) {
+        console.error('Failed to roll back order transaction:', rollbackError);
+      }
+    }
+
+    res.status(error.status || 500).json({ error: error.message });
   }
 });
 
 app.get('/api/orders/my-orders', async (req, res) => {
   try {
     const rows = await dbQuery(
-      `SELECT * FROM Orders WHERE userId = ? ORDER BY createdAt DESC`,
+      `SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC`,
       [req.user.id]
     );
 
-    res.json(rows.map((order) => ({
-      ...order,
-      totalAmount: Number(order.totalAmount),
-      items: parseJson(order.items, []),
-      shippingAddress: parseJson(order.shippingAddress, {}),
-    })));
+    const orders = await Promise.all(rows.map((order) => buildOrderResponse(order)));
+    res.json(orders);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// ==========================================
-// Custom & B2B Orders
-// ==========================================
+app.get('/api/orders/brand/my-orders', requireAccountTypes('BRAND', 'ADMIN'), async (req, res) => {
+  try {
+    const rows = req.user.accountType === 'ADMIN'
+      ? await dbQuery(`SELECT * FROM orders ORDER BY order_date DESC`)
+      : await dbQuery(
+          `SELECT DISTINCT o.*
+           FROM orders o
+           JOIN order_items oi ON oi.order_id = o.order_id
+           WHERE oi.brand_user_id = ?
+           ORDER BY o.order_date DESC`,
+          [req.user.id]
+        );
+
+    const orders = await Promise.all(
+      rows.map((order) => buildOrderResponse(order, req.user.accountType === 'ADMIN' ? null : req.user.id))
+    );
+
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put(
+  '/api/orders/:orderId/items/:itemIndex/deliver',
+  requireAccountTypes('BRAND', 'ADMIN'),
+  async (req, res) => {
+    const orderId = Number(req.params.orderId);
+    const orderItemId = Number(req.params.itemIndex);
+
+    if (!Number.isInteger(orderId) || orderId <= 0 || !Number.isInteger(orderItemId) || orderItemId <= 0) {
+      return res.status(400).json({ error: 'A valid order id and item index are required' });
+    }
+
+    try {
+      const itemRows = await dbQuery(
+        `SELECT * FROM order_items WHERE order_item_id = ? AND order_id = ? LIMIT 1`,
+        [orderItemId, orderId]
+      );
+      const orderItem = itemRows[0];
+
+      if (!orderItem) {
+        return res.status(404).json({ error: 'Order item not found' });
+      }
+
+      if (
+        req.user.accountType !== 'ADMIN' &&
+        Number(orderItem.brand_user_id) !== Number(req.user.id)
+      ) {
+        return res.status(403).json({ error: 'You can only update delivery for your own products' });
+      }
+
+      await dbQuery(
+        `UPDATE order_items
+         SET delivery_status = 'DELIVERED',
+             delivered_at = CURRENT_TIMESTAMP
+         WHERE order_item_id = ?`,
+        [orderItemId]
+      );
+
+      const orderRows = await dbQuery(`SELECT * FROM orders WHERE order_id = ? LIMIT 1`, [orderId]);
+      const order = orderRows[0];
+
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      const allItems = await getOrderItems(orderId);
+      const nextOrderStatus = deriveDbOrderStatus(
+        allItems.map((item) => ({ deliveryStatus: item.deliveryStatus }))
+      );
+
+      await dbQuery(
+        `UPDATE orders SET order_status = ? WHERE order_id = ?`,
+        [nextOrderStatus, orderId]
+      );
+
+      const refreshedOrderRows = await dbQuery(`SELECT * FROM orders WHERE order_id = ? LIMIT 1`, [orderId]);
+      const refreshedOrder = await buildOrderResponse(
+        refreshedOrderRows[0],
+        req.user.accountType === 'ADMIN' ? null : req.user.id
+      );
+
+      res.json({
+        message: 'Delivery status updated successfully',
+        order: refreshedOrder,
+      });
+    } catch (error) {
+      res.status(error.status || 500).json({ error: error.message });
+    }
+  }
+);
+
+// Custom order routes
 app.post('/api/custom-orders', async (req, res) => {
-  const { orderType, requirements, contactInfo } = req.body;
+  const { orderType, requirements = {}, contactInfo = {} } = req.body;
 
   if (!orderType) {
     return res.status(400).json({ error: 'Order type is required' });
   }
 
+  const quantity = Number(requirements.quantity || 0);
+  const normalizedContactEmail = String(contactInfo.email || '').trim().toLowerCase();
+  const phoneDigits = String(contactInfo.phone || '').replace(/\D/g, '');
+
+  if (!Number.isInteger(quantity) || quantity <= 0) {
+    return res.status(400).json({ error: 'A valid quantity is required' });
+  }
+
+  if (!isValidEmail(normalizedContactEmail)) {
+    return res.status(400).json({ error: 'A valid contact email is required' });
+  }
+
+  if (phoneDigits.length !== 10) {
+    return res.status(400).json({ error: 'Contact phone number must be 10 digits' });
+  }
+
   try {
+    const serviceTypeId = await getOrCreateServiceType(orderType);
+    const requestNumber = generateRequestNumber();
+
     const result = await dbQuery(
-      `INSERT INTO CustomOrders (
-        userId,
-        orderType,
-        requirements,
-        contactInfo
-      ) VALUES (?, ?, ?, ?)`,
+      `INSERT INTO custom_orders (
+        user_id,
+        service_type_id,
+        request_number,
+        company_name,
+        project_description,
+        quantity,
+        request_status,
+        quote_amount,
+        expected_delivery_date,
+        internal_notes,
+        timeline,
+        contact_name,
+        contact_email,
+        contact_phone,
+        requirements_json
+      ) VALUES (?, ?, ?, ?, ?, ?, 'NEW', 0.00, NULL, NULL, ?, ?, ?, ?, ?)`,
       [
         req.user.id,
-        orderType,
-        JSON.stringify(requirements || {}),
-        JSON.stringify(contactInfo || {}),
+        serviceTypeId,
+        requestNumber,
+        String(contactInfo.company || '').trim(),
+        String(requirements.message || '').trim(),
+        quantity,
+        String(requirements.timeline || '').trim(),
+        String(contactInfo.name || '').trim(),
+        normalizedContactEmail,
+        phoneDigits,
+        JSON.stringify({
+          orderType,
+          timeline: String(requirements.timeline || '').trim(),
+          message: String(requirements.message || '').trim(),
+        }),
       ]
     );
 
     res.status(201).json({
       message: 'Custom order request submitted successfully',
       orderId: result.insertId,
+      requestNumber,
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -822,23 +1584,46 @@ app.post('/api/custom-orders', async (req, res) => {
 app.get('/api/custom-orders/my-requests', async (req, res) => {
   try {
     const rows = await dbQuery(
-      `SELECT * FROM CustomOrders WHERE userId = ? ORDER BY createdAt DESC`,
+      `SELECT
+        co.*,
+        st.name_en AS service_name_en,
+        st.name_es AS service_name_es
+       FROM custom_orders co
+       LEFT JOIN service_types st ON st.service_type_id = co.service_type_id
+       WHERE co.user_id = ?
+       ORDER BY co.created_at DESC`,
       [req.user.id]
     );
 
-    res.json(rows.map((request) => ({
-      ...request,
-      requirements: parseJson(request.requirements, {}),
-      contactInfo: parseJson(request.contactInfo, {}),
-    })));
+    res.json(rows.map((request) => {
+      const requirementsJson = readJson(request.requirements_json, {});
+
+      return {
+        id: request.custom_order_id,
+        orderType: requirementsJson.orderType || request.service_name_en || 'custom-order',
+        requirements: {
+          quantity: Number(request.quantity || 0),
+          timeline: request.timeline || requirementsJson.timeline || '',
+          message: request.project_description || requirementsJson.message || '',
+        },
+        contactInfo: {
+          name: request.contact_name || '',
+          email: request.contact_email || '',
+          phone: request.contact_phone || '',
+          company: request.company_name || '',
+        },
+        status: request.request_status,
+        quoteAmount: Number(request.quote_amount || 0),
+        expectedDeliveryDate: request.expected_delivery_date,
+        createdAt: request.created_at,
+      };
+    }));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// ==========================================
-// Contact Inquiries
-// ==========================================
+// Contact routes
 app.post('/api/contact', async (req, res) => {
   const { name, email, subject, message } = req.body;
 
@@ -848,8 +1633,23 @@ app.post('/api/contact', async (req, res) => {
 
   try {
     const result = await dbQuery(
-      `INSERT INTO ContactMessages (name, email, subject, message) VALUES (?, ?, ?, ?)`,
-      [name, String(email).trim().toLowerCase(), subject || '', message]
+      `INSERT INTO contact_forms (
+        user_id,
+        name,
+        email,
+        subject,
+        message,
+        inquiry_type,
+        status
+      ) VALUES (?, ?, ?, ?, ?, ?, 'OPEN')`,
+      [
+        req.user.id || null,
+        String(name).trim(),
+        String(email).trim().toLowerCase(),
+        String(subject || '').trim(),
+        String(message).trim(),
+        mapSubjectToInquiryType(subject),
+      ]
     );
 
     res.status(201).json({
@@ -863,7 +1663,7 @@ app.post('/api/contact', async (req, res) => {
 
 app.get('/api/contact', requireAccountTypes('ADMIN'), async (req, res) => {
   try {
-    const rows = await dbQuery(`SELECT * FROM ContactMessages ORDER BY createdAt DESC`);
+    const rows = await dbQuery(`SELECT * FROM contact_forms ORDER BY contact_id DESC`);
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });

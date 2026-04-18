@@ -279,15 +279,34 @@ function AccountNotifications() {
 /* ── Orders ──────────────────────────────────────────────────── */
 function AccountOrders() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deliveringKey, setDeliveringKey] = useState('');
+  const [actionMessage, setActionMessage] = useState('');
+  const isBrand = user?.accountType === 'BRAND';
+
+  const getStatusLabel = (status) => {
+    const key = {
+      Processing: 'account.status_processing',
+      Delivered: 'account.status_delivered',
+      'Partially Delivered': 'account.status_partially_delivered',
+    }[String(status || '').trim()];
+
+    return key ? t(key) : status || t('account.not_available');
+  };
 
   useEffect(() => {
-    Promise.all([
-      fetchWithAuth('/orders/my-orders'),
-      fetchWithAuth('/custom-orders/my-requests'),
-    ])
-      .then(([regularOrders, customOrders]) => {
+    const request = isBrand
+      ? Promise.all([fetchWithAuth('/orders/brand/my-orders')])
+      : Promise.all([
+          fetchWithAuth('/orders/my-orders'),
+          fetchWithAuth('/custom-orders/my-requests'),
+        ]);
+
+    request
+      .then((responses) => {
+        const [regularOrders, customOrders = []] = responses;
         const combinedOrders = [
           ...regularOrders.map(order => ({
             ...order,
@@ -305,13 +324,45 @@ function AccountOrders() {
         setLoading(false);
       })
       .catch(err => { console.error(err); setLoading(false); });
-  }, []);
+  }, [isBrand]);
+
+  async function handleDeliver(orderId, itemIndex) {
+    const key = `${orderId}-${itemIndex}`;
+    setDeliveringKey(key);
+    setActionMessage('');
+
+    try {
+      const data = await fetchWithAuth(`/orders/${orderId}/items/${itemIndex}/deliver`, {
+        method: 'PUT',
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) => (
+          order.orderKind === 'regular' && order.id === orderId
+            ? {
+                ...order,
+                ...data.order,
+                orderKind: 'regular',
+                sortDate: order.sortDate || data.order.createdAt,
+              }
+            : order
+        ))
+      );
+    } catch (error) {
+      setActionMessage(error.message || t('account.deliver_error'));
+    } finally {
+      setDeliveringKey('');
+    }
+  }
 
   if (loading) return <p>{t('account.loading_orders')}</p>;
 
   return (
     <div>
       <h2 className="font-display text-xl mb-6 text-navy">{t('account.orders')}</h2>
+      {actionMessage && (
+        <p role="alert" className="mb-4 text-sm text-red-500">{actionMessage}</p>
+      )}
       {orders.length === 0 ? (
         <p className="text-navy/60">{t('account.no_orders')}</p>
       ) : (
@@ -332,13 +383,21 @@ function AccountOrders() {
               ) : (
                 <>
                   <p className="text-sm text-navy/70">{t('account.total')}: ${Number(order.totalAmount).toFixed(2)}</p>
+                  {isBrand && order.shippingAddress?.fullName && (
+                    <p className="text-sm text-navy/70">{t('account.customer')}: {order.shippingAddress.fullName}</p>
+                  )}
                   <div className="mt-3 space-y-2">
                     {(order.items || []).map((item, index) => (
                       <div key={`${order.id}-${item.productId || item.id || index}`} className="rounded-md bg-zinc-50 p-3">
                         <p className="text-sm font-medium text-navy">
                           {item.name || item.nameEn || t('account.item_number', { number: index + 1 })}
                         </p>
-                        <div className="account-orders__item-grid mt-1 grid grid-cols-1 sm:grid-cols-4 gap-1 text-xs text-navy/60">
+                        {item.brandName && (
+                          <p className="mt-1 text-xs text-navy/70">
+                            {t('product.brand')}: {item.brandName}
+                          </p>
+                        )}
+                        <div className="account-orders__item-grid mt-2 grid grid-cols-1 sm:grid-cols-5 gap-1 text-xs text-navy/60">
                           <span>{t('account.size')}: {item.selectedSize || t('account.not_available')}</span>
                           <span>{t('account.color')}: {item.selectedColor || t('account.not_available')}</span>
                           <span>{t('account.qty')}: {item.quantity || 1}</span>
@@ -347,14 +406,27 @@ function AccountOrders() {
                               Number(item.price || 0) * Number(item.quantity || 1)
                             ).toFixed(2)}
                           </span>
+                          <span>{t('account.delivery_status')}: {getStatusLabel(item.deliveryStatus)}</span>
                         </div>
+                        {isBrand && item.deliveryStatus !== 'Delivered' && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeliver(order.id, item.itemIndex)}
+                            disabled={deliveringKey === `${order.id}-${item.itemIndex}`}
+                            className="mt-3 rounded-md bg-navy px-4 py-2 text-xs font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {deliveringKey === `${order.id}-${item.itemIndex}`
+                              ? t('account.delivering')
+                              : t('account.deliver_product')}
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
                 </>
               )}
 
-              <p className="text-sm text-navy/70">{t('account.status')}: {order.status}</p>
+              <p className="text-sm text-navy/70">{t('account.status')}: {getStatusLabel(order.status)}</p>
               <p className="text-sm text-navy/70 mt-2">{t('account.date')}: {new Date(order.createdAt).toLocaleDateString()}</p>
             </div>
           ))}

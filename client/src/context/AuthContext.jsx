@@ -5,7 +5,7 @@
  * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { authService } from '../services/userAuth';
 import { fetchWithAuth } from '../services/api';
 
@@ -16,8 +16,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    authService.getCurrentUser().then(u => {
-      setUser(u);
+    authService.getCurrentUser().then((currentUser) => {
+      setUser(currentUser);
       setLoading(false);
     });
   }, []);
@@ -25,11 +25,11 @@ export function AuthProvider({ children }) {
   async function login({ email, password }) {
     setLoading(true);
     try {
-      const u = await authService.login(email, password);
-      setUser(u);
-      return { success: true, user: u };
-    } catch (err) {
-      return { success: false, message: err?.message || 'Login failed. Please try again.' };
+      const currentUser = await authService.login(email, password);
+      setUser(currentUser);
+      return { success: true, user: currentUser };
+    } catch (error) {
+      return { success: false, message: error?.message || 'Login failed. Please try again.' };
     } finally {
       setLoading(false);
     }
@@ -38,11 +38,11 @@ export function AuthProvider({ children }) {
   async function register({ email, password, accountType = 'CUSTOMER', firstName = '', lastName = '', companyName = '', phone = '' }) {
     setLoading(true);
     try {
-      const u = await authService.register({ email, password, accountType, firstName, lastName, companyName, phone });
-      setUser(u);
+      const currentUser = await authService.register({ email, password, accountType, firstName, lastName, companyName, phone });
+      setUser(currentUser);
       return { success: true };
-    } catch (err) {
-      return { success: false, message: err?.message || 'Registration failed. Please try again.' };
+    } catch (error) {
+      return { success: false, message: error?.message || 'Registration failed. Please try again.' };
     } finally {
       setLoading(false);
     }
@@ -52,12 +52,12 @@ export function AuthProvider({ children }) {
     try {
       const data = await fetchWithAuth('/users/profile', {
         method: 'PUT',
-        body: JSON.stringify({ firstName, lastName, companyName, phone, email, addresses })
+        body: JSON.stringify({ firstName, lastName, companyName, phone, email, addresses }),
       });
       setUser(data.user || { ...user, firstName, lastName, companyName, phone, email, addresses });
       return { success: true };
-    } catch (err) {
-      return { success: false, message: err?.message || 'Failed to update profile.' };
+    } catch (error) {
+      return { success: false, message: error?.message || 'Failed to update profile.' };
     }
   }
 
@@ -65,11 +65,11 @@ export function AuthProvider({ children }) {
     try {
       await fetchWithAuth('/users/password', {
         method: 'PUT',
-        body: JSON.stringify({ currentPassword, newPassword })
+        body: JSON.stringify({ currentPassword, newPassword }),
       });
       return { success: true };
-    } catch (err) {
-      return { success: false, message: err?.message || 'Failed to update password.' };
+    } catch (error) {
+      return { success: false, message: error?.message || 'Failed to update password.' };
     }
   }
 
@@ -77,12 +77,12 @@ export function AuthProvider({ children }) {
     try {
       const data = await fetchWithAuth('/users/notifications', {
         method: 'PUT',
-        body: JSON.stringify(notifications)
+        body: JSON.stringify(notifications),
       });
       setUser(data.user || { ...user, notifications });
       return { success: true };
-    } catch (err) {
-      return { success: false, message: err?.message || 'Failed to update notification preferences.' };
+    } catch (error) {
+      return { success: false, message: error?.message || 'Failed to update notification preferences.' };
     }
   }
 
