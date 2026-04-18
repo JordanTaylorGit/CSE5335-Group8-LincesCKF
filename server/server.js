@@ -7,7 +7,10 @@ const bcrypt = require('bcryptjs');
 const db = require('./config/db');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['https://dctdo5snio73e.cloudfront.net', 'http://localhost:5173'],
+  credentials: true
+}));
 app.use(express.json());
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -131,6 +134,17 @@ app.put('/api/users/profile', authMiddleware, (req, res) => {
 app.get('/api/products', (req, res) => {
   db.query(`SELECT * FROM Products`, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+app.get('api/products/featured', (req, res) => {
+  const query = 'SELECT * FROM products WHERE featured = 1 LIMIT 4';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Database error' });
+    }
     res.json(results);
   });
 });
