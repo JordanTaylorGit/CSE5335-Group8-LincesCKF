@@ -25,6 +25,7 @@ const CustomOrders = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const orderTypes = [
     {
@@ -61,6 +62,7 @@ const CustomOrders = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (formError) setFormError('');
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -69,6 +71,14 @@ const CustomOrders = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError('');
+
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 10) {
+      setFormError(t('customOrders.form.phoneValidation'));
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -79,7 +89,7 @@ const CustomOrders = () => {
           contactInfo: {
             name: formData.name,
             email: formData.email,
-            phone: formData.phone,
+            phone: phoneDigits,
             company: formData.company
           },
           requirements: {
@@ -94,7 +104,7 @@ const CustomOrders = () => {
       setStep(3);
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Failed to submit order request.');
+      alert(t('customOrders.submitError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -201,8 +211,18 @@ const CustomOrders = () => {
               value={formData.phone}
               onChange={handleInputChange}
               required
+              inputMode="numeric"
+              pattern="[0-9]{10}"
+              placeholder="1234567890"
+              aria-invalid={Boolean(formError)}
+              aria-describedby={formError ? 'custom-order-phone-error' : undefined}
               className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
             />
+            {formError && (
+              <p id="custom-order-phone-error" role="alert" className="mt-2 text-sm text-red-600">
+                {formError}
+              </p>
+            )}
           </div>
           {orderType === 'b2b-manufacturing' && (
             <div>
@@ -341,7 +361,7 @@ const CustomOrders = () => {
             {t('customOrders.success.newRequest')}
           </button>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => window.location.href = '/catalog'}
             className="px-6 py-3 border border-navy text-navy hover:bg-navy hover:text-white transition-colors"
           >
             {t('customOrders.success.continueShopping')}

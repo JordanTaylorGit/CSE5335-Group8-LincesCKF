@@ -43,13 +43,13 @@ export default function Navbar() {
         <Link
           to="/"
           className="font-accent text-xl tracking-[0.2em] text-navy hover:text-silk-red transition-colors"
-          aria-label="Linces'CKF home"
+          aria-label={t("nav.home_label")}
         >
           LINCES<span className="text-silk-red">'</span>CKF
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8" aria-label="Primary navigation">
+        <nav className="hidden md:flex items-center gap-8" aria-label={t("nav.primary_navigation")}>
           <NavLink to="/">{t("nav.home")}</NavLink>
           <NavLink to="/catalog">{t("nav.catalog")}</NavLink>
           <NavLink to="/b2b">{t("nav.b2b")}</NavLink>
@@ -64,7 +64,7 @@ export default function Navbar() {
           <button
             onClick={toggleLanguage}
             className="font-body text-xs tracking-widest uppercase text-navy/60 hover:text-silk-red transition-colors flex items-center gap-1.5"
-            aria-label={language === "es" ? "Switch language to English" : "Cambiar idioma a espanol"}
+            aria-label={language === "es" ? t("nav.switch_to_english") : t("nav.switch_to_spanish")}
             aria-pressed={language === "es"}
           >
             <Globe size={16} strokeWidth={1.5} />
@@ -113,7 +113,7 @@ export default function Navbar() {
           <button
             className="md:hidden text-navy"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
+            aria-label={t("nav.toggle_menu")}
             aria-controls="mobile-navigation"
             aria-expanded={mobileOpen}
           >
@@ -127,7 +127,7 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div id="mobile-navigation" className="md:hidden bg-white border-t border-sky-mid py-6 px-6">
-          <nav className="flex flex-col gap-5" aria-label="Mobile navigation">
+          <nav className="flex flex-col gap-5" aria-label={t("nav.mobile_navigation")}>
             <NavLink to="/" mobile>
               {t("nav.home")}
             </NavLink>

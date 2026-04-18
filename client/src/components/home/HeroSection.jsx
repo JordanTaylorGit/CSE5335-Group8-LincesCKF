@@ -25,7 +25,7 @@ export default function HeroSection() {
         {/* Hero background image */}
         <img
           src="https://images.unsplash.com/photo-1758551015352-fa735f167422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwc2lsayUyMGZhYnJpYyUyMGZsb3dpbmclMjBsdXh1cnl8ZW58MXx8fHwxNzY5OTg5MTkwfDA&ixlib=rb-4.1.0&q=80&w=1080"
-          alt="Premium silk fabric"
+          alt={t('hero.imageAlt')}
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Silk sheen — lighter diagonal highlight */}

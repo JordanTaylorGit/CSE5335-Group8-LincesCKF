@@ -7,10 +7,12 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useCart } from "../context/CartContext";
 import { fetchWithAuth } from "../services/api";
 
 function Checkout() {
+  const { t } = useTranslation();
   const { cartItems, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
 
@@ -27,6 +29,7 @@ function Checkout() {
   });
 
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderMessage, setOrderMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const parseField = (field) => {
@@ -56,16 +59,27 @@ function Checkout() {
     e.preventDefault();
 
     if (cartItems.length === 0) {
-      alert("Your cart is empty.");
+      alert(t('checkout.empty_cart'));
       return;
     }
 
+    const orderItems = cartItems.map((item) => ({
+      productId: Number(item.productId || item.id),
+      id: item.id,
+      name: item.name,
+      price: Number(item.price),
+      quantity: Number(item.quantity),
+      selectedColor: item.selectedColor,
+      selectedSize: item.selectedSize,
+      image: getItemImage(item),
+    }));
+
     setIsSubmitting(true);
     try {
-      await fetchWithAuth('/orders', {
+      const data = await fetchWithAuth('/orders', {
         method: 'POST',
         body: JSON.stringify({
-          items: cartItems,
+          items: orderItems,
           totalAmount: cartTotal,
           shippingAddress: {
             fullName: formData.fullName,
@@ -76,6 +90,11 @@ function Checkout() {
         })
       });
 
+      if (!Array.isArray(data.stockUpdates)) {
+        setOrderMessage(t('checkout.inventory_unconfirmed'));
+      } else {
+        setOrderMessage(t('checkout.inventory_confirmed'));
+      }
       setOrderPlaced(true);
       clearCart();
 
@@ -83,7 +102,7 @@ function Checkout() {
         navigate("/");
       }, 2500);
     } catch (err) {
-      alert(err.message || 'Error placing order');
+      alert(err.message || t('checkout.order_error'));
       setIsSubmitting(false);
     }
   };
@@ -92,15 +111,15 @@ function Checkout() {
     return (
       <div className="min-h-screen bg-[#f6f4f1] flex items-center justify-center px-4">
         <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
-          <h1 className="text-2xl font-bold mb-3">Order Placed Successfully</h1>
+          <h1 className="text-2xl font-bold mb-3">{t('checkout.success_title')}</h1>
           <p className="text-gray-600 mb-4">
-            Your order has been placed. Redirecting to home page...
+            {orderMessage || t('checkout.success_redirect')}
           </p>
           <Link
             to="/"
             className="inline-block bg-black text-white px-5 py-3 rounded-lg"
           >
-            Go to Home
+            {t('checkout.go_home')}
           </Link>
         </div>
       </div>
@@ -111,15 +130,15 @@ function Checkout() {
     <div className="min-h-screen bg-[#f6f4f1] px-4 py-8">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
         <div className="bg-white rounded-2xl shadow-md p-6">
-          <h1 className="text-2xl font-bold mb-6">Checkout</h1>
+          <h1 className="text-2xl font-bold mb-6">{t('checkout.title')}</h1>
 
           <form onSubmit={handlePlaceOrder} className="space-y-4">
-            <h2 className="text-lg font-semibold">Shipping Details</h2>
+            <h2 className="text-lg font-semibold">{t('checkout.shipping_details')}</h2>
 
             <input
               type="text"
               name="fullName"
-              placeholder="Full Name"
+              placeholder={t('checkout.full_name')}
               value={formData.fullName}
               onChange={handleChange}
               required
@@ -129,7 +148,7 @@ function Checkout() {
             <input
               type="email"
               name="email"
-              placeholder="Email Address"
+              placeholder={t('checkout.email_address')}
               value={formData.email}
               onChange={handleChange}
               required
@@ -139,7 +158,7 @@ function Checkout() {
             <input
               type="text"
               name="address"
-              placeholder="Address"
+              placeholder={t('checkout.address')}
               value={formData.address}
               onChange={handleChange}
               required
@@ -150,7 +169,7 @@ function Checkout() {
               <input
                 type="text"
                 name="city"
-                placeholder="City"
+                placeholder={t('checkout.city')}
                 value={formData.city}
                 onChange={handleChange}
                 required
@@ -159,7 +178,7 @@ function Checkout() {
               <input
                 type="text"
                 name="zipCode"
-                placeholder="ZIP Code"
+                placeholder={t('checkout.zip_code')}
                 value={formData.zipCode}
                 onChange={handleChange}
                 required
@@ -167,12 +186,12 @@ function Checkout() {
               />
             </div>
 
-            <h2 className="text-lg font-semibold pt-2">Payment Details</h2>
+            <h2 className="text-lg font-semibold pt-2">{t('checkout.payment_details')}</h2>
 
             <input
               type="text"
               name="cardName"
-              placeholder="Name on Card"
+              placeholder={t('checkout.card_name')}
               value={formData.cardName}
               onChange={handleChange}
               required
@@ -182,7 +201,7 @@ function Checkout() {
             <input
               type="text"
               name="cardNumber"
-              placeholder="Card Number"
+              placeholder={t('checkout.card_number')}
               value={formData.cardNumber}
               onChange={handleChange}
               required
@@ -215,16 +234,16 @@ function Checkout() {
               disabled={isSubmitting}
               className="w-full bg-black text-white rounded-lg px-4 py-3 font-medium hover:opacity-90 transition disabled:opacity-50"
             >
-              {isSubmitting ? 'Processing...' : 'Place Order'}
+              {isSubmitting ? t('checkout.processing') : t('checkout.place_order')}
             </button>
           </form>
         </div>
 
         <div className="bg-white rounded-2xl shadow-md p-6 h-fit">
-          <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('checkout.order_summary')}</h2>
 
           {cartItems.length === 0 ? (
-            <p className="text-gray-500">Your cart is empty.</p>
+            <p className="text-gray-500">{t('checkout.empty_cart')}</p>
           ) : (
             <div className="space-y-4">
               {cartItems.map((item) => (
@@ -241,7 +260,7 @@ function Checkout() {
                     <div>
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-gray-500">
-                        Qty: {item.quantity}
+                        {t('account.qty')}: {item.quantity}
                       </p>
                     </div>
                   </div>
@@ -253,7 +272,7 @@ function Checkout() {
               ))}
 
               <div className="flex justify-between pt-4 text-lg font-bold">
-                <span>Total</span>
+                <span>{t('account.total')}</span>
                 <span>${Number(cartTotal).toFixed(2)}</span>
               </div>
             </div>

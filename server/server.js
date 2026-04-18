@@ -23,6 +23,39 @@ function dbQuery(sql, params = []) {
   });
 }
 
+function beginTransaction() {
+  return new Promise((resolve, reject) => {
+    db.beginTransaction((err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+}
+
+function commitTransaction() {
+  return new Promise((resolve, reject) => {
+    db.commit((err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+}
+
+function rollbackTransaction() {
+  return new Promise((resolve, reject) => {
+    db.rollback((err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+}
+
+function httpError(status, message) {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+}
+
 function parseJson(value, fallback) {
   if (value === null || value === undefined || value === '') return fallback;
   if (typeof value !== 'string') return value;
@@ -141,6 +174,9 @@ function serializeProduct(row) {
 }
 
 function normalizeProductBody(body) {
+  const sizes = normalizeSizes(body.sizes);
+  const sizeStockTotal = getSizeStockTotal(sizes);
+
   return {
     name: String(body.name || '').trim(),
     description: String(body.description || '').trim(),
@@ -148,10 +184,177 @@ function normalizeProductBody(body) {
     category: String(body.category || '').trim(),
     material: String(body.material || '').trim(),
     images: toJsonText(body.images, []),
-    stockQuantity: Number(body.stockQuantity || 0),
-    sizes: toJsonText(body.sizes, []),
+    stockQuantity: sizeStockTotal ?? Number(body.stockQuantity || 0),
+    sizes: JSON.stringify(sizes),
     colors: toJsonText(body.colors, []),
   };
+}
+
+function normalizeSizes(value) {
+  const rawSizes = parseJson(value, Array.isArray(value) ? value : []);
+
+  if (!Array.isArray(rawSizes)) return [];
+
+  return rawSizes
+    .map((entry) => {
+      if (typeof entry === 'string') {
+        return entry.trim();
+      }
+
+      if (!entry || typeof entry !== 'object') return null;
+
+      const name = String(entry.name || entry.size || entry.label || '').trim();
+      if (!name) return null;
+
+      const stockValue = entry.stockQuantity ?? entry.stock ?? entry.quantity;
+      const stockQuantity = Number(stockValue);
+
+      if (!Number.isFinite(stockQuantity)) {
+        return { name };
+      }
+
+      return {
+        ...entry,
+        name,
+        stockQuantity: Math.max(0, Math.floor(stockQuantity)),
+      };
+    })
+    .filter(Boolean);
+}
+
+function getSizeName(size) {
+  if (typeof size === 'string') return size.trim();
+  return String(size?.name || size?.size || size?.label || '').trim();
+}
+
+function getSizeStock(size) {
+  if (!size || typeof size !== 'object') return null;
+  const stock = Number(size.stockQuantity ?? size.stock ?? size.quantity);
+  return Number.isFinite(stock) ? stock : null;
+}
+
+function getSizeStockTotal(sizes) {
+  if (!Array.isArray(sizes)) return null;
+  const stockedSizes = sizes.filter((size) => getSizeStock(size) !== null);
+
+  if (stockedSizes.length === 0) return null;
+
+  return stockedSizes.reduce((total, size) => total + getSizeStock(size), 0);
+}
+
+function getOrderQuantitiesByProduct(items) {
+  return items.reduce((orders, item) => {
+    const productId = Number(item.productId || item.id);
+    const quantity = Number(item.quantity);
+    const selectedSize = String(item.selectedSize || item.size || '').trim();
+
+    if (!Number.isInteger(productId) || productId <= 0) {
+      throw httpError(400, 'Each order item must include a valid product id');
+    }
+
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      throw httpError(400, 'Each order item must include a valid quantity');
+    }
+
+    if (!selectedSize) {
+      throw httpError(400, 'Each order item must include a selected size');
+    }
+
+    const order = orders.get(productId) || { total: 0, sizes: new Map() };
+    order.total += quantity;
+    order.sizes.set(selectedSize, (order.sizes.get(selectedSize) || 0) + quantity);
+    orders.set(productId, order);
+
+    return orders;
+  }, new Map());
+}
+
+async function decrementProductStock(orderQuantities) {
+  const stockUpdates = [];
+
+  for (const [productId, order] of orderQuantities.entries()) {
+    const rows = await dbQuery(
+      `SELECT id, name, sizes, stockQuantity FROM Products WHERE id = ? FOR UPDATE`,
+      [productId]
+    );
+    const product = rows[0];
+
+    if (!product) {
+      throw httpError(404, `Product ${productId} was not found`);
+    }
+
+    const currentStock = Number(product.stockQuantity || 0);
+    const sizes = normalizeSizes(product.sizes);
+    const hasSizeStock = sizes.some((size) => getSizeStock(size) !== null);
+
+    if (hasSizeStock) {
+      const updatedSizes = sizes.map((size) => (
+        typeof size === 'string' ? { name: size } : { ...size, name: getSizeName(size) }
+      ));
+
+      for (const [selectedSize, quantity] of order.sizes.entries()) {
+        const sizeIndex = updatedSizes.findIndex(
+          (size) => getSizeName(size).toLowerCase() === selectedSize.toLowerCase()
+        );
+
+        if (sizeIndex === -1) {
+          throw httpError(400, `${product.name} does not have size ${selectedSize}`);
+        }
+
+        const availableStock = getSizeStock(updatedSizes[sizeIndex]) ?? 0;
+        if (availableStock < quantity) {
+          throw httpError(
+            409,
+            `${product.name} size ${selectedSize} has only ${availableStock} item(s) left in stock`
+          );
+        }
+
+        updatedSizes[sizeIndex] = {
+          ...updatedSizes[sizeIndex],
+          stockQuantity: availableStock - quantity,
+        };
+
+        stockUpdates.push({
+          productId,
+          name: product.name,
+          size: selectedSize,
+          quantityOrdered: quantity,
+          stockRemaining: availableStock - quantity,
+        });
+      }
+
+      const nextTotalStock = getSizeStockTotal(updatedSizes) ?? 0;
+      await dbQuery(
+        `UPDATE Products SET stockQuantity = ?, sizes = ? WHERE id = ?`,
+        [nextTotalStock, JSON.stringify(updatedSizes), productId]
+      );
+      continue;
+    }
+
+    if (currentStock < order.total) {
+      throw httpError(
+        409,
+        `${product.name} has only ${currentStock} item(s) left in stock`
+      );
+    }
+
+    await dbQuery(
+      `UPDATE Products SET stockQuantity = stockQuantity - ? WHERE id = ?`,
+      [order.total, productId]
+    );
+
+    for (const [selectedSize, quantity] of order.sizes.entries()) {
+      stockUpdates.push({
+        productId,
+        name: product.name,
+        size: selectedSize,
+        quantityOrdered: quantity,
+        stockRemaining: currentStock - order.total,
+      });
+    }
+  }
+
+  return stockUpdates;
 }
 
 app.get('/api/health', (req, res) => {

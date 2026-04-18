@@ -6,10 +6,12 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AuthModal from '../AuthModal';
 import { useAuth } from '@context/AuthContext';
 
 export default function SiteAuthGate({ children }) {
+  const { t } = useTranslation();
   const { isAuthenticated, loading } = useAuth();
   const [authOpen, setAuthOpen] = useState(true);
 
@@ -25,7 +27,7 @@ export default function SiteAuthGate({ children }) {
         <div
           className="w-8 h-8 border-2 border-sky-mid border-t-navy rounded-full animate-spin"
           role="status"
-          aria-label="Loading authentication status"
+          aria-label={t('auth.loading_status')}
         />
       </div>
     );
@@ -39,17 +41,17 @@ export default function SiteAuthGate({ children }) {
             Linces'CKF
           </p>
           <h1 className="font-display text-4xl text-navy mb-4">
-            Sign in to continue
+            {t('auth.sign_in_to_continue')}
           </h1>
           <p className="font-body text-navy/60 leading-7 mb-8">
-            Please log in or create an account to continue with Linces'CKF.
+            {t('auth.sign_in_required_message')}
           </p>
           <button
             type="button"
             onClick={() => setAuthOpen(true)}
             className="font-body rounded-md bg-navy px-6 py-3 text-sm text-white hover:bg-silk-red transition-colors"
           >
-            Login or Register
+            {t('auth.login_or_register')}
           </button>
         </section>
 

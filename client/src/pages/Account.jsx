@@ -73,7 +73,7 @@ function AccountSettings() {
   async function handleProfileSave(e) {
     e.preventDefault();
     setProfileMsg('');
-    if (!email.trim()) return setProfileMsg(t('account.email') + ' is required.');
+    if (!email.trim()) return setProfileMsg(t('account.field_required', { field: t('account.email') }));
     const address = {
       line1: line1.trim(),
       line2: line2.trim(),
@@ -93,9 +93,9 @@ function AccountSettings() {
   async function handlePasswordChange(e) {
     e.preventDefault();
     setPwMsg('');
-    if (!currentPw) return setPwMsg(t('account.current_password') + ' is required.');
-    if (newPw.length < 6) return setPwMsg('New password must be at least 6 characters.');
-    if (newPw !== confirmPw) return setPwMsg('Passwords do not match.');
+    if (!currentPw) return setPwMsg(t('account.field_required', { field: t('account.current_password') }));
+    if (newPw.length < 6) return setPwMsg(t('auth.error_password_length'));
+    if (newPw !== confirmPw) return setPwMsg(t('auth.error_passwords_match'));
     setPwBusy(true);
     const res = await updatePassword({ currentPassword: currentPw, newPassword: newPw });
     setPwBusy(false);
@@ -283,26 +283,79 @@ function AccountOrders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchWithAuth('/orders/my-orders')
-      .then(data => { setOrders(data); setLoading(false); })
+    Promise.all([
+      fetchWithAuth('/orders/my-orders'),
+      fetchWithAuth('/custom-orders/my-requests'),
+    ])
+      .then(([regularOrders, customOrders]) => {
+        const combinedOrders = [
+          ...regularOrders.map(order => ({
+            ...order,
+            orderKind: 'regular',
+            sortDate: order.createdAt,
+          })),
+          ...customOrders.map(order => ({
+            ...order,
+            orderKind: 'custom',
+            sortDate: order.createdAt,
+          })),
+        ].sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
+
+        setOrders(combinedOrders);
+        setLoading(false);
+      })
       .catch(err => { console.error(err); setLoading(false); });
   }, []);
 
-  if (loading) return <p>Loading orders...</p>;
+  if (loading) return <p>{t('account.loading_orders')}</p>;
 
   return (
     <div>
-      <h2 className="font-display text-xl mb-6 text-navy">My Orders</h2>
+      <h2 className="font-display text-xl mb-6 text-navy">{t('account.orders')}</h2>
       {orders.length === 0 ? (
-        <p className="text-navy/60">You have no orders yet.</p>
+        <p className="text-navy/60">{t('account.no_orders')}</p>
       ) : (
         <div className="space-y-4">
           {orders.map(order => (
-            <div key={order.id} className="p-4 border border-zinc-200 rounded-md">
-              <p className="font-semibold text-navy">Order #{order.id}</p>
-              <p className="text-sm text-navy/70">Total: ${order.totalAmount.toFixed(2)}</p>
-              <p className="text-sm text-navy/70">Status: {order.status}</p>
-              <p className="text-sm text-navy/70 mt-2">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
+            <div key={`${order.orderKind}-${order.id}`} className="p-4 border border-zinc-200 rounded-md">
+              <p className="font-semibold text-navy">
+                {order.orderKind === 'custom' ? t('account.custom_order') : t('account.order_number', { id: order.id })}
+              </p>
+
+              {order.orderKind === 'custom' ? (
+                <>
+                  <p className="text-sm text-navy/70">{t('account.request_number', { id: order.id })}</p>
+                  <p className="text-sm text-navy/70">{t('account.type')}: {String(order.orderType || '').replaceAll('-', ' ')}</p>
+                  <p className="text-sm text-navy/70">{t('account.timeline')}: {order.requirements?.timeline || t('account.not_specified')}</p>
+                  <p className="text-sm text-navy/70">{t('account.quantity')}: {order.requirements?.quantity || t('account.not_specified')}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-navy/70">{t('account.total')}: ${Number(order.totalAmount).toFixed(2)}</p>
+                  <div className="mt-3 space-y-2">
+                    {(order.items || []).map((item, index) => (
+                      <div key={`${order.id}-${item.productId || item.id || index}`} className="rounded-md bg-zinc-50 p-3">
+                        <p className="text-sm font-medium text-navy">
+                          {item.name || item.nameEn || t('account.item_number', { number: index + 1 })}
+                        </p>
+                        <div className="mt-1 grid grid-cols-1 sm:grid-cols-4 gap-1 text-xs text-navy/60">
+                          <span>{t('account.size')}: {item.selectedSize || t('account.not_available')}</span>
+                          <span>{t('account.color')}: {item.selectedColor || t('account.not_available')}</span>
+                          <span>{t('account.qty')}: {item.quantity || 1}</span>
+                          <span>
+                            {t('account.line_total')}: ${(
+                              Number(item.price || 0) * Number(item.quantity || 1)
+                            ).toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <p className="text-sm text-navy/70">{t('account.status')}: {order.status}</p>
+              <p className="text-sm text-navy/70 mt-2">{t('account.date')}: {new Date(order.createdAt).toLocaleDateString()}</p>
             </div>
           ))}
         </div>
@@ -350,7 +403,7 @@ export default function Account() {
           {/* If user is a brand show product creation link */}
           {user?.accountType === 'BRAND' && (
             <Link to="/account/brand/add-item" className={`block font-body text-sm tracking-wider py-2 border-b border-transparent ${location.pathname.startsWith('/account/brand') ? 'text-silk-amber border-silk-amber' : 'text-navy/60 hover:text-navy'}`}>
-              Add Item
+              {t('account.add_item')}
             </Link>
           )}
 
@@ -384,7 +437,7 @@ function BrandAreaWrapper() {
   if (!user || user.accountType !== 'BRAND') {
     return (
       <div className="p-6 border rounded-md">
-        <p className="text-navy/70">This section is available for Brand accounts only.</p>
+        <p className="text-navy/70">{t('account.brand_only')}</p>
       </div>
     );
   }

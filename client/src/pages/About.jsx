@@ -19,7 +19,7 @@ export default function About() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30 z-10" />
         <img
           src="https://images.unsplash.com/photo-1761746395622-5f7e0e7b4ec7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwZGVzaWduJTIwc3R1ZGlvJTIwd29ya3NwYWNlfGVufDF8fHx8MTc2OTk2MzM4Nnww&ixlib=rb-4.1.0&q=80&w=1080"
-          alt="About Linces'CKF"
+          alt={t('about.hero.imageAlt')}
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="relative z-20 text-center px-4 max-w-4xl mx-auto text-white">

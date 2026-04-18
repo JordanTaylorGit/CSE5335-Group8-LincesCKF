@@ -11,6 +11,35 @@ import { useCart } from "../context/CartContext";
 import { useTranslation } from 'react-i18next';
 import { fetchWithAuth } from "../services/api";
 
+function getSizeName(size) {
+  if (typeof size === "string") return size;
+  return String(size?.name || size?.size || size?.label || "");
+}
+
+function getSizeStock(size) {
+  if (!size || typeof size !== "object") return null;
+  const stock = Number(size.stockQuantity ?? size.stock ?? size.quantity);
+  return Number.isFinite(stock) ? stock : null;
+}
+
+function isSizeAvailable(size) {
+  const stock = getSizeStock(size);
+  return stock === null || stock > 0;
+}
+
+function getTotalAvailableStock(product, sizes) {
+  const sizeStocks = sizes
+    .map(getSizeStock)
+    .filter((stock) => stock !== null);
+
+  if (sizeStocks.length > 0) {
+    return sizeStocks.reduce((total, stock) => total + stock, 0);
+  }
+
+  const stock = Number(product.stockQuantity);
+  return Number.isFinite(stock) ? stock : Infinity;
+}
+
 function ProductDetails() {
   const { id } = useParams();
   const { addToCart } = useCart();
@@ -37,9 +66,10 @@ function ProductDetails() {
         setProduct(data);
         const parsedColors = parseField(data.colors);
         const parsedSizes = parseField(data.sizes);
+        const firstAvailableSize = parsedSizes.find(isSizeAvailable);
 
         if (parsedColors.length > 0) setSelectedColor({ name: parsedColors[0] });
-        if (parsedSizes.length > 0) setSelectedSize(parsedSizes[0]);
+        if (firstAvailableSize) setSelectedSize(getSizeName(firstAvailableSize));
         setLoading(false);
       })
       .catch(err => {
@@ -52,7 +82,7 @@ function ProductDetails() {
   const productDesc = product?.description;
 
   if (loading) {
-    return <div className="p-10 text-lg">Loading...</div>;
+    return <div className="p-10 text-lg">{t('common.loading')}</div>;
   }
 
   if (!product) {
@@ -64,17 +94,25 @@ function ProductDetails() {
   const parsedColors = parseField(product.colors);
   const parsedSizes = parseField(product.sizes);
   const displayPrice = Number(product.price).toFixed(2);
+  const isOutOfStock = getTotalAvailableStock(product, parsedSizes) <= 0;
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] py-10">
 
       <div className="mx-auto grid max-w-[1400px] gap-10 px-8 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-[18px] bg-white shadow-sm">
+        <div className="relative overflow-hidden rounded-[18px] bg-white shadow-sm">
           <img
             src={imageUrl}
             alt={product.name}
-            className="h-[520px] w-full object-cover"
+            className={`h-[520px] w-full object-cover ${isOutOfStock ? "opacity-60" : ""}`}
           />
+          {isOutOfStock && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/55">
+              <span className="rounded bg-slate-900/75 px-6 py-3 text-sm font-semibold uppercase tracking-widest text-white">
+                {t('product.out_of_stock')}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="rounded-[18px] bg-white p-8 shadow-sm">
@@ -125,29 +163,39 @@ function ProductDetails() {
             </h3>
 
             <div className="flex flex-wrap gap-3">
-              {parsedSizes.map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  onClick={() => setSelectedSize(size)}
-                  className={`cursor-pointer rounded-lg border px-4 py-2 text-sm font-medium transition active:scale-95 ${
-                    selectedSize === size
-                      ? "border-slate-900 bg-slate-900 text-white"
-                      : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
-                  }`}
-                  aria-pressed={selectedSize === size}
-                >
-                  {size}
-                </button>
-              ))}
+              {parsedSizes.map((size) => {
+                const sizeName = getSizeName(size);
+                const sizeStock = getSizeStock(size);
+                const disabled = sizeStock !== null && sizeStock <= 0;
+
+                return (
+                  <button
+                    key={sizeName}
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => setSelectedSize(sizeName)}
+                    className={`cursor-pointer rounded-lg border px-4 py-2 text-sm font-medium transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 ${
+                      selectedSize === sizeName
+                        ? "border-slate-900 bg-slate-900 text-white"
+                        : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
+                    }`}
+                    aria-pressed={selectedSize === sizeName}
+                    title={sizeStock !== null ? t('product.size_stock_title', { count: sizeStock }) : sizeName}
+                  >
+                    {sizeName}
+                    {sizeStock !== null ? ` (${t('product.size_stock_left', { count: sizeStock })})` : ""}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           <button
             onClick={() => addToCart(product, selectedColor?.name, selectedSize)}
-            className="mt-10 cursor-pointer rounded-lg bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 active:scale-95 active:shadow-inner"
+            disabled={isOutOfStock}
+            className="mt-10 cursor-pointer rounded-lg bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 active:scale-95 active:shadow-inner disabled:cursor-not-allowed disabled:bg-slate-400"
           >
-            {t('product.addToCart')}
+            {isOutOfStock ? t('product.out_of_stock') : t('product.addToCart')}
           </button>
         </div>
       </div>

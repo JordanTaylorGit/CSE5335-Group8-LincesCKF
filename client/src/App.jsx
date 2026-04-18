@@ -12,6 +12,7 @@ import { LanguageProvider } from '@context/LanguageContext';
 import ProtectedRoute from '@components/auth/ProtectedRoute';
 import SiteAuthGate from '@components/auth/SiteAuthGate';
 import Layout from '@components/layout/Layout';
+import ScrollToTop from '@components/ScrollToTop';
 import Seo from '@components/Seo';
 
 // Pages — lazy loaded for code splitting
@@ -33,6 +34,7 @@ export default function App() {
       <AuthProvider>
         <CartProvider>
           <Router>
+            <ScrollToTop />
             <Seo />
             <SiteAuthGate>
               <Layout>
