@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -8,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_for_lincesckf';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // ==========================================
 // Auth Middleware
