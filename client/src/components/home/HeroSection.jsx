@@ -13,7 +13,7 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="hero-section relative w-full overflow-hidden"
       style={{ minHeight: '50vh' }}
       aria-label={t('hero.ariaLabel')}
     >
@@ -53,7 +53,7 @@ export default function HeroSection() {
 
       {/* ── Content ── */}
       <div
-        className="relative z-10 flex flex-col items-center justify-center text-center px-6"
+        className="hero-section__content relative z-10 flex flex-col items-center justify-center text-center px-6"
         style={{ minHeight: '50vh' }}
       >
         <div className="max-w-4xl mx-auto">
@@ -121,7 +121,7 @@ export default function HeroSection() {
           </div>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="hero-section__actions flex flex-col sm:flex-row gap-4 justify-center items-center">
             {/* Primary — white filled */}
             <Link
               to="/catalog"

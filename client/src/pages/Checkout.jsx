@@ -109,8 +109,8 @@ function Checkout() {
 
   if (orderPlaced) {
     return (
-      <div className="min-h-screen bg-[#f6f4f1] flex items-center justify-center px-4">
-        <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
+      <div className="checkout-page checkout-page--success min-h-screen bg-[#f6f4f1] flex items-center justify-center px-4">
+        <div className="checkout-page__success-card bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
           <h1 className="text-2xl font-bold mb-3">{t('checkout.success_title')}</h1>
           <p className="text-gray-600 mb-4">
             {orderMessage || t('checkout.success_redirect')}
@@ -127,9 +127,9 @@ function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f4f1] px-4 py-8">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-2xl shadow-md p-6">
+    <div className="checkout-page min-h-screen bg-[#f6f4f1] px-4 py-8">
+      <div className="checkout-page__layout max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
+        <div className="checkout-page__form-card bg-white rounded-2xl shadow-md p-6">
           <h1 className="text-2xl font-bold mb-6">{t('checkout.title')}</h1>
 
           <form onSubmit={handlePlaceOrder} className="space-y-4">
@@ -165,7 +165,7 @@ function Checkout() {
               className="w-full border rounded-lg px-4 py-3 outline-none"
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="checkout-page__double-row grid grid-cols-2 gap-4">
               <input
                 type="text"
                 name="city"
@@ -208,7 +208,7 @@ function Checkout() {
               className="w-full border rounded-lg px-4 py-3 outline-none"
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="checkout-page__double-row grid grid-cols-2 gap-4">
               <input
                 type="text"
                 name="expiry"
@@ -239,7 +239,7 @@ function Checkout() {
           </form>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 h-fit">
+        <div className="checkout-page__summary-card bg-white rounded-2xl shadow-md p-6 h-fit">
           <h2 className="text-xl font-semibold mb-4">{t('checkout.order_summary')}</h2>
 
           {cartItems.length === 0 ? (

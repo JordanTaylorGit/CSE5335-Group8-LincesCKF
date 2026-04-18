@@ -14,7 +14,7 @@ function CartSummary() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 h-fit">
+    <div className="cart-summary bg-white rounded-xl shadow-md p-6 h-fit">
       <h2 className="text-xl font-semibold mb-4">{t('cart.orderSummary')}</h2>
 
       <div className="space-y-3 text-sm">

@@ -63,13 +63,13 @@ function StepCard({ step, index }) {
 
   return (
     <div
-      className="relative flex flex-col items-center text-center px-4"
+      className="process-steps__card relative flex flex-col items-center text-center px-4"
       style={{ flex: '1 1 220px' }}
     >
       {/* Connector line (desktop only, not on last) */}
       {index < STEPS.length - 1 && (
         <div
-          className="hidden lg:block absolute top-9 z-0"
+          className="process-steps__connector hidden lg:block absolute top-9 z-0"
           style={{
             left: 'calc(50% + 36px)',
             right: 'calc(-50% + 36px)',
@@ -155,7 +155,7 @@ export default function ProcessSteps() {
 
   return (
     <section
-      className="py-24 px-6"
+      className="process-steps py-24 px-6"
       style={{ background: '#0B2545' }}
       aria-labelledby="process-heading"
     >
@@ -201,7 +201,7 @@ export default function ProcessSteps() {
         </div>
 
         {/* Steps */}
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-6 relative">
+        <div className="process-steps__grid flex flex-col lg:flex-row gap-10 lg:gap-6 relative">
           {STEPS.map((step, i) => (
             <StepCard key={step.number} step={step} index={i} />
           ))}

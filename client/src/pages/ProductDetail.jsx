@@ -97,14 +97,14 @@ function ProductDetails() {
   const isOutOfStock = getTotalAvailableStock(product, parsedSizes) <= 0;
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] py-10">
+    <div className="product-detail-page min-h-screen bg-[#f5f5f5] py-10">
 
-      <div className="mx-auto grid max-w-[1400px] gap-10 px-8 lg:grid-cols-2">
-        <div className="relative overflow-hidden rounded-[18px] bg-white shadow-sm">
+      <div className="product-detail-page__layout mx-auto grid max-w-[1400px] gap-10 px-8 lg:grid-cols-2">
+        <div className="product-detail-page__media relative overflow-hidden rounded-[18px] bg-white shadow-sm">
           <img
             src={imageUrl}
             alt={product.name}
-            className={`h-[520px] w-full object-cover ${isOutOfStock ? "opacity-60" : ""}`}
+            className={`product-detail-page__image h-[520px] w-full object-cover ${isOutOfStock ? "opacity-60" : ""}`}
           />
           {isOutOfStock && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/55">
@@ -115,7 +115,7 @@ function ProductDetails() {
           )}
         </div>
 
-        <div className="rounded-[18px] bg-white p-8 shadow-sm">
+        <div className="product-detail-page__content rounded-[18px] bg-white p-8 shadow-sm">
           <p className="text-sm capitalize text-gray-500">{t({ blouse: 'catalog.blouses', 
             dress: 'catalog.dresses', shirt: 'catalog.shirts', scarf: 'catalog.scarves', 
             skirt: 'catalog.skirt', robe: 'catalog.robe' }[product.category] || product.category)}
@@ -193,7 +193,7 @@ function ProductDetails() {
           <button
             onClick={() => addToCart(product, selectedColor?.name, selectedSize)}
             disabled={isOutOfStock}
-            className="mt-10 cursor-pointer rounded-lg bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 active:scale-95 active:shadow-inner disabled:cursor-not-allowed disabled:bg-slate-400"
+            className="product-detail-page__cta mt-10 cursor-pointer rounded-lg bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 active:scale-95 active:shadow-inner disabled:cursor-not-allowed disabled:bg-slate-400"
           >
             {isOutOfStock ? t('product.out_of_stock') : t('product.addToCart')}
           </button>

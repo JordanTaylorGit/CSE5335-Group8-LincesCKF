@@ -126,7 +126,7 @@ const CustomOrders = () => {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+      <div className="custom-orders-page__type-grid grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
         {orderTypes.map((type, index) => (
           <motion.button
             key={type.id}
@@ -171,7 +171,7 @@ const CustomOrders = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="custom-orders-page__form-grid grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-navy/70 mb-2">
               {t('customOrders.form.name')}
@@ -200,7 +200,7 @@ const CustomOrders = () => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="custom-orders-page__form-grid grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-navy/70 mb-2">
               {t('customOrders.form.phone')}
@@ -241,7 +241,7 @@ const CustomOrders = () => {
           )}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="custom-orders-page__form-grid grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-navy/70 mb-2">
               {t('customOrders.form.quantity')}
@@ -291,7 +291,7 @@ const CustomOrders = () => {
           />
         </div>
 
-        <div className="flex justify-between items-center pt-6">
+        <div className="custom-orders-page__form-actions flex justify-between items-center pt-6">
           <button
             type="button"
             onClick={() => setStep(1)}
@@ -340,7 +340,7 @@ const CustomOrders = () => {
             <span className="font-medium">{formData.timeline}</span>
           </div>
         </div>
-        <div className="mt-8 space-x-4">
+        <div className="custom-orders-page__success-actions mt-8 space-x-4">
           <button
             onClick={() => {
               setStep(1);
@@ -372,11 +372,11 @@ const CustomOrders = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white py-16">
+    <div className="custom-orders-page min-h-screen bg-white py-16">
       <div className="max-w-6xl mx-auto px-6">
         {/* Progress Indicator */}
-        <div className="flex justify-center mb-12">
-          <div className="flex items-center space-x-2 sm:space-x-8 w-full max-w-2xl px-2 sm:px-0">
+        <div className="custom-orders-page__progress flex justify-center mb-12">
+          <div className="custom-orders-page__progress-track flex items-center space-x-2 sm:space-x-8 w-full max-w-2xl px-2 sm:px-0">
             <div className={`flex items-center space-x-2 sm:space-x-3 ${step >= 1 ? 'text-navy' : 'text-navy/40'}`}>
               <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-sm font-medium ${
                 step >= 1 ? 'bg-navy text-white' : 'bg-navy/20 text-navy'

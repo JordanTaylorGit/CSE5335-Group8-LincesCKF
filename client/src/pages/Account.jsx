@@ -123,7 +123,7 @@ function AccountSettings() {
               <input id="s-company" type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} className={inputCls} autoComplete="organization" />
             </div>
           ) : (
-            <div className="flex gap-3">
+            <div className="account-settings__name-row flex gap-3">
               <div className="flex-1">
                 <label htmlFor="s-first" className={labelCls}>{t('account.first_name')}</label>
                 <input id="s-first" type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className={inputCls} autoComplete="given-name" />
@@ -154,7 +154,7 @@ function AccountSettings() {
                 <label htmlFor="s-address-line2" className={labelCls}>{t('account.address_line2')}</label>
                 <input id="s-address-line2" type="text" value={line2} onChange={e => setLine2(e.target.value)} className={inputCls} autoComplete="address-line2" />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="account-settings__address-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="s-city" className={labelCls}>{t('account.city')}</label>
                   <input id="s-city" type="text" value={city} onChange={e => setCity(e.target.value)} className={inputCls} autoComplete="address-level2" />
@@ -164,7 +164,7 @@ function AccountSettings() {
                   <input id="s-state" type="text" value={state} onChange={e => setState(e.target.value)} className={inputCls} autoComplete="address-level1" />
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="account-settings__address-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="s-postal" className={labelCls}>{t('account.postal_code')}</label>
                   <input id="s-postal" type="text" value={postalCode} onChange={e => setPostalCode(e.target.value)} className={inputCls} autoComplete="postal-code" />
@@ -338,7 +338,7 @@ function AccountOrders() {
                         <p className="text-sm font-medium text-navy">
                           {item.name || item.nameEn || t('account.item_number', { number: index + 1 })}
                         </p>
-                        <div className="mt-1 grid grid-cols-1 sm:grid-cols-4 gap-1 text-xs text-navy/60">
+                        <div className="account-orders__item-grid mt-1 grid grid-cols-1 sm:grid-cols-4 gap-1 text-xs text-navy/60">
                           <span>{t('account.size')}: {item.selectedSize || t('account.not_available')}</span>
                           <span>{t('account.color')}: {item.selectedColor || t('account.not_available')}</span>
                           <span>{t('account.qty')}: {item.quantity || 1}</span>
@@ -378,12 +378,12 @@ export default function Account() {
   const location = useLocation();
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-20">
+    <div className="account-page max-w-5xl mx-auto px-6 py-20">
       <h1 className="font-display text-4xl md:text-5xl text-navy mb-12">{t('account.title')}</h1>
 
-      <div className="flex flex-col md:flex-row gap-12">
+      <div className="account-page__layout flex flex-col md:flex-row gap-12">
         {/* Sidebar */}
-        <aside className="w-full md:w-48 space-y-2">
+        <aside className="account-page__sidebar w-full md:w-48 space-y-2">
           {baseTabs.map(tab => {
             const href = `/account${tab.path ? `/${tab.path}` : ''}`;
             const active = location.pathname === href;
@@ -417,7 +417,7 @@ export default function Account() {
         </aside>
 
         {/* Content */}
-        <div className="flex-1">
+        <div className="account-page__content flex-1">
           <Routes>
             <Route path="/"              element={<AccountProfile      />} />
             <Route path="orders"         element={<AccountOrders       />} />
@@ -432,11 +432,12 @@ export default function Account() {
 }
 
 function BrandAreaWrapper() {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   if (!user || user.accountType !== 'BRAND') {
     return (
-      <div className="p-6 border rounded-md">
+      <div className="account-page__brand-only p-6 border rounded-md">
         <p className="text-navy/70">{t('account.brand_only')}</p>
       </div>
     );

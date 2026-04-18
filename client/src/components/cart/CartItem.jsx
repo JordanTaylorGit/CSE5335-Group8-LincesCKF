@@ -13,11 +13,11 @@ function CartItem({ item }) {
   const { t, i18n } = useTranslation();
   
   return (
-    <div className="grid gap-4 rounded-xl border border-gray-200 bg-white p-4 md:grid-cols-[120px_1fr_auto]">
+    <div className="cart-item grid gap-4 rounded-xl border border-gray-200 bg-white p-4 md:grid-cols-[120px_1fr_auto]">
       <img
         src={item.image}
         alt={item.name}
-        className="h-[120px] w-full rounded-lg object-cover md:w-[120px]"
+        className="cart-item__image h-[120px] w-full rounded-lg object-cover md:w-[120px]"
       />
 
       <div>
@@ -29,8 +29,8 @@ function CartItem({ item }) {
         </p>
       </div>
 
-      <div className="flex flex-col items-start gap-3 md:items-end">
-        <div className="flex items-center gap-2">
+      <div className="cart-item__actions flex flex-col items-start gap-3 md:items-end">
+        <div className="cart-item__quantity flex items-center gap-2">
           <button
             type="button"
             onClick={() =>

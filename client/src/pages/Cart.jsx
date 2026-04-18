@@ -15,9 +15,9 @@ function Cart() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-[#f2f2f2] min-h-screen px-4 py-8">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-[2fr_1fr] gap-6">
-        <div className="bg-white rounded-xl shadow-md p-6">
+    <div className="cart-page bg-[#f2f2f2] min-h-screen px-4 py-8">
+      <div className="cart-page__layout max-w-6xl mx-auto grid md:grid-cols-[2fr_1fr] gap-6">
+        <div className="cart-page__items-card bg-white rounded-xl shadow-md p-6">
           <h1 className="text-2xl font-bold mb-6">{t('product.addToCart')}</h1>
 
           {cartItems.length === 0 ? (

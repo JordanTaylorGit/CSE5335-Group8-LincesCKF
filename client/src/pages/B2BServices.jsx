@@ -70,7 +70,7 @@ function PageHero() {
 
   return (
     <section
-      className="relative flex items-end px-6 pb-20 overflow-hidden"
+      className="services-page__hero relative flex items-end px-6 pb-20 overflow-hidden"
       style={{
         minHeight: '52vh',
         background: `url('https://images.unsplash.com/photo-1684259499086-93cb3e555803?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaWxrJTIwbWFudWZhY3R1cmluZyUyMGZhY3RvcnklMjBwcm9kdWN0aW9ufGVufDF8fHx8MTc2OTk4OTI0Mnww&ixlib=rb-4.1.0&q=80&w=1080') center/cover no-repeat`,
@@ -128,6 +128,7 @@ function ServiceCard({ service, index }) {
 
   return (
     <div
+      className="services-page__card"
       style={{
         flex: '1 1 240px',
         padding: '32px 28px',
@@ -193,6 +194,7 @@ function B2BFeatureCard({ feature, index }) {
 
   return (
     <div
+      className="services-page__feature-card"
       style={{
         flex: '1 1 240px',
         padding: '32px 28px',
@@ -233,12 +235,12 @@ export default function ServicesPage() {
   const { t }      = useTranslation();
 
   return (
-    <div style={{ background: '#ffffff' }}>
+    <div className="services-page" style={{ background: '#ffffff' }}>
       {/* ── 1. Page Hero (navy) ── */}
       <PageHero />
 
       {/* ── 2. What We Offer (white) ── */}
-      <section className="py-24 px-6" style={{ background: '#ffffff' }}>
+      <section className="services-page__offers py-24 px-6" style={{ background: '#ffffff' }}>
         <div className="max-w-6xl mx-auto">
           <div className="mb-14">
             <Eyebrow text={t('services.what.eyebrow')} />
@@ -252,7 +254,7 @@ export default function ServicesPage() {
               {t('services.what.heading')}
             </h2>
           </div>
-          <div className="flex flex-wrap gap-5">
+          <div className="services-page__offer-grid flex flex-wrap gap-5">
             {SERVICES.map((s, i) => <ServiceCard key={i} service={s} index={i} />)}
           </div>
         </div>
@@ -263,7 +265,7 @@ export default function ServicesPage() {
 
       {/* ── 4. CTA Section (white) ── */}
       <section
-        className="relative py-24 px-6 overflow-hidden"
+        className="services-page__cta relative py-24 px-6 overflow-hidden"
         style={{ background: '#ffffff' }}
       >
         <div className="relative z-10 max-w-6xl mx-auto text-center">

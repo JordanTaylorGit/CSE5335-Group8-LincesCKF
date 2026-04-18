@@ -14,12 +14,12 @@ export default function Layout({ children }) {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="site-layout min-h-screen flex flex-col relative">
       <a href="#main-content" className="skip-link">
         {t('common.skip_to_content')}
       </a>
       <Navbar />
-      <main id="main-content" tabIndex="-1" className="flex-1 pt-18">
+      <main id="main-content" tabIndex="-1" className="site-main flex-1 pt-18">
         {children}
       </main>
       <Footer />

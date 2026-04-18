@@ -8,7 +8,7 @@ const initialProducts = [
     price: 120.00,
     category: 'blouse',
     material: '100% Silk',
-    images: ['https://images.unsplash.com/photo-1564257631407-4deb1f99d992?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/19895950/pexels-photo-19895950.jpeg?cs=srgb&dl=pexels-marceloverfe-19895950.jpg&fm=jpg'],
     stockQuantity: 50,
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     colors: ['White', 'Navy', 'Burgundy']
@@ -19,7 +19,7 @@ const initialProducts = [
     price: 95.00,
     category: 'blouse',
     material: 'Satin Silk Blend',
-    images: ['https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/19895954/pexels-photo-19895954.jpeg?cs=srgb&dl=pexels-marceloverfe-19895954.jpg&fm=jpg'],
     stockQuantity: 40,
     sizes: ['S', 'M', 'L'],
     colors: ['Black', 'Rose', 'Silver']
@@ -30,7 +30,7 @@ const initialProducts = [
     price: 110.00,
     category: 'blouse',
     material: '100% Silk Chiffon',
-    images: ['https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/22441278/pexels-photo-22441278.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441278.jpg&fm=jpg'],
     stockQuantity: 25,
     sizes: ['XS', 'S', 'M', 'L'],
     colors: ['Blush', 'Ivory']
@@ -41,7 +41,7 @@ const initialProducts = [
     price: 135.00,
     category: 'blouse',
     material: '100% Charmeuse Silk',
-    images: ['https://images.unsplash.com/photo-1551163943-3f6a855d1153?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/22441291/pexels-photo-22441291.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441291.jpg&fm=jpg'],
     stockQuantity: 35,
     sizes: ['S', 'M', 'L', 'XL'],
     colors: ['Emerald', 'Midnight Blue']
@@ -54,7 +54,7 @@ const initialProducts = [
     price: 250.00,
     category: 'dress',
     material: '95% Silk, 5% Elastane',
-    images: ['https://images.unsplash.com/photo-1539008835657-9e8e9680c956?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/11813835/pexels-photo-11813835.jpeg?cs=srgb&dl=pexels-vladimir-konoplev-155326297-11813835.jpg&fm=jpg'],
     stockQuantity: 30,
     sizes: ['S', 'M', 'L'],
     colors: ['Black', 'Emerald', 'Champagne']
@@ -65,7 +65,7 @@ const initialProducts = [
     price: 195.00,
     category: 'dress',
     material: '100% Mulberry Silk',
-    images: ['https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/8916598/pexels-photo-8916598.jpeg?cs=srgb&dl=pexels-leeloothefirst-8916598.jpg&fm=jpg'],
     stockQuantity: 45,
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     colors: ['Ruby', 'Sapphire', 'Pearl']
@@ -76,7 +76,7 @@ const initialProducts = [
     price: 280.00,
     category: 'dress',
     material: 'Heavyweight Silk Crepe',
-    images: ['https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/19895965/pexels-photo-19895965.jpeg?cs=srgb&dl=pexels-marceloverfe-19895965.jpg&fm=jpg'],
     stockQuantity: 20,
     sizes: ['S', 'M', 'L'],
     colors: ['Navy', 'Plum']
@@ -87,7 +87,7 @@ const initialProducts = [
     price: 350.00,
     category: 'dress',
     material: '100% Silk Charmeuse',
-    images: ['https://images.unsplash.com/photo-1518622358385-8ea7d0794bf6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/12290104/pexels-photo-12290104.jpeg?cs=srgb&dl=pexels-keynotez-12290104.jpg&fm=jpg'],
     stockQuantity: 15,
     sizes: ['XS', 'S', 'M'],
     colors: ['Crimson', 'Gold', 'Black']
@@ -100,7 +100,7 @@ const initialProducts = [
     price: 145.00,
     category: 'shirt',
     material: '100% Washable Silk',
-    images: ['https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/10131161/pexels-photo-10131161.jpeg?cs=srgb&dl=pexels-ron-lach-10131161.jpg&fm=jpg'],
     stockQuantity: 75,
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     colors: ['Ivory', 'Charcoal', 'Blush']
@@ -111,7 +111,7 @@ const initialProducts = [
     price: 160.00,
     category: 'shirt',
     material: '100% Silk Crepe de Chine',
-    images: ['https://images.unsplash.com/photo-1598554747436-c9293d6a588f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/14459666/pexels-photo-14459666.jpeg?cs=srgb&dl=pexels-feyzayildirimphoto-14459666.jpg&fm=jpg'],
     stockQuantity: 60,
     sizes: ['S', 'M', 'L'],
     colors: ['White', 'Light Blue', 'Olive']
@@ -122,7 +122,7 @@ const initialProducts = [
     price: 125.00,
     category: 'shirt',
     material: 'Lightweight Silk Blend',
-    images: ['https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/22441295/pexels-photo-22441295.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441295.jpg&fm=jpg'],
     stockQuantity: 50,
     sizes: ['S', 'M', 'L', 'XL'],
     colors: ['Sand', 'Navy', 'Rust']
@@ -133,7 +133,7 @@ const initialProducts = [
     price: 175.00,
     category: 'shirt',
     material: '100% Silk Twill',
-    images: ['https://images.unsplash.com/photo-1589310621855-d9e6571ab42d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/22441317/pexels-photo-22441317.jpeg?cs=srgb&dl=pexels-dayong-tien-681073045-22441317.jpg&fm=jpg'],
     stockQuantity: 30,
     sizes: ['XS', 'S', 'M', 'L'],
     colors: ['Black', 'Cream']
@@ -146,7 +146,7 @@ const initialProducts = [
     price: 65.00,
     category: 'scarf',
     material: '100% Silk Twill',
-    images: ['https://images.unsplash.com/photo-1584916201218-f4242ceb4809?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/3844856/pexels-photo-3844856.jpeg?cs=srgb&dl=pexels-nuy-nuy-2192969-3844856.jpg&fm=jpg'],
     stockQuantity: 100,
     sizes: ['One Size'],
     colors: ['Geometric Print', 'Floral Print']
@@ -157,7 +157,7 @@ const initialProducts = [
     price: 45.00,
     category: 'scarf',
     material: '100% Silk Charmeuse',
-    images: ['https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/36455709/pexels-photo-36455709.jpeg?cs=srgb&dl=pexels-dauphotographer-36455709.jpg&fm=jpg'],
     stockQuantity: 120,
     sizes: ['One Size'],
     colors: ['Leopard', 'Polka Dot', 'Solid Black']
@@ -168,7 +168,7 @@ const initialProducts = [
     price: 110.00,
     category: 'scarf',
     material: 'Silk Cashmere Blend',
-    images: ['https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/36455711/pexels-photo-36455711.jpeg?cs=srgb&dl=pexels-dauphotographer-36455711.jpg&fm=jpg'],
     stockQuantity: 40,
     sizes: ['One Size'],
     colors: ['Camel', 'Soft Grey', 'Navy']
@@ -179,7 +179,7 @@ const initialProducts = [
     price: 85.00,
     category: 'scarf',
     material: '100% Habotai Silk',
-    images: ['https://images.unsplash.com/photo-1601409000833-a44cc9ea43e6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    images: ['https://images.pexels.com/photos/36455718/pexels-photo-36455718.jpeg?cs=srgb&dl=pexels-dauphotographer-36455718.jpg&fm=jpg'],
     stockQuantity: 25,
     sizes: ['One Size'],
     colors: ['Ocean Blue', 'Sunset Orange', 'Amethyst']

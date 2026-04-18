@@ -117,14 +117,14 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div>
+    <div className="home-page">
       {/* ══ 1. Hero section ════════════════════════════════════════════════ */}
       <HeroSection />
 
       {/* ══ 2. Featured products section ══════════════════════════════════ */}
-      <section className="py-24 px-6" style={{ background: '#ffffff' }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4">
+      <section className="home-page__featured py-24 px-6" style={{ background: '#ffffff' }}>
+        <div className="home-page__featured-inner max-w-6xl mx-auto">
+          <div className="home-page__featured-head flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4">
             <div>
               <Eyebrow text={t('featured.eyebrow')} />
               <SectionHeading>{t('featured.heading')}</SectionHeading>
@@ -154,14 +154,14 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="home-page__featured-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredProducts.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
           </div>
         </div>
       </section>
 
       {/* ══ 3. B2B section ════════════════════════════════════════ */}
-      <section className="py-24 px-6" style={{ background: '#0B2545' }}>
+      <section className="home-page__b2b py-24 px-6" style={{ background: '#0B2545' }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Eyebrow text={t('b2b.eyebrow')} dark />
@@ -179,7 +179,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-5 mb-14">
+          <div className="home-page__b2b-grid flex flex-wrap gap-5 mb-14">
             {B2B_FEATURES.map((f, i) => <B2BFeatureCard key={i} feature={f} index={i} />)}
           </div>
 
@@ -212,7 +212,7 @@ export default function HomePage() {
 
       {/* ══ 4. Quote/Cta section ═══════════════════════════════ */}
       <section
-        className="py-20 px-6 text-center"
+        className="home-page__cta py-20 px-6 text-center"
         style={{ background: '#ffffff', borderTop: '1px solid #B8D4E8', borderBottom: '1px solid #B8D4E8' }}
       >
         <div className="max-w-2xl mx-auto">

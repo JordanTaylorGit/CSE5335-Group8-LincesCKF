@@ -34,22 +34,22 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`site-header fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-white shadow-sm" : "bg-white border-b border-sky-mid"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-18 py-4">
+      <div className="site-header__inner max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-18 py-4">
         {/* Logo */}
         <Link
           to="/"
-          className="font-accent text-xl tracking-[0.2em] text-navy hover:text-silk-red transition-colors"
+          className="site-header__logo font-accent text-xl tracking-[0.2em] text-navy hover:text-silk-red transition-colors"
           aria-label={t("nav.home_label")}
         >
           LINCES<span className="text-silk-red">'</span>CKF
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8" aria-label={t("nav.primary_navigation")}>
+        <nav className="site-header__desktop-nav hidden md:flex items-center gap-8" aria-label={t("nav.primary_navigation")}>
           <NavLink to="/">{t("nav.home")}</NavLink>
           <NavLink to="/catalog">{t("nav.catalog")}</NavLink>
           <NavLink to="/b2b">{t("nav.b2b")}</NavLink>
@@ -59,7 +59,7 @@ export default function Navbar() {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
+        <div className="site-header__actions flex items-center gap-4">
           {/* Language Toggle */}
           <button
             onClick={toggleLanguage}
@@ -102,7 +102,7 @@ export default function Navbar() {
             {/* Added to cart toast */}
             {message && (
               <div
-                className="absolute right-0 top-8 z-50 whitespace-nowrap font-body text-xs text-white bg-navy px-3 py-2 shadow-md"
+                className="site-header__toast absolute right-0 top-8 z-50 whitespace-nowrap font-body text-xs text-white bg-navy px-3 py-2 shadow-md"
                 style={{ borderLeft: '3px solid #C8102E', animation: 'fadeUp 0.3s ease forwards' }}
               >
                 {message}
@@ -111,7 +111,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden text-navy"
+            className="site-header__menu-toggle md:hidden text-navy"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={t("nav.toggle_menu")}
             aria-controls="mobile-navigation"
@@ -126,7 +126,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div id="mobile-navigation" className="md:hidden bg-white border-t border-sky-mid py-6 px-6">
+        <div id="mobile-navigation" className="site-header__mobile-panel md:hidden bg-white border-t border-sky-mid py-6 px-6">
           <nav className="flex flex-col gap-5" aria-label={t("nav.mobile_navigation")}>
             <NavLink to="/" mobile>
               {t("nav.home")}

@@ -23,7 +23,7 @@ export default function SiteAuthGate({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="auth-gate min-h-screen flex items-center justify-center bg-white">
         <div
           className="w-8 h-8 border-2 border-sky-mid border-t-navy rounded-full animate-spin"
           role="status"
@@ -35,8 +35,8 @@ export default function SiteAuthGate({ children }) {
 
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-transparent px-6">
-        <section className="max-w-md text-center">
+      <main className="auth-gate min-h-screen flex items-center justify-center bg-transparent px-6">
+        <section className="auth-gate__panel max-w-md text-center">
           <p className="font-accent text-xs tracking-[0.28em] uppercase text-silk-amber mb-4">
             Linces'CKF
           </p>
