@@ -186,33 +186,32 @@ const initialProducts = [
   }
 ];
 
-function seedProducts() {
-  db.get(`SELECT COUNT(*) as count FROM Products`, [], (err, row) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
+async function seedProducts() {
+  try {
+    const [rows] = await db.execute(`SELECT COUNT(*) as count FROM Products`);
     
     // Always clear and re-seed for this update
     console.log('Clearing old products and seeding new ones...');
-    db.run(`DELETE FROM Products`, (err) => {
-      if (err) console.error(err);
-      
-      const stmt = db.prepare(`INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-      
-      initialProducts.forEach(p => {
-        stmt.run([
+    await db.execute(`DELETE FROM Products`);
+    
+    for (const p of initialProducts) {
+      await db.execute(
+        `INSERT INTO Products (name, description, price, category, material, images, stockQuantity, sizes, colors) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
           p.name, p.description, p.price, p.category, p.material, 
           JSON.stringify(p.images), p.stockQuantity, 
           JSON.stringify(p.sizes), JSON.stringify(p.colors)
-        ]);
-      });
-      
-      stmt.finalize();
-      console.log('Products seeded successfully.');
-    });
-  });
+        ]
+      );
+    }
+    
+    console.log('Products seeded successfully.');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error seeding database:', err);
+    process.exit(1);
+  }
 }
 
-// Wait a bit for DB to initialize before seeding
-setTimeout(seedProducts, 1000);
+// Run the seed
+seedProducts();

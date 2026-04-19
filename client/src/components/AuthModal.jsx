@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import './auth.css';
@@ -15,6 +16,7 @@ const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabi
 export default function AuthModal({ isOpen, onClose }) {
   const { user, login, register, logout } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [mode, setMode]               = useState('login');
   const [accountType, setAccountType] = useState('CUSTOMER');
@@ -99,6 +101,7 @@ export default function AuthModal({ isOpen, onClose }) {
       if (isLogin) {
         const name = res.user?.firstName || res.user?.companyName || res.user?.email;
         alert(`${t('auth.welcome_back')}, ${name}!`);
+        navigate('/');
       }
       onClose?.();
     } else setError(res.message || t('auth.error_login_failed'));

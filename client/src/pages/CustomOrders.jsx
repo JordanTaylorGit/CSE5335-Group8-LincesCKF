@@ -5,12 +5,14 @@
  * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 
 const CustomOrders = () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const [step, setStep] = useState(1);
   const [orderType, setOrderType] = useState('');
   const [formData, setFormData] = useState({
@@ -24,6 +26,15 @@ const CustomOrders = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const type = params.get('type');
+    if (type) {
+      setOrderType(type);
+      setStep(2);
+    }
+  }, [location.search]);
 
   const orderTypes = [
     {
@@ -71,7 +82,7 @@ const CustomOrders = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/custom-orders', {
+      const response = await fetch('http://localhost:5001/api/custom-orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

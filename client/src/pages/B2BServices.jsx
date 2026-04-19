@@ -6,6 +6,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import ProcessSteps from '../components/home/ProcessSteps';
 
 const SERVICES = [
@@ -290,7 +291,7 @@ export default function ServicesPage() {
             }}>
               {t('b2b.cta.desc')}
             </p>
-            <a href="/contact"
+            <Link to="/custom-orders?type=b2b-manufacturing"
               style={{
                 display: 'inline-block',
                 padding: '16px 32px',
@@ -310,7 +311,7 @@ export default function ServicesPage() {
               onMouseLeave={e => { e.currentTarget.style.background = '#ffae42'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(11,37,69,0.3)'; }}
             >
               {t('b2b.cta.button')}
-            </a>
+            </Link>
           </div>
         </div>
       </section>

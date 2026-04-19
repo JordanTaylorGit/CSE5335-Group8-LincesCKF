@@ -212,14 +212,23 @@ function Checkout() {
             <p className="text-gray-500">Your cart is empty.</p>
           ) : (
             <div className="space-y-4">
-              {cartItems.map((item) => (
+              {cartItems.map((item) => {
+                let imgSrc = item.image;
+                if (item.images) {
+                  try {
+                    imgSrc = typeof item.images === 'string' ? JSON.parse(item.images)[0] : item.images[0];
+                  } catch (e) {
+                    imgSrc = item.images;
+                  }
+                }
+                return (
                 <div
                   key={item.id}
                   className="flex items-center justify-between border-b pb-3"
                 >
                   <div className="flex items-center gap-3">
                     <img
-                      src={item.images ? JSON.parse(item.images)[0] : item.image}
+                      src={imgSrc}
                       alt={item.name}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
@@ -235,7 +244,7 @@ function Checkout() {
                     ${(item.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
-              ))}
+              )})}
 
               <div className="flex justify-between pt-4 text-lg font-bold">
                 <span>Total</span>

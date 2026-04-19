@@ -12,10 +12,19 @@ function CartItem({ item }) {
   const { removeFromCart, increaseQuantity, decreaseQuantity } = useCart();
   const { t, i18n } = useTranslation();
   
+  let imgSrc = item.image;
+  if (item.images) {
+    try {
+      imgSrc = typeof item.images === 'string' ? JSON.parse(item.images)[0] : item.images[0];
+    } catch (e) {
+      imgSrc = item.images;
+    }
+  }
+
   return (
     <div className="grid gap-4 rounded-xl border border-gray-200 bg-white p-4 md:grid-cols-[120px_1fr_auto]">
       <img
-        src={item.image}
+        src={imgSrc}
         alt={item.name}
         className="h-[120px] w-full rounded-lg object-cover md:w-[120px]"
       />
