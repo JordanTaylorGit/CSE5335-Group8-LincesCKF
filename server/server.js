@@ -248,6 +248,17 @@ function mapCustomOrderRow(row) {
   };
 }
 
+async function getCustomOrderById(customOrderId) {
+  const rows = await dbQuery(
+    `${CUSTOM_ORDER_SELECT_SQL}
+     WHERE co.custom_order_id = ?
+     LIMIT 1`,
+    [customOrderId]
+  );
+
+  return rows[0] ? mapCustomOrderRow(rows[0]) : null;
+}
+
 async function ensureContactFormBrandSupport() {
   const tableRows = await dbQuery(`SHOW TABLES LIKE 'contact_forms'`);
 
@@ -614,13 +625,14 @@ function normalizeProductBody(body) {
   const sizeStockTotal = getSizeStockTotal(sizes);
 
   return {
-    categoryName: String(body.category || 'other').trim().toLowerCase() || 'other',
+    categoryName: String(body.category || '').trim().toLowerCase(),
     sku: String(body.sku || '').trim(),
     nameEn: String(body.name || body.nameEn || '').trim(),
     nameEs: String(body.nameEs || body.name || '').trim(),
     descriptionEn: String(body.description || body.descriptionEn || '').trim(),
     descriptionEs: String(body.descriptionEs || body.description || '').trim(),
     image: images[0] || '',
+    imageList: images,
     imagesJson: toJsonString(images, []),
     price: Number(body.price),
     stockQuantity: sizeStockTotal ?? Number(body.stockQuantity || 0),
@@ -628,7 +640,9 @@ function normalizeProductBody(body) {
     material: String(body.material || '').trim(),
     weight: body.weight === undefined || body.weight === '' ? null : Number(body.weight),
     isFeatured: body.featured ? 1 : 0,
+    sizeList: sizes,
     sizesJson: JSON.stringify(sizes),
+    colorList: colors,
     colorsJson: JSON.stringify(colors),
   };
 }
@@ -1392,7 +1406,7 @@ app.get('/api/products/featured', async (req, res) => {
 
   try {
     const rows = await dbQuery(
-      `${PRODUCT_SELECT_SQL} WHERE p.is_featured = 1 ORDER BY p.product_id ASC LIMIT ?`,
+      `${PRODUCT_SELECT_SQL} WHERE p.is_featured = 1 ORDER BY p.product_id DESC LIMIT ?`,
       [limit]
     );
 
@@ -1418,8 +1432,18 @@ app.get('/api/products/:id', async (req, res) => {
 app.post('/api/products', requireAccountTypes('BRAND', 'ADMIN'), async (req, res) => {
   const product = normalizeProductBody(req.body);
 
-  if (!product.nameEn || !Number.isFinite(product.price) || product.price < 0) {
-    return res.status(400).json({ error: 'Product name and valid price are required' });
+  if (
+    !product.nameEn ||
+    !product.descriptionEn ||
+    !product.categoryName ||
+    !product.material ||
+    product.imageList.length === 0 ||
+    product.sizeList.length === 0 ||
+    product.colorList.length === 0 ||
+    !Number.isFinite(product.price) ||
+    product.price < 0
+  ) {
+    return res.status(400).json({ error: 'All product fields except featured are required' });
   }
 
   try {
@@ -1875,6 +1899,59 @@ app.get('/api/custom-orders/my-requests', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+app.put(
+  '/api/custom-orders/:customOrderId/deliver',
+  requireAccountTypes('BRAND', 'ADMIN'),
+  async (req, res) => {
+    const customOrderId = Number(req.params.customOrderId);
+
+    if (!Number.isInteger(customOrderId) || customOrderId <= 0) {
+      return res.status(400).json({ error: 'A valid custom order id is required' });
+    }
+
+    try {
+      const currentOrder = await getCustomOrderById(customOrderId);
+
+      if (!currentOrder) {
+        return res.status(404).json({ error: 'Custom order not found' });
+      }
+
+      if (!currentOrder.brandUserId) {
+        return res.status(400).json({ error: 'Only brand-targeted custom orders can be marked as delivered' });
+      }
+
+      if (
+        req.user.accountType !== 'ADMIN' &&
+        Number(currentOrder.brandUserId) !== Number(req.user.id)
+      ) {
+        return res.status(403).json({ error: 'You can only update delivery for custom orders assigned to your brand' });
+      }
+
+      if (String(currentOrder.status || '').trim().toUpperCase() === 'CANCELLED') {
+        return res.status(400).json({ error: 'Cancelled custom orders cannot be marked as delivered' });
+      }
+
+      if (String(currentOrder.status || '').trim().toUpperCase() !== 'COMPLETED') {
+        await dbQuery(
+          `UPDATE custom_orders
+           SET request_status = 'COMPLETED'
+           WHERE custom_order_id = ?`,
+          [customOrderId]
+        );
+      }
+
+      const refreshedOrder = await getCustomOrderById(customOrderId);
+
+      res.json({
+        message: 'Custom order marked as delivered successfully',
+        order: refreshedOrder,
+      });
+    } catch (error) {
+      res.status(error.status || 500).json({ error: error.message });
+    }
+  }
+);
 
 // Contact routes
 app.post('/api/contact', async (req, res) => {

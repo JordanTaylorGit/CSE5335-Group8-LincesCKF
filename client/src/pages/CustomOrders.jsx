@@ -16,13 +16,12 @@ const INITIAL_FORM_DATA = {
   email: '',
   phone: '',
   brandId: '',
-  company: '',
   quantity: '',
   timeline: '',
   message: ''
 };
 
-const BRAND_TARGET_ORDER_TYPES = new Set(['custom-garment', 'bulk-order']);
+const BRAND_TARGET_ORDER_TYPES = new Set(['custom-garment', 'bulk-order', 'b2b-manufacturing']);
 
 const CustomOrders = () => {
   const { t } = useTranslation();
@@ -142,8 +141,7 @@ const CustomOrders = () => {
           contactInfo: {
             name: formData.name,
             email: formData.email,
-            phone: phoneDigits,
-            company: formData.company
+            phone: phoneDigits
           },
           requirements: {
             quantity: formData.quantity,
@@ -283,21 +281,6 @@ const CustomOrders = () => {
               </p>
             )}
           </div>
-          {orderType === 'b2b-manufacturing' && (
-            <div>
-              <label className="block text-sm font-medium text-navy/70 mb-2">
-                {t('customOrders.form.company')}
-              </label>
-              <input
-                type="text"
-                name="company"
-                value={formData.company}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
-              />
-            </div>
-          )}
           {shouldShowBrandField && (
             <div>
               <label className="block text-sm font-medium text-navy/70 mb-2">
@@ -318,7 +301,6 @@ const CustomOrders = () => {
                   </option>
                 ))}
               </select>
-              <p className="mt-2 text-xs text-navy/60">{t('customOrders.form.brandHelp')}</p>
             </div>
           )}
         </div>

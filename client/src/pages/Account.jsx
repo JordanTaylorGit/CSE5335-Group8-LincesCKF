@@ -104,7 +104,6 @@ function BrandInquiriesSection() {
     <section>
       <div className="mb-6">
         <h2 className="font-display text-xl text-navy">{t('account.brand_inquiries')}</h2>
-        <p className="mt-1 text-sm text-navy/60">{t('account.brand_inquiries_desc')}</p>
       </div>
 
       {loading ? (
@@ -122,9 +121,11 @@ function BrandInquiriesSection() {
                   <p className="font-medium text-navy">{inquiry.name || t('account.not_available')}</p>
                   <p className="text-sm text-navy/60">{inquiry.email || t('account.not_available')}</p>
                 </div>
-                <p className="text-xs text-navy/50">
-                  {t('account.received_on')}: {inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleDateString() : t('account.not_available')}
-                </p>
+                {inquiry.createdAt && (
+                  <p className="text-xs text-navy/50">
+                    {t('account.received_on')}: {new Date(inquiry.createdAt).toLocaleDateString()}
+                  </p>
+                )}
               </div>
 
               <p className="mt-3 text-sm text-navy/70">
@@ -226,9 +227,11 @@ function BrandCustomOrderRequestsSection() {
                   <p className="font-medium text-navy">{request.contactInfo?.name || t('account.not_available')}</p>
                   <p className="text-sm text-navy/60">{request.contactInfo?.email || t('account.not_available')}</p>
                 </div>
-                <p className="text-xs text-navy/50">
-                  {t('account.received_on')}: {request.createdAt ? new Date(request.createdAt).toLocaleDateString() : t('account.not_available')}
-                </p>
+                {request.createdAt && (
+                  <p className="text-xs text-navy/50">
+                    {t('account.received_on')}: {new Date(request.createdAt).toLocaleDateString()}
+                  </p>
+                )}
               </div>
 
               <div className="mt-3 space-y-1 text-sm text-navy/70">
@@ -396,9 +399,6 @@ function AccountSettings() {
         </form>
       </section>
 
-      {isBrand && <BrandInquiriesSection />}
-      {isBrand && <BrandCustomOrderRequestsSection />}
-
       {/* Change Password */}
       <section>
         <h2 className="font-display text-xl mb-6 text-navy">{t('account.change_password')}</h2>
@@ -431,6 +431,7 @@ function AccountSettings() {
 function AccountNotifications() {
   const { user, updateNotifications } = useAuth();
   const { t } = useTranslation();
+  const isBrand = user?.accountType === 'BRAND';
   const [prefs, setPrefs] = useState(user?.notifications || { email: true, sms: false });
   const [msg,   setMsg]   = useState('');
   const [busy,  setBusy]  = useState(false);
@@ -455,35 +456,41 @@ function AccountNotifications() {
 
   return (
     <div>
-      <h2 className="font-display text-xl mb-6 text-navy">{t('account.notification_prefs')}</h2>
-      <div className="max-w-md space-y-1">
-        {channels.map(({ key, label, desc }) => (
-          <div key={key} className="flex items-center justify-between py-4 border-b border-zinc-100">
-            <div>
-              <p className="text-sm font-medium text-navy">{label}</p>
-              <p className="text-xs text-navy/50 mt-0.5">{desc}</p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={prefs[key]}
-              aria-label={label}
-              onClick={() => toggle(key)}
-              className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ml-4 ${prefs[key] ? 'bg-navy' : 'bg-zinc-300'}`}
-            >
-              <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${prefs[key] ? 'translate-x-5' : 'translate-x-0'}`} />
-            </button>
-          </div>
-        ))}
+      <div className="space-y-12">
+        {isBrand && <BrandInquiriesSection />}
 
-        {msg && (
-          <p role="alert" className={`text-sm pt-2 ${msg === t('account.prefs_saved') ? 'text-green-600' : 'text-red-500'}`}>{msg}</p>
-        )}
-        <div className="pt-4">
-          <button onClick={handleSave} disabled={busy} className="px-6 py-2.5 bg-navy text-white text-sm rounded-md font-body disabled:opacity-50 cursor-pointer">
-            {busy ? t('account.saving') : t('account.save_prefs')}
-          </button>
-        </div>
+        <section>
+          <h2 className="font-display text-xl mb-6 text-navy">{t('account.notification_prefs')}</h2>
+          <div className="max-w-md space-y-1">
+            {channels.map(({ key, label, desc }) => (
+              <div key={key} className="flex items-center justify-between py-4 border-b border-zinc-100">
+                <div>
+                  <p className="text-sm font-medium text-navy">{label}</p>
+                  <p className="text-xs text-navy/50 mt-0.5">{desc}</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={prefs[key]}
+                  aria-label={label}
+                  onClick={() => toggle(key)}
+                  className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ml-4 ${prefs[key] ? 'bg-navy' : 'bg-zinc-300'}`}
+                >
+                  <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${prefs[key] ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+            ))}
+
+            {msg && (
+              <p role="alert" className={`text-sm pt-2 ${msg === t('account.prefs_saved') ? 'text-green-600' : 'text-red-500'}`}>{msg}</p>
+            )}
+            <div className="pt-4">
+              <button onClick={handleSave} disabled={busy} className="px-6 py-2.5 bg-navy text-white text-sm rounded-md font-body disabled:opacity-50 cursor-pointer">
+                {busy ? t('account.saving') : t('account.save_prefs')}
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
@@ -498,6 +505,7 @@ function AccountOrders() {
   const [deliveringKey, setDeliveringKey] = useState('');
   const [actionMessage, setActionMessage] = useState('');
   const isBrand = user?.accountType === 'BRAND';
+  const currentUserId = Number(user?.id);
 
   const getStatusLabel = (status) => {
     const key = {
@@ -527,8 +535,44 @@ function AccountOrders() {
   };
 
   useEffect(() => {
+    let mounted = true;
+
+    function mergeOrdersById(rows, orderKind) {
+      const merged = new Map();
+
+      rows.forEach((order) => {
+        const existing = merged.get(order.id);
+        if (existing) {
+          merged.set(order.id, {
+            ...existing,
+            ...order,
+            orderKind,
+            sortDate: existing.sortDate || order.createdAt,
+            isPlacedOrder: existing.isPlacedOrder || order.isPlacedOrder,
+            isBrandOrder: existing.isBrandOrder || order.isBrandOrder,
+          });
+          return;
+        }
+
+        merged.set(order.id, {
+          ...order,
+          orderKind,
+          sortDate: order.createdAt,
+          isPlacedOrder: Boolean(order.isPlacedOrder),
+          isBrandOrder: Boolean(order.isBrandOrder),
+        });
+      });
+
+      return [...merged.values()];
+    }
+
     const request = isBrand
-      ? Promise.all([fetchWithAuth('/orders/brand/my-orders')])
+      ? Promise.all([
+          fetchWithAuth('/orders/my-orders'),
+          fetchWithAuth('/custom-orders/my-requests'),
+          fetchWithAuth('/orders/brand/my-orders'),
+          fetchWithAuth('/custom-orders/brand-requests'),
+        ])
       : Promise.all([
           fetchWithAuth('/orders/my-orders'),
           fetchWithAuth('/custom-orders/my-requests'),
@@ -536,24 +580,60 @@ function AccountOrders() {
 
     request
       .then((responses) => {
-        const [regularOrders, customOrders = []] = responses;
-        const combinedOrders = [
-          ...regularOrders.map(order => ({
-            ...order,
-            orderKind: 'regular',
-            sortDate: order.createdAt,
-          })),
-          ...customOrders.map(order => ({
-            ...order,
-            orderKind: 'custom',
-            sortDate: order.createdAt,
-          })),
-        ].sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
+        let combinedOrders = [];
 
-        setOrders(combinedOrders);
-        setLoading(false);
+        if (isBrand) {
+          const [
+            ownRegularOrders = [],
+            ownCustomOrders = [],
+            brandRegularOrders = [],
+            brandCustomOrders = [],
+          ] = responses;
+
+          const regularOrders = mergeOrdersById([
+            ...ownRegularOrders.map((order) => ({ ...order, isPlacedOrder: true })),
+            ...brandRegularOrders.map((order) => ({ ...order, isBrandOrder: true })),
+          ], 'regular');
+
+          const customOrders = mergeOrdersById([
+            ...ownCustomOrders.map((order) => ({ ...order, isPlacedOrder: true })),
+            ...brandCustomOrders.map((order) => ({ ...order, isBrandOrder: true })),
+          ], 'custom');
+
+          combinedOrders = [...regularOrders, ...customOrders];
+        } else {
+          const [regularOrders = [], customOrders = []] = responses;
+          combinedOrders = [
+            ...regularOrders.map(order => ({
+              ...order,
+              orderKind: 'regular',
+              sortDate: order.createdAt,
+            })),
+            ...customOrders.map(order => ({
+              ...order,
+              orderKind: 'custom',
+              sortDate: order.createdAt,
+            })),
+          ];
+        }
+
+        combinedOrders.sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
+
+        if (mounted) {
+          setOrders(combinedOrders);
+          setLoading(false);
+        }
       })
-      .catch(err => { console.error(err); setLoading(false); });
+      .catch(err => {
+        console.error(err);
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, [isBrand]);
 
   async function handleDeliver(orderId, itemIndex) {
@@ -573,6 +653,35 @@ function AccountOrders() {
                 ...order,
                 ...data.order,
                 orderKind: 'regular',
+                sortDate: order.sortDate || data.order.createdAt,
+              }
+            : order
+        ))
+      );
+    } catch (error) {
+      setActionMessage(error.message || t('account.deliver_error'));
+    } finally {
+      setDeliveringKey('');
+    }
+  }
+
+  async function handleCustomOrderDeliver(customOrderId) {
+    const key = `custom-${customOrderId}`;
+    setDeliveringKey(key);
+    setActionMessage('');
+
+    try {
+      const data = await fetchWithAuth(`/custom-orders/${customOrderId}/deliver`, {
+        method: 'PUT',
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) => (
+          order.orderKind === 'custom' && order.id === customOrderId
+            ? {
+                ...order,
+                ...data.order,
+                orderKind: 'custom',
                 sortDate: order.sortDate || data.order.createdAt,
               }
             : order
@@ -609,8 +718,35 @@ function AccountOrders() {
                   <p className="text-sm text-navy/70">{t('account.type')}: {getCustomOrderTypeLabel(order.orderType)}</p>
                   <p className="text-sm text-navy/70">{t('account.timeline')}: {order.requirements?.timeline || t('account.not_specified')}</p>
                   <p className="text-sm text-navy/70">{t('account.quantity')}: {order.requirements?.quantity || t('account.not_specified')}</p>
+                  {isBrand && order.contactInfo?.name && (
+                    <p className="text-sm text-navy/70">{t('account.customer')}: {order.contactInfo.name}</p>
+                  )}
+                  {isBrand && order.contactInfo?.email && (
+                    <p className="text-sm text-navy/70">{t('account.email')}: {order.contactInfo.email}</p>
+                  )}
+                  {isBrand && order.contactInfo?.phone && (
+                    <p className="text-sm text-navy/70">{t('account.phone')}: {order.contactInfo.phone}</p>
+                  )}
                   {order.brandName && (
                     <p className="text-sm text-navy/70">{t('product.brand')}: {order.brandName}</p>
+                  )}
+                  <div className="mt-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-navy/60">{t('account.project_details')}</p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm text-navy">
+                      {order.requirements?.message || t('account.not_specified')}
+                    </p>
+                  </div>
+                  {isBrand && Number(order.brandUserId) === currentUserId && String(order.status || '').trim().toUpperCase() !== 'COMPLETED' && String(order.status || '').trim().toUpperCase() !== 'CANCELLED' && (
+                    <button
+                      type="button"
+                      onClick={() => handleCustomOrderDeliver(order.id)}
+                      disabled={deliveringKey === `custom-${order.id}`}
+                      className="mt-3 rounded-md bg-navy px-4 py-2 text-xs font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {deliveringKey === `custom-${order.id}`
+                        ? t('account.delivering')
+                        : t('account.deliver_product')}
+                    </button>
                   )}
                 </>
               ) : (
@@ -647,7 +783,7 @@ function AccountOrders() {
                           </span>
                           <span>{t('account.delivery_status')}: {getStatusLabel(item.deliveryStatus)}</span>
                         </div>
-                        {isBrand && item.deliveryStatus !== 'Delivered' && (
+                        {isBrand && Number(item.brandId) === currentUserId && item.deliveryStatus !== 'Delivered' && (
                           <button
                             type="button"
                             onClick={() => handleDeliver(order.id, item.itemIndex)}

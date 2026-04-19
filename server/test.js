@@ -472,6 +472,7 @@ async function runTests() {
     }),
   });
   assert.equal(targetedCustomOrder.response.status, 201, 'Targeted custom order should succeed');
+  const targetedCustomOrderId = targetedCustomOrder.body?.orderId;
 
   const b2bCustomOrder = await request('/custom-orders', {
     method: 'POST',
@@ -509,6 +510,28 @@ async function runTests() {
   assert.ok(
     brandCustomOrders.body.some((order) => order.brandUserId === brandOneId && order.orderType === 'custom-garment'),
     'Brand custom order requests should include the targeted request'
+  );
+
+  const wrongBrandCustomDeliver = await request(`/custom-orders/${targetedCustomOrderId}/deliver`, {
+    method: 'PUT',
+    headers: authHeaders(brandTwoToken),
+  });
+  assert.equal(wrongBrandCustomDeliver.response.status, 403, 'Other brands should not deliver someone else’s custom order');
+
+  const deliverCustomOrder = await request(`/custom-orders/${targetedCustomOrderId}/deliver`, {
+    method: 'PUT',
+    headers: authHeaders(brandOneToken),
+  });
+  assert.equal(deliverCustomOrder.response.status, 200, 'Owning brand should be able to deliver the targeted custom order');
+  assert.equal(deliverCustomOrder.body?.order?.status, 'COMPLETED', 'Delivered custom order should update status to completed');
+
+  const customerCustomOrdersAfterDeliver = await request('/custom-orders/my-requests', {
+    headers: authHeaders(refreshedCustomerToken),
+  });
+  assert.equal(customerCustomOrdersAfterDeliver.response.status, 200, 'Customer custom orders should still load after delivery');
+  assert.ok(
+    customerCustomOrdersAfterDeliver.body.some((order) => order.id === targetedCustomOrderId && order.status === 'COMPLETED'),
+    'Customer custom orders should show the delivered targeted request as completed'
   );
 
   const targetedContact = await request('/contact', {

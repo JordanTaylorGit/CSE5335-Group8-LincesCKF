@@ -18,8 +18,6 @@ const INITIAL_FORM_DATA = {
   message: '',
 };
 
-const BRAND_TARGET_SUBJECTS = ['product-inquiry', 'custom-order', 'b2b-partnership'];
-
 export default function Contact() {
   const { t } = useTranslation();
   const mapAddress = '123 Silk Street, New York, NY 10001, United States';
@@ -29,8 +27,6 @@ export default function Contact() {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [brands, setBrands] = useState([]);
   const [brandsLoading, setBrandsLoading] = useState(true);
-
-  const shouldShowBrandField = BRAND_TARGET_SUBJECTS.includes(formData.subject);
 
   useEffect(() => {
     let mounted = true;
@@ -61,18 +57,10 @@ export default function Contact() {
   const handleFieldChange = (field) => (e) => {
     const nextValue = e.target.value;
 
-    setFormData((current) => {
-      const nextFormData = {
-        ...current,
-        [field]: nextValue,
-      };
-
-      if (field === 'subject' && !BRAND_TARGET_SUBJECTS.includes(nextValue)) {
-        nextFormData.brandId = '';
-      }
-
-      return nextFormData;
-    });
+    setFormData((current) => ({
+      ...current,
+      [field]: nextValue,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -232,29 +220,27 @@ export default function Contact() {
                 </select>
               </div>
 
-              {shouldShowBrandField && (
-                <div>
-                  <label htmlFor="brandId" className="block text-sm font-medium text-navy/70 mb-2">
-                    {t('contact.form.brand')}
-                  </label>
-                  <select
-                    id="brandId"
-                    value={formData.brandId}
-                    onChange={handleFieldChange('brandId')}
-                    className="w-full px-4 py-3 bg-gray-50 border border-navy/20 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent transition-all"
-                  >
-                    <option value="">
-                      {brandsLoading ? t('contact.form.loadingBrands') : t('contact.form.selectBrand')}
+              <div>
+                <label htmlFor="brandId" className="block text-sm font-medium text-navy/70 mb-2">
+                  {t('contact.form.brand')}
+                </label>
+                <select
+                  id="brandId"
+                  value={formData.brandId}
+                  onChange={handleFieldChange('brandId')}
+                  className="w-full px-4 py-3 bg-gray-50 border border-navy/20 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent transition-all"
+                >
+                  <option value="">
+                    {brandsLoading ? t('contact.form.loadingBrands') : t('contact.form.selectBrand')}
+                  </option>
+                  {brands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
                     </option>
-                    {brands.map((brand) => (
-                      <option key={brand.id} value={brand.id}>
-                        {brand.name}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="mt-2 text-xs text-navy/60">{t('contact.form.brandHelp')}</p>
-                </div>
-              )}
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-navy/60">{t('contact.form.brandHelp')}</p>
+              </div>
 
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-navy/70 mb-2">

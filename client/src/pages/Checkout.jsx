@@ -53,27 +53,6 @@ function formatExpiry(value) {
   return `${digits.slice(0, 2)}/${digits.slice(2)}`;
 }
 
-function isValidCardNumber(cardDigits) {
-  if (cardDigits.length < 13 || cardDigits.length > 19) return false;
-
-  let sum = 0;
-  let shouldDouble = false;
-
-  for (let index = cardDigits.length - 1; index >= 0; index -= 1) {
-    let digit = Number(cardDigits[index]);
-
-    if (shouldDouble) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
-
-    sum += digit;
-    shouldDouble = !shouldDouble;
-  }
-
-  return sum % 10 === 0;
-}
-
 function isValidExpiry(expiry) {
   const match = /^(0[1-9]|1[0-2])\/(\d{2})$/.exec(String(expiry || "").trim());
   if (!match) return false;
@@ -86,7 +65,7 @@ function isValidExpiry(expiry) {
 }
 
 function Checkout() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { cartItems, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
 
@@ -160,7 +139,7 @@ function Checkout() {
       nextErrors.cardName = t('checkout.validation_card_name');
     }
 
-    if (!isValidCardNumber(cardDigits)) {
+    if (!cardDigits) {
       nextErrors.cardNumber = t('checkout.validation_card_number');
     }
 
@@ -415,7 +394,7 @@ function Checkout() {
             <div className="space-y-4">
               {cartItems.map((item) => (
                 <div
-                  key={item.id}
+                  key={`${item.id}-${item.selectedColor || 'no-color'}-${item.selectedSize || 'no-size'}`}
                   className="flex items-center justify-between border-b pb-3"
                 >
                   <div className="flex items-center gap-3">
@@ -425,7 +404,12 @@ function Checkout() {
                       className="w-16 h-16 object-cover rounded-lg"
                     />
                     <div>
-                      <p className="font-medium">{item.name}</p>
+                      <p className="font-medium">{i18n.language === 'es' ? item.nameEs || item.name : item.nameEn || item.name}</p>
+                      {item.brandName && (
+                        <p className="text-sm text-gray-500">
+                          {t('product.brand')}: {item.brandName}
+                        </p>
+                      )}
                       <p className="text-sm text-gray-500">
                         {t('account.qty')}: {item.quantity}
                       </p>

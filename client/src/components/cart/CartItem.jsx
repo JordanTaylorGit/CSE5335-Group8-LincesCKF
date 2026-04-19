@@ -22,6 +22,11 @@ function CartItem({ item }) {
 
       <div className="cart-item__content min-w-0">
         <h3 className="text-[18px] font-medium text-slate-900">{i18n.language === 'es' ? item.nameEs : item.nameEn}</h3>
+        {item.brandName && (
+          <p className="mt-1 text-sm text-slate-500">
+            {t('product.brand')}: {item.brandName}
+          </p>
+        )}
         <p className="mt-1 text-sm text-slate-500">{t('product.color')}: {i18n.language === 'es' ? item.selectedColorEs : item.selectedColor}</p>
         <p className="mt-1 text-sm text-slate-500">{t('product.size')}: {item.selectedSize}</p>
         <p className="mt-3 text-[18px] font-semibold text-slate-900">

@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "cleanup-test-data": "node cleanup_test_data.js",
     "seed": "node seed.js",
     "reset-stock": "node reset_stock_full.js",
     "test": "node test.js"
