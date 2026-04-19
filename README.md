@@ -194,20 +194,6 @@ npm run dev
 Backend runs at **http://localhost:5001**  
 Frontend runs at **http://localhost:5173**
 
-### Useful Maintenance Scripts
-
-From `server/`:
-
-```bash
-npm test
-npm run cleanup-test-data
-npm run reset-stock
-```
-
-- `npm test` runs the backend regression and API smoke suite
-- `npm run cleanup-test-data` removes inserted integration-test users, products, orders, custom orders, and contact messages
-- `npm run reset-stock` refills seeded inventory after checkout testing
-
 ### Testing and Maintenance Support
 
 - `TESTING_CHECKLIST.md` is the end-to-end manual verification guide for local runs, AWS deployment checks, API spot checks, and database write verification.
@@ -502,7 +488,7 @@ const description = i18n.language === 'es' ? product.descriptionEs : product.des
 
 ---
 
-## AI Queries Used During Earlier Project Phases
+## AI Queries Used 
 
 This section is preserved as part of the course process documentation. The sections above describe the current implementation and current behavior of the app.
 
