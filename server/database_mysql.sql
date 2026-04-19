@@ -186,6 +186,7 @@ CREATE TABLE IF NOT EXISTS service_types (
 CREATE TABLE IF NOT EXISTS custom_orders (
   custom_order_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
+  brand_user_id INT NULL,
   service_type_id INT NOT NULL,
   request_number VARCHAR(100) UNIQUE,
   company_name VARCHAR(200),
@@ -205,6 +206,10 @@ CREATE TABLE IF NOT EXISTS custom_orders (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
     ON UPDATE CASCADE
     ON DELETE RESTRICT,
+  CONSTRAINT fk_customorders_brand
+    FOREIGN KEY (brand_user_id) REFERENCES users(user_id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL,
   CONSTRAINT fk_customorders_servicetype
     FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id)
     ON UPDATE CASCADE
@@ -226,6 +231,7 @@ CREATE TABLE IF NOT EXISTS service_inquiries (
 CREATE TABLE IF NOT EXISTS contact_forms (
   contact_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NULL,
+  brand_user_id INT NULL,
   name VARCHAR(150),
   email VARCHAR(150),
   subject VARCHAR(200),

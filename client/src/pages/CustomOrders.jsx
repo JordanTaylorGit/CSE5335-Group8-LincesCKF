@@ -5,25 +5,31 @@
  * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Factory, Package, Scissors } from 'lucide-react';
 import { fetchWithAuth } from '../services/api';
 
+const INITIAL_FORM_DATA = {
+  name: '',
+  email: '',
+  phone: '',
+  brandId: '',
+  quantity: '',
+  timeline: '',
+  message: ''
+};
+
+const BRAND_TARGET_ORDER_TYPES = new Set(['custom-garment', 'bulk-order', 'b2b-manufacturing']);
+
 const CustomOrders = () => {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [orderType, setOrderType] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    quantity: '',
-    timeline: '',
-    message: ''
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [brands, setBrands] = useState([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
@@ -56,8 +62,52 @@ const CustomOrders = () => {
     { value: '6+ months', label: t('customOrders.timelines.6plusmonths') }
   ];
 
+  const selectedOrderTypeLabel =
+    orderTypes.find((type) => type.id === orderType)?.title ||
+    orderType.replaceAll('-', ' ');
+
+  const selectedTimelineLabel =
+    timelines.find((timeline) => timeline.value === formData.timeline)?.label ||
+    formData.timeline;
+
+  const selectedBrandLabel =
+    brands.find((brand) => String(brand.id) === String(formData.brandId))?.name || '';
+
+  const shouldShowBrandField = BRAND_TARGET_ORDER_TYPES.has(orderType);
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetchWithAuth('/brands')
+      .then((data) => {
+        if (mounted) {
+          setBrands(Array.isArray(data) ? data : []);
+        }
+      })
+      .catch((error) => {
+        console.error('Error loading brands:', error);
+        if (mounted) {
+          setBrands([]);
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setBrandsLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const handleOrderTypeSelect = (type) => {
+    setFormError('');
     setOrderType(type);
+    setFormData((prev) => ({
+      ...prev,
+      brandId: BRAND_TARGET_ORDER_TYPES.has(type) ? prev.brandId : '',
+    }));
     setStep(2);
   };
 
@@ -87,11 +137,11 @@ const CustomOrders = () => {
         method: 'POST',
         body: JSON.stringify({
           orderType,
+          brandId: formData.brandId || null,
           contactInfo: {
             name: formData.name,
             email: formData.email,
-            phone: phoneDigits,
-            company: formData.company
+            phone: phoneDigits
           },
           requirements: {
             quantity: formData.quantity,
@@ -231,19 +281,26 @@ const CustomOrders = () => {
               </p>
             )}
           </div>
-          {orderType === 'b2b-manufacturing' && (
+          {shouldShowBrandField && (
             <div>
               <label className="block text-sm font-medium text-navy/70 mb-2">
-                {t('customOrders.form.company')}
+                {t('customOrders.form.brand')}
               </label>
-              <input
-                type="text"
-                name="company"
-                value={formData.company}
+              <select
+                name="brandId"
+                value={formData.brandId}
                 onChange={handleInputChange}
-                required
                 className="w-full px-4 py-3 border border-navy/20 rounded-lg focus:ring-2 focus:ring-silk-amber focus:border-transparent transition-all"
-              />
+              >
+                <option value="">
+                  {brandsLoading ? t('customOrders.form.loadingBrands') : t('customOrders.form.selectBrand')}
+                </option>
+                {brands.map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </div>
@@ -340,27 +397,25 @@ const CustomOrders = () => {
           </div>
           <div className="flex justify-between py-2 border-b border-navy/10">
             <span className="text-navy/70">{t('customOrders.success.orderType')}</span>
-            <span className="font-medium capitalize">{orderType.replace('-', ' ')}</span>
+            <span className="font-medium">{selectedOrderTypeLabel}</span>
           </div>
           <div className="flex justify-between py-2 border-b border-navy/10">
             <span className="text-navy/70">{t('customOrders.success.timeline')}</span>
-            <span className="font-medium">{formData.timeline}</span>
+            <span className="font-medium">{selectedTimelineLabel}</span>
           </div>
+          {selectedBrandLabel && (
+            <div className="flex justify-between py-2 border-b border-navy/10">
+              <span className="text-navy/70">{t('customOrders.success.brand')}</span>
+              <span className="font-medium">{selectedBrandLabel}</span>
+            </div>
+          )}
         </div>
         <div className="custom-orders-page__success-actions mt-8 space-x-4">
           <button
             onClick={() => {
               setStep(1);
               setOrderType('');
-              setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                company: '',
-                quantity: '',
-                timeline: '',
-                message: ''
-              });
+              setFormData(INITIAL_FORM_DATA);
               setIsSubmitted(false);
             }}
             className="px-6 py-3 bg-navy text-white hover:bg-silk-gold transition-colors"

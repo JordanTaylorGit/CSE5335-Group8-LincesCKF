@@ -22,10 +22,10 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
-  async function login({ email, password }) {
+  async function login({ email, password, accountType }) {
     setLoading(true);
     try {
-      const currentUser = await authService.login(email, password);
+      const currentUser = await authService.login(email, password, accountType);
       setUser(currentUser);
       return { success: true, user: currentUser };
     } catch (error) {
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
     try {
       const currentUser = await authService.register({ email, password, accountType, firstName, lastName, companyName, phone });
       setUser(currentUser);
-      return { success: true };
+      return { success: true, user: currentUser };
     } catch (error) {
       return { success: false, message: error?.message || 'Registration failed. Please try again.' };
     } finally {

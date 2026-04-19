@@ -8,11 +8,11 @@
 import { fetchWithAuth, API_BASE_URL } from './api';
 
 export const authService = {
-  async login(email, password) {
+  async login(email, password, accountType) {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, accountType }),
     });
 
     if (!response.ok) {

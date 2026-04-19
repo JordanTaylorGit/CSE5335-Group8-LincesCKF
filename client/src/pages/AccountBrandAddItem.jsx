@@ -12,6 +12,7 @@ export default function AccountBrandAddItem() {
   const [images, setImages] = useState('');
   const [sizes, setSizes] = useState('');
   const [colors, setColors] = useState('');
+  const [featured, setFeatured] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
 
@@ -47,7 +48,20 @@ export default function AccountBrandAddItem() {
     e.preventDefault();
     setMsg('');
 
-    if (!name.trim() || !price) return setMsg(t('account.add_item_required_error'));
+    const parsedImages = parseList(images);
+    const parsedColors = parseList(colors);
+
+    if (
+      !name.trim() ||
+      !description.trim() ||
+      price === '' ||
+      !category.trim() ||
+      !material.trim() ||
+      parsedImages.length === 0 ||
+      parsedColors.length === 0
+    ) {
+      return setMsg(t('account.add_item_required_error'));
+    }
 
     let parsedSizes;
     try {
@@ -66,12 +80,13 @@ export default function AccountBrandAddItem() {
       name: name.trim(),
       description: description.trim(),
       price: Number(price),
-      category: category.trim() || 'other',
+      category: category.trim(),
       material: material.trim(),
-      images: parseList(images),
+      images: parsedImages,
       stockQuantity: totalStock,
       sizes: parsedSizes,
-      colors: parseList(colors),
+      colors: parsedColors,
+      featured,
     };
 
     try {
@@ -90,6 +105,7 @@ export default function AccountBrandAddItem() {
       setImages('');
       setSizes('');
       setColors('');
+      setFeatured(false);
     } catch (err) {
       setMsg(err.message || t('account.add_item_create_error'));
     } finally {
@@ -106,18 +122,18 @@ export default function AccountBrandAddItem() {
       <form onSubmit={handleSubmit} className="account-brand-form max-w-xl space-y-4">
         <div>
           <label className="block text-sm text-navy mb-1">{t('account.item_name')}</label>
-          <input value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
+          <input required value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
         </div>
 
         <div>
           <label className="block text-sm text-navy mb-1">{t('account.description')}</label>
-          <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" rows={4} />
+          <textarea required value={description} onChange={e => setDescription(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" rows={4} />
         </div>
 
         <div className="account-brand-form__grid grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-navy mb-1">{t('account.price_usd')}</label>
-            <input type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
+            <input required type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
           </div>
           <div>
             <label className="block text-sm text-navy mb-1">{t('account.total_stock')}</label>
@@ -128,29 +144,42 @@ export default function AccountBrandAddItem() {
         <div className="account-brand-form__grid grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-navy mb-1">{t('account.category')}</label>
-            <input value={category} onChange={e => setCategory(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
+            <input required value={category} onChange={e => setCategory(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
           </div>
           <div>
             <label className="block text-sm text-navy mb-1">{t('account.material')}</label>
-            <input value={material} onChange={e => setMaterial(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
+            <input required value={material} onChange={e => setMaterial(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
           </div>
         </div>
 
         <div>
           <label className="block text-sm text-navy mb-1">{t('account.images_csv')}</label>
-          <input value={images} onChange={e => setImages(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
+          <input required value={images} onChange={e => setImages(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
         </div>
 
         <div className="account-brand-form__grid grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-navy mb-1">{t('account.sizes_stock')}</label>
-            <input value={sizes} onChange={e => setSizes(e.target.value)} placeholder={t('account.sizes_stock_placeholder')} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
+            <input required value={sizes} onChange={e => setSizes(e.target.value)} placeholder={t('account.sizes_stock_placeholder')} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
           </div>
           <div>
             <label className="block text-sm text-navy mb-1">{t('account.colors_csv')}</label>
-            <input value={colors} onChange={e => setColors(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
+            <input required value={colors} onChange={e => setColors(e.target.value)} className="w-full px-4 py-2 rounded-md bg-zinc-100" />
           </div>
         </div>
+
+        <label className="flex items-start gap-3 rounded-md bg-zinc-100 px-4 py-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={featured}
+            onChange={e => setFeatured(e.target.checked)}
+            className="mt-1 h-4 w-4 accent-navy"
+          />
+          <span className="block">
+            <span className="block text-sm text-navy">{t('account.featured_item')}</span>
+            <span className="block text-xs text-navy/60">{t('account.featured_item_help')}</span>
+          </span>
+        </label>
 
         {msg && <p className="text-sm text-navy/70">{msg}</p>}
 

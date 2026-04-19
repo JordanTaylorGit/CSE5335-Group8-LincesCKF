@@ -1,18 +1,17 @@
 # Linces'CKF — Premium Silk E-Commerce Platform
 ### UTA CSE 5335 Web Data Management · Group 8
 
-A bilingual (English/Spanish) e-commerce platform for a premium silk garment brand, featuring **Direct-to-Consumer** sales and **B2B Manufacturing Services**. The project now includes a React frontend, an Express API, and a MySQL database schema for authentication, products, orders, and custom manufacturing requests.
+A bilingual (English/Spanish) e-commerce platform for a premium silk garment brand, featuring **Direct-to-Consumer** sales and **B2B Manufacturing Services**. The project now includes a React frontend, an Express API, and a MySQL database schema for authentication, products, orders, contact routing, and custom manufacturing requests.
 
 
 ---
 ## Login Information
 
-- Click on the Login Page and Register, if you are a new user. Enter all the details in the form and click Submit. 
-- After registering, enter the same details in the Login page. 
-- Once logged in, to view the Account details page, click 'My Account' in the Nav Bar.
-- This page allows the user to view their account details and change the password if required.
-- Checkout button and call-to-action only work if logged in.
-- Login persists via `localStorage` for phase 2. To be changed in phase 3.
+- New users can register as either a `CUSTOMER` or a `BRAND` from the login modal.
+- Login requires the correct account type selection, so customer credentials do not authenticate as a brand account and vice versa.
+- Once logged in, `My Account` provides access to profile details, password changes, notification settings, orders, and brand-only management tools.
+- Protected actions such as checkout, adding brand products, and marking deliveries require login.
+- Authentication uses the backend API and stores the session token in `localStorage`, which keeps the user signed in across refreshes until logout.
 
 ### Seeded Test Accounts
 
@@ -33,7 +32,7 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 
 | # | Student | Responsibilities |
 |---|---------|-----------------|
-| 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, Project Regression Testing, collaborated in drafting README |
+| 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, Brand vs. Customer order logic in the website Brand and Account Creation Pages, Project Regression Testing, Peer Review, Bug Fixes and collaborated in drafting README |
 | 2 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
 | 3 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
 | 4 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, README |
@@ -46,8 +45,8 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 
 | Phase | Host | URL |
 |-------|------|-----|
-| Phase 2 (Frontend) | UTA Cloud | [jxt0693.uta.cloud](http://jxt0693.uta.cloud) |
-| Phase 3 (Full Stack) | TBD | TBD |
+| Frontend demo | UTA Cloud | [jxt0693.uta.cloud](http://jxt0693.uta.cloud) |
+| Current full-stack deployment | TBD | TBD |
 
 ---
 
@@ -82,17 +81,17 @@ The platform is fully bilingual — all UI strings, product names, descriptions,
 ## Project Structure
 
 ```
-lincesckf/
+CSE5335-Group8-LincesCKF/
 ├── client/
-│   ├── public/
-│   │   └── images/                  # Product images (silkBlouse.jpeg, silkDress.jpeg, etc.)
 │   ├── src/
 │   │   ├── assets/
 │   │   │   └── styles/
-│   │   │       └── global.css       # Global styles, font imports
+│   │   │       ├── global.css       # Global styles, font imports, focus tokens
+│   │   │       └── responsive.css   # Responsive layout overrides for dense pages
 │   │   ├── components/
 │   │   │   ├── auth/
-│   │   │   │   └── ProtectedRoute.jsx
+│   │   │   │   ├── ProtectedRoute.jsx
+│   │   │   │   └── SiteAuthGate.jsx
 │   │   │   ├── layout/
 │   │   │   │   ├── Layout.jsx       # Wraps all pages with Navbar + Footer
 │   │   │   │   ├── Navbar.jsx       # Fixed header, cart badge, language toggle, auth
@@ -103,17 +102,19 @@ lincesckf/
 │   │   │   ├── cart/
 │   │   │   │   ├── CartItem.jsx     # Individual cart row with quantity controls
 │   │   │   │   └── CartSummary.jsx  # Order total and checkout button
+│   │   │   ├── catalog/
+│   │   │   │   ├── CatalogFilters.jsx
+│   │   │   │   └── ProductGallery.jsx
 │   │   │   ├── shared/
 │   │   │   │   └── ProductCard.jsx  # Reusable card with color/size selection
 │   │   │   ├── AuthModal.jsx        # Login/register modal
+│   │   │   ├── ScrollToTop.jsx      # Route scroll reset helper
+│   │   │   ├── Seo.jsx              # Per-page document metadata helper
 │   │   │   ├── auth.css
-│   │   │   └── AuthModal.css
 │   │   ├── context/
 │   │   │   ├── AuthContext.jsx      # Auth state — login, register, logout
 │   │   │   ├── CartContext.jsx      # Cart state — add, remove, quantity, messages
 │   │   │   └── LanguageContext.jsx  # Language toggle (EN/ES), persisted to localStorage
-│   │   ├── data/
-│   │   │   └── products.js          # Single source for product data (bilingual)
 │   │   ├── i18n/
 │   │   │   ├── i18n.js              # i18 configuration
 │   │   │   └── translations.js      # All EN + ES strings (single file, both languages)
@@ -136,9 +137,17 @@ lincesckf/
 │   ├── postcss.config.js
 │   ├── package.json
 │   └── vite.config.js
+├── server/
+│   ├── server.js                  # Express API, auth, products, orders, custom orders, contact routing
+│   ├── database_mysql.sql         # MySQL schema + seed inserts
+│   ├── seed.js                    # Seed helper
+│   ├── test.js                    # API smoke and regression coverage
+│   ├── cleanup_test_data.js       # Removes integration-test inserts
+│   ├── reset_stock_full.js        # Refills seeded inventory for demos/tests
+│   └── package.json
 ```
 
-> **Current project note:** The repository includes both the React client and the Express/MySQL backend used for authentication, catalog data, orders, and custom orders.
+> **Current project note:** The repository includes both the React client and the Express/MySQL backend used for authentication, catalog data, orders, contact routing, and custom orders.
 
 ---
 
@@ -153,7 +162,7 @@ lincesckf/
 ```bash
 # Clone the repository
 git clone https://github.com/JordanTaylorGit/CSE5335-Group8-LincesCKF.git
-cd lincesckf/client
+cd CSE5335-Group8-LincesCKF/client
 
 # Install dependencies
 npm install
@@ -185,6 +194,12 @@ npm run dev
 Backend runs at **http://localhost:5001**  
 Frontend runs at **http://localhost:5173**
 
+### Testing and Maintenance Support
+
+- `TESTING_CHECKLIST.md` is the end-to-end manual verification guide for local runs, AWS deployment checks, API spot checks, and database write verification.
+- `PROJECT_OVERVIEW.md` summarizes the implemented feature set, architecture notes, and original team-planning breakdown.
+- The backend smoke suite plus the cleanup and stock-reset scripts are intended to support repeatable demos, regression passes, and merge validation.
+
 ---
 
 ## Naming Conventions
@@ -213,24 +228,106 @@ npm run preview
 
 ---
 
-## 🌐 Features
+## Current Full-Stack Features
 
-### Phase 2 — React Frontend
+### Authentication and Account Roles
 
-- Bilingual UI (EN/ES) with language toggle — persists via localStorage
-- Fully responsive design — mobile, tablet, and desktop layouts
-- Authentication — login, register, logout with localStorage session persistence
-- Shopping cart — add, remove, quantity controls, color/size tracking, toast notifications
-- Product catalog — category filters, responsive grid, bilingual product names
-- Product detail pages — color swatch selection, size selection, bilingual name and description
-- Cart badge — live count reflecting total quantity across all items
-- Responsive navigation — desktop nav + mobile hamburger menu
-- Home page — hero, featured products, B2B overview, quote CTA
-- B2B Services page — service cards, process steps, quote CTA
-- Custom Orders page — 3-step order type selection and form flow
-- Contact page — contact form with subject selection
-- Consistent design system across all pages (see Design System section)
-- Account Details Page
+- Customer and Brand registration with role-aware login validation
+- JWT-based protected API access with session persistence across refresh
+- Toast and inline feedback for login and registration failures
+- Account dashboard for profile updates, password changes, address information, and notification preferences
+
+### Storefront and Bilingual Experience
+
+- English-first initial load with persistent EN/ES language switching
+- Bilingual product names, descriptions, category labels, colors, and account/order UI
+- Responsive Home, Catalog, Product Detail, Cart, Checkout, About, Contact, and B2B Services pages
+- Home page featured section powered by `GET /api/products/featured`
+- Route-aware SEO metadata updates for titles, descriptions, canonical URLs, Open Graph, Twitter cards, and document language
+
+### Inventory, Stock, and Out-of-Stock Handling
+
+- Product inventory stored in MySQL with both total stock and per-size stock
+- Product cards and product detail pages show out-of-stock states and disable unavailable selections
+- Cart quantity updates are capped by the selected size's available stock
+- Checkout decrements stock and updates both the total product quantity and size-level availability
+
+
+### Cart and Checkout
+
+- Add-to-cart flow tracks product, color, size, quantity, and brand metadata
+- Cart persists across page refresh with `localStorage` until checkout or manual removal
+- Cart and checkout summaries show brand names for each line item
+- Checkout creates order, order items, payment, and shipping records through the backend API
+
+### Brand Product Management
+
+- Brand accounts can add new catalog items from the account dashboard
+- Add Item supports bilingual product fields, images, category, colors, price, size-based stock entry, and a featured-products toggle
+- All add-item fields are required except the featured-products toggle
+- Newly added items appear in the brand's product list and in the public catalog immediately
+- Newly added items appear on the Home page when they are marked as featured from the add-item form or through the database/API
+
+### Order Fulfillment and Delivery Updates
+
+- Customers see both regular orders and custom orders in My Orders
+- Brand accounts see both the orders they place themselves and the store/custom orders routed to their brand
+- Brands can mark individual store order items as delivered
+- Customer order status updates to Delivered or Partially Delivered based on brand fulfillment progress
+- Brands can mark targeted custom orders as delivered and the customer sees the updated custom-order status
+
+### Custom Orders and Contact Routing
+
+- All custom order types support selecting a target brand
+- Brand-targeted custom orders are routed to the selected brand and shown in that brand's My Orders view
+- Contact Us supports brand-directed inquiries
+- Brand-directed contact messages appear in the target brand's Notifications section
+
+## User Flows
+
+### Customer Flow
+
+1. Open the app in a fresh browser session. The app loads in English first, and later uses the language saved in `localStorage`.
+2. Browse the Home page, featured products, and Catalog listings.
+3. Open a product detail page, choose color and size, and add the item to cart.
+4. Refresh the page if needed. The cart remains saved until the user removes items or completes checkout.
+5. Open Checkout, review brand names in the order summary, and submit the order.
+6. Open `My Account` to review placed orders, delivery progress, profile details, and notification settings.
+7. Submit Contact Us messages or custom-order requests, with the option to route requests to a selected brand.
+8. Track both regular orders and custom orders from the customer account view.
+
+### Brand Flow
+
+1. Log in using a Brand account.
+2. Open `My Account` and review brand-specific sections such as `My Products`, `Orders`, and `Notifications`.
+3. Add a new product with bilingual content, images, pricing, category, size-based stock, and the option to mark it as featured. All fields except the featured toggle must be filled before submit.
+4. Confirm the product appears in the brand product list and public Catalog. It appears on the Home page when marked as featured.
+5. Review `My Orders`, which includes both orders placed by the brand account and orders/custom requests routed to that brand for fulfillment.
+6. Mark eligible routed order items as delivered. Customers then see updated Delivered or Partially Delivered status in their account.
+7. Review targeted custom orders in the brand order view and mark them delivered when completed.
+8. Review brand-directed Contact Us messages in the Notifications section.
+
+## Database Write Map
+
+| Flow / Action | Inserts Into | Notes |
+|---|---|---|
+| Customer registration | `users` | Creates a new customer account |
+| Brand registration | `users` | Creates a new brand account |
+| Profile save with first shipping address | `addresses` | Later profile saves usually update the same address row |
+| Brand adds a product | `products` | Also inserts into `categories` if the entered category does not already exist |
+| Customer checkout | `addresses`, `orders`, `order_items`, `payments` | Also updates product stock in `products` |
+| Customer submits custom order | `custom_orders` | Also inserts into `service_types` if the order type does not already exist |
+| Customer submits Contact Us form | `contact_forms` | `brand_user_id` is filled when the user targets a brand |
+| Brand marks store order delivered | No new rows | Updates `order_items` and `orders` |
+| Brand marks custom order delivered | No new rows | Updates `custom_orders` |
+
+### Tables Not Used by the Live App Flow
+
+- `shopping_carts`
+- `cart_items`
+- `service_inquiries`
+
+These tables are currently not populated by the live frontend/backend flow. The cart is stored in browser `localStorage`. Contact Us submissions are written to `contact_forms`, and Custom Orders submissions are written to `custom_orders`.
 
 
 ---
@@ -275,11 +372,11 @@ Pages follow a consistent alternating section pattern:
 
 ## Responsive Design
 
-The platform is fully responsive across mobile, tablet, and desktop using **Tailwind CSS v3** utility classes with a **mobile-first** approach. No additional CSS frameworks are used.
+The platform is responsive across mobile, tablet, and desktop using **Tailwind CSS v3** utility classes together with layout-specific overrides in `client/src/assets/styles/responsive.css`. The design stays mobile-first, then refines dense surfaces such as catalog grids, checkout, account pages, and custom-order forms with targeted media-query adjustments.
 
 ### Breakpoints
 
-Tailwind's default breakpoint scale is used throughout:
+The app primarily uses Tailwind's breakpoint scale:
 
 | Prefix | Min-width | Typical device |
 |--------|-----------|----------------|
@@ -289,66 +386,88 @@ Tailwind's default breakpoint scale is used throughout:
 | `lg:` | 1024px | Laptop |
 | `xl:` | 1280px | Desktop |
 
+`responsive.css` also applies layout-specific overrides around `1100px`, `900px`, `768px`, and `560px` for components that need extra control.
+
 ### Responsive Patterns by Component
 
 | Component | Pattern |
 |-----------|---------|
-| **Navbar** | Desktop nav hidden on mobile (`hidden md:flex`); hamburger toggle shown with `md:hidden` |
-| **Product Catalog grid** | `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` — 1 → 2 → 3 → 4 columns |
-| **Cart layout** | Single column on mobile; `md:grid-cols-[2fr_1fr]` sidebar layout on tablet+ |
+| **Navbar** | Desktop nav is hidden on mobile, while the hamburger toggle opens a separate mobile navigation panel with stacked links |
+| **Home featured products** | Featured-product cards scale from 4 columns on large screens down to 3, 2, and 1 column on smaller widths |
+| **Catalog grid** | `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`, with responsive overrides keeping card heights, media ratios, and action rows stable |
+| **Product detail** | Two-column media/content layout on large screens; collapses to one column on tablet/mobile, with narrower padding and full-width CTA treatment |
+| **Cart and Checkout** | Sidebar summary layout on larger screens; collapses to a single column on smaller screens, with sticky summaries becoming static for mobile usability |
+| **Contact page** | Multi-column contact, form, and map layout on larger screens; form and embedded map stack vertically on smaller screens |
+| **Custom Orders** | Type-selection cards and form grids collapse from 3 / 2 columns to one column; progress steps remain usable on narrow screens with horizontal overflow support |
+| **Account dashboard** | Sidebar becomes wrapped pill-style navigation on smaller screens; settings, addresses, brand add-item form, and order item grids collapse to one column |
 | **Footer** | `grid-cols-1 md:grid-cols-4` — stacked on mobile, 4 columns on tablet+ |
-| **Hero CTA buttons** | `flex-col sm:flex-row` — stacked on mobile, side-by-side on sm+ |
 
 ### Focus & Touch
 
 - Global `:focus-visible` styles are defined in `global.css` using the `silk-gold` token, ensuring keyboard and touch focus indicators are visible on all interactive elements.
-- Minimum tap target sizes are maintained on all buttons and links for touch usability.
+- Toasts, summaries, and account navigation reposition on smaller screens to avoid clipping or overlap.
+- Touch-heavy controls such as cart quantity buttons, product selectors, mobile navigation, and custom-order actions remain usable without requiring hover interactions.
 
 ---
 
 ## Accessibility
 
-The platform follows WCAG 2.1 AA guidelines using custom-built accessibility patterns throughout — no third-party a11y libraries are used.
+The app includes accessibility-oriented patterns across navigation, authentication, forms, account management, and product interaction. It has not been through a formal accessibility audit, but the current implementation includes semantic structure, keyboard support, focus management, and assistive labels in the main user flows.
 
-### ARIA & Semantic HTML
+### Semantic Structure
 
-- Semantic landmark elements (`<header>`, `<main>`, `<footer>`, `<nav>`, `<form>`) used across all layout components
-- ARIA roles and attributes applied to all interactive components:
-  - `AuthModal` — `role="dialog"`, `aria-modal`, `aria-labelledby`, `aria-selected` on tabs, `role="alert"` on errors, `aria-busy` on submit
-  - `ProcessSteps` — `aria-labelledby` linking the section to its heading
-  - Social media links in `Footer` — descriptive `aria-label` on every icon link
-  - Navbar buttons — `aria-label` on cart link, language toggle, and hamburger menu
+- Layout components use semantic elements such as `<header>`, `<main>`, `<footer>`, `<nav>`, `<section>`, and `<form>`.
+- `Layout.jsx` includes a skip link that moves keyboard users directly to `#main-content`.
+- `ProcessSteps` uses `aria-labelledby`, and the contact map iframe includes a descriptive `title`.
 
-### Keyboard Navigation
+### Dialog, Navigation, and Controls
 
-`AuthModal` implements a full focus trap:
-- Moves focus to the first focusable element when the modal opens
-- Traps Tab / Shift+Tab cycling within the modal
-- Closes on Escape and restores focus to the trigger element
+- `AuthModal` uses `role="dialog"`, `aria-modal`, `aria-labelledby`, focus trapping, Escape-to-close, and focus restoration to the previously active element.
+- Navbar controls expose `aria-label`, `aria-controls`, `aria-expanded`, and `aria-current` where appropriate.
+- Product size/color selectors, product gallery thumbnails, catalog category chips, and language/account-type toggles use pressed-state patterns such as `aria-pressed`.
+- Notification preferences on the account page use `role="switch"` with `aria-checked`.
+- Footer social/contact links include descriptive `aria-label` values.
 
-Focusable elements are selected via:
-```js
-const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-```
+### Forms, Feedback, and Media
 
-### Focus Styles
+- Auth, account, contact, catalog filter, checkout, and custom-order forms use visible labels with matching `htmlFor` / `id` pairs.
+- Common fields include useful `autoComplete` values such as `email`, `given-name`, `family-name`, `organization`, `tel`, `address-line1`, `postal-code`, and card-entry hints in checkout.
+- Error and success feedback is announced through `role="alert"` in the auth modal, account settings, custom-order phone validation, and order-action messages.
+- The auth gate loading state exposes `role="status"` while authentication is being resolved.
+- Product, catalog, cart, checkout, about, and hero images use descriptive `alt` text based on product or page context.
 
-A global `:focus-visible` style is defined in `global.css`:
-```css
-:focus-visible {
-  outline: 2px solid var(--color-silk-gold);
-  outline-offset: 3px;
-}
-```
-Form inputs use Tailwind `focus:ring-2` classes for additional inline focus indication.
+### Focus and Motion
 
-### Images & Alt Text
+- A global `:focus-visible` rule in `global.css` provides a consistent visible outline across interactive controls.
+- `prefers-reduced-motion: reduce` is respected by reducing animations and transition duration for motion-sensitive users.
 
-All `<img>` elements carry descriptive `alt` attributes — product images use the product name, and decorative images use `alt=""`.
+---
 
-### Forms
+## SEO
 
-All form inputs in `AuthModal`, `Account`, and `Contact` use `<label htmlFor>` with matching `id` attributes. Password and user data fields include appropriate `autoComplete` attributes. Error messages use `role="alert"` for immediate screen reader announcement.
+The frontend includes a shared route-level SEO helper in `client/src/components/Seo.jsx`, mounted once at the app root in `App.jsx`. It updates metadata on navigation so the storefront pages keep meaningful titles and descriptions instead of a single static document title.
+
+### Current SEO Behavior
+
+- Route-specific page titles and descriptions are defined for Home, Catalog, Product Detail, B2B Services, Custom Orders, About, Contact, Cart, Checkout, and Account pages.
+- The document title is updated on route change.
+- The main description meta tag is updated on route change.
+- The root `<html>` element language is updated to `en` or `es` based on the active app language.
+- A canonical URL link tag is maintained for the current route.
+- Open Graph metadata is updated for `og:type`, `og:site_name`, `og:title`, `og:description`, `og:locale`, and `og:url`.
+- Twitter metadata is updated for `twitter:card`, `twitter:title`, and `twitter:description`.
+- A `robots` meta tag is set to `index, follow`.
+
+### Deployment Note
+
+- `Seo.jsx` uses `VITE_SITE_URL` when it is configured to build canonical URLs against the deployed frontend domain.
+- If `VITE_SITE_URL` is not set, canonical URLs fall back to the current browser origin.
+- `client/index.html` provides baseline metadata for the first page load, while `Seo.jsx` keeps metadata in sync after client-side route changes.
+
+### Scope
+
+- This is client-side SEO metadata support for a React SPA.
+- The current repo does not document sitemap generation or server-side rendering.
 
 ---
 
@@ -361,16 +480,17 @@ All UI strings are managed in a single file: `src/i18n/translations.js`. Both En
 2. Add the Spanish equivalent directly below under `es`
 3. Use `const { t } = useTranslation()` and call `t('your.key')` in the component
 
-**Product bilingual fields** — for phase 2 product names and descriptions are stored directly on the product object in `data/products.js`:
+**Product bilingual fields** — product payloads returned by the backend include bilingual names and descriptions:
 ```js
-const { i18n } = useTranslation();
 const name = i18n.language === 'es' ? product.nameEs : product.nameEn;
 const description = i18n.language === 'es' ? product.descriptionEs : product.descriptionEn;
 ```
 
 ---
 
-## AI Queries Used
+## AI Queries Used 
+
+This section is preserved as part of the course process documentation. The sections above describe the current implementation and current behavior of the app.
 
 ### Jordan:
 Generate just essential scaffolding for multi phase e-commerce web development project. Phase 1 was planning and design. Phase 2 front-end. Phase 3 back end. Phase 4 integration. Phase 1 is completed by time, we are on phase 2 front-end. Linces'CKF is a bilingual (Spanish/English) e -commerce platform for a premium silk garment brand that offers two main business lines:
@@ -380,13 +500,13 @@ Generate just essential scaffolding for multi phase e-commerce web development p
 Describe best practices for implementing hero section and b2b process steps into Linces'CKF home page and b2b services page respectively. Hero section and process steps must ensure responsive design across platforms
 
 ### Lakshmi Priya: 
-Suggest guidelines on how to fix vite errors after initial scaffolding
+Explain how to integrate frontend form validation with backend validation for login and registration APIs. Include error messaging, status codes, and UX-friendly feedback.
 
-Describe the best way to design a login and register page for a Customer and a Brand with validations
+Describe how JWT-based authentication between frontend and backend works and suggest how to integrate it
 
-Suggest how to structure the account details page of a logged in user
+Walkthrough the best practices of designing a login authentication flow for a web application
 
-How to make the login page consistent with the color theme?
+Elaborate the guidelines to follow for making the navigation links secure and accessible only upon login?
 
 ### Ishan:
 I have a React + Tailwind component for a multi-step progress indicator that overflows horizontally on mobile (step 3 causes scrolling). How can I make it fully responsive and prevent overflow while keeping steps aligned properly?
@@ -402,6 +522,10 @@ For the cart, describe Context to add, update quantity, and remove items, along 
 No prompts used for this phase.
 
 ## External websites referenced
-W3 Schools, GeeksforGeeks, StackOverflow, Mozilla MDN Docs.
-
-https://phrase.com/blog/posts/i18n-a-simple-definition/ for i18n Internationalization
+Node.js Documentation: https://nodejs.org/docs/latest/api/  
+MySQL Documentation: https://dev.mysql.com/doc/  
+React Documentation: https://react.dev/  
+Express Documentation: https://expressjs.com/  
+MDN Web Docs: https://developer.mozilla.org/  
+Phrase i18n overview: https://phrase.com/blog/posts/i18n-a-simple-definition/  
+Additional reference sites used during development: W3Schools, GeeksforGeeks, and Stack Overflow.

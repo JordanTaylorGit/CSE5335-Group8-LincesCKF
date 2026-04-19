@@ -42,7 +42,10 @@ function Cart() {
           ) : (
             <div className="space-y-4">
               {cartItems.map((item) => (
-                <CartItem key={item.id} item={item} />
+                <CartItem
+                  key={`${item.id}-${item.selectedColor || 'no-color'}-${item.selectedSize || 'no-size'}`}
+                  item={item}
+                />
               ))}
             </div>
           )}

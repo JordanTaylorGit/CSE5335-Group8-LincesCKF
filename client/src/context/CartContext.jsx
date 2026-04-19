@@ -5,14 +5,29 @@
  * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
 
-import { createContext, useContext, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const CartContext = createContext();
+const CART_STORAGE_KEY = "lincesckf_cart";
+
+function loadStoredCart() {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const rawCart = window.localStorage.getItem(CART_STORAGE_KEY);
+    if (!rawCart) return [];
+
+    const parsedCart = JSON.parse(rawCart);
+    return Array.isArray(parsedCart) ? parsedCart : [];
+  } catch {
+    return [];
+  }
+}
 
 export function CartProvider({ children }) {
   const { t } = useTranslation();
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(loadStoredCart);
   const [message, setMessage] = useState("");
   const timerRef = useRef(null);
 
@@ -27,6 +42,18 @@ export function CartProvider({ children }) {
       setMessage("");
     }, 5000);
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  useEffect(() => () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+  }, []);
 
   const parseListField = (field) => {
     if (!field) return [];
