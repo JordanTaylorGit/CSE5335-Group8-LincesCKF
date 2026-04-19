@@ -26,20 +26,42 @@ export default function AuthModal({ isOpen, onClose }) {
   const [password, setPassword]       = useState('');
   const [confirmPw, setConfirmPw]     = useState('');
   const [error, setError]             = useState('');
+  const [authToast, setAuthToast]     = useState(null);
   const [busy, setBusy]               = useState(false);
 
   const dialogRef      = useRef(null);
   const previousFocus  = useRef(null);
+  const closeTimeout   = useRef(null);
 
   // Reset form on close
   useEffect(() => {
     if (!isOpen) {
+      if (closeTimeout.current) {
+        window.clearTimeout(closeTimeout.current);
+        closeTimeout.current = null;
+      }
       setMode('login'); setAccountType('CUSTOMER');
       setFirstName(''); setLastName(''); setCompanyName(''); setPhone('');
       setEmail(''); setPassword(''); setConfirmPw('');
-      setError(''); setBusy(false);
+      setError(''); setAuthToast(null); setBusy(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!authToast?.message) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      setAuthToast(null);
+    }, 4000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [authToast]);
+
+  useEffect(() => () => {
+    if (closeTimeout.current) {
+      window.clearTimeout(closeTimeout.current);
+    }
+  }, []);
 
   // Focus management + focus trap + Escape key
   useEffect(() => {
@@ -78,34 +100,72 @@ export default function AuthModal({ isOpen, onClose }) {
   const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const isValidPhone = (v) => /^\d{10}$/.test(v.replace(/\D/g, ''));
 
+  function showToast(message, type = 'error') {
+    setAuthToast({ message, type });
+  }
+
+  function handleAuthError(message, toast = isLogin) {
+    setError(message);
+    if (toast) {
+      showToast(message, 'error');
+    }
+  }
+
+  function handleAuthSuccess(message) {
+    setError('');
+    showToast(message, 'success');
+
+    if (closeTimeout.current) {
+      window.clearTimeout(closeTimeout.current);
+    }
+
+    closeTimeout.current = window.setTimeout(() => {
+      closeTimeout.current = null;
+      onClose?.();
+    }, 900);
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!isLogin && accountType === 'CUSTOMER' && !firstName.trim()) return setError(t('auth.error_first_name_required'));
-    if (!isLogin && accountType === 'CUSTOMER' && !lastName.trim())  return setError(t('auth.error_last_name_required'));
-    if (!isLogin && accountType === 'BRAND'    && !companyName.trim()) return setError(t('auth.error_company_name_required'));
-    if (!isValidEmail(email))                    return setError(t('auth.error_invalid_email'));
-    if (!isLogin && !isValidPhone(phone))        return setError(t('auth.error_invalid_phone'));
-    if (password.length < 6)                     return setError(t('auth.error_password_length'));
-    if (!isLogin && password !== confirmPw)      return setError(t('auth.error_passwords_match'));
+    setAuthToast(null);
+    if (!isLogin && accountType === 'CUSTOMER' && !firstName.trim()) return handleAuthError(t('auth.error_first_name_required'), false);
+    if (!isLogin && accountType === 'CUSTOMER' && !lastName.trim())  return handleAuthError(t('auth.error_last_name_required'), false);
+    if (!isLogin && accountType === 'BRAND'    && !companyName.trim()) return handleAuthError(t('auth.error_company_name_required'), false);
+    if (!isValidEmail(email))                    return handleAuthError(t('auth.error_invalid_email'));
+    if (!isLogin && !isValidPhone(phone))        return handleAuthError(t('auth.error_invalid_phone'), false);
+    if (password.length < 6)                     return handleAuthError(t('auth.error_password_length'));
+    if (!isLogin && password !== confirmPw)      return handleAuthError(t('auth.error_passwords_match'), false);
 
     setBusy(true);
     const res = isLogin
-      ? await login({ email, password })
+      ? await login({ email, password, accountType })
       : await register({ email, password, accountType, firstName, lastName, companyName, phone });
     setBusy(false);
 
     if (res.success) {
-      if (isLogin) {
-        const name = res.user?.firstName || res.user?.companyName || res.user?.email;
-        alert(`${t('auth.welcome_back')}, ${name}!`);
-      }
-      onClose?.();
-    } else setError(res.message || t('auth.error_login_failed'));
+      const name = res.user?.firstName || res.user?.companyName || res.user?.email || email;
+      const successMessage = isLogin
+        ? `${t('auth.welcome_back')}, ${name}!`
+        : t('auth.register_success');
+      handleAuthSuccess(successMessage);
+    } else {
+      handleAuthError(res.message || t('auth.error_login_failed'));
+    }
   }
 
   return (
     <div className="auth-overlay">
+      {authToast?.message && (
+        <div
+          className={`auth-toast ${authToast.type === 'success' ? 'auth-toast--success' : 'auth-toast--error'}`}
+          role="alert"
+          aria-live="assertive"
+        >
+          {authToast.message}
+        </div>
+      )}
+
       <div onClick={() => onClose?.()} className="auth-backdrop" aria-hidden="true" />
 
       <div
@@ -145,14 +205,14 @@ export default function AuthModal({ isOpen, onClose }) {
                 role="tab"
                 aria-selected={isLogin}
                 className={`auth-tab-btn ${isLogin ? 'auth-tab-btn--active' : 'auth-tab-btn--inactive'}`}
-                onClick={() => { setMode('login'); setError(''); }}
+                onClick={() => { setMode('login'); setError(''); setAuthToast(null); }}
               >{t('auth.tab_login')}</button>
               <button
                 type="button"
                 role="tab"
                 aria-selected={!isLogin}
                 className={`auth-tab-btn ${!isLogin ? 'auth-tab-btn--active' : 'auth-tab-btn--inactive'}`}
-                onClick={() => { setMode('register'); setError(''); }}
+                onClick={() => { setMode('register'); setError(''); setAuthToast(null); }}
               >{t('auth.tab_register')}</button>
             </div>
 

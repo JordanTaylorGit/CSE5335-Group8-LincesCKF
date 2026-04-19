@@ -84,8 +84,6 @@ The platform is fully bilingual — all UI strings, product names, descriptions,
 ```
 lincesckf/
 ├── client/
-│   ├── public/
-│   │   └── images/                  # Product images (silkBlouse.jpeg, silkDress.jpeg, etc.)
 │   ├── src/
 │   │   ├── assets/
 │   │   │   └── styles/
@@ -107,13 +105,10 @@ lincesckf/
 │   │   │   │   └── ProductCard.jsx  # Reusable card with color/size selection
 │   │   │   ├── AuthModal.jsx        # Login/register modal
 │   │   │   ├── auth.css
-│   │   │   └── AuthModal.css
 │   │   ├── context/
 │   │   │   ├── AuthContext.jsx      # Auth state — login, register, logout
 │   │   │   ├── CartContext.jsx      # Cart state — add, remove, quantity, messages
 │   │   │   └── LanguageContext.jsx  # Language toggle (EN/ES), persisted to localStorage
-│   │   ├── data/
-│   │   │   └── products.js          # Single source for product data (bilingual)
 │   │   ├── i18n/
 │   │   │   ├── i18n.js              # i18 configuration
 │   │   │   └── translations.js      # All EN + ES strings (single file, both languages)
@@ -361,9 +356,8 @@ All UI strings are managed in a single file: `src/i18n/translations.js`. Both En
 2. Add the Spanish equivalent directly below under `es`
 3. Use `const { t } = useTranslation()` and call `t('your.key')` in the component
 
-**Product bilingual fields** — for phase 2 product names and descriptions are stored directly on the product object in `data/products.js`:
+**Product bilingual fields** — product payloads returned by the backend include bilingual names and descriptions:
 ```js
-const { i18n } = useTranslation();
 const name = i18n.language === 'es' ? product.nameEs : product.nameEn;
 const description = i18n.language === 'es' ? product.descriptionEs : product.descriptionEn;
 ```
@@ -380,13 +374,13 @@ Generate just essential scaffolding for multi phase e-commerce web development p
 Describe best practices for implementing hero section and b2b process steps into Linces'CKF home page and b2b services page respectively. Hero section and process steps must ensure responsive design across platforms
 
 ### Lakshmi Priya: 
-Suggest guidelines on how to fix vite errors after initial scaffolding
+Explain how to integrate frontend form validation with backend validation for login and registration APIs. Include error messaging, status codes, and UX-friendly feedback.
 
-Describe the best way to design a login and register page for a Customer and a Brand with validations
+Describe how JWT-based authentication between frontend and backend works and suggest how to integrate it
 
-Suggest how to structure the account details page of a logged in user
+Walkthrough the best practices of designing a login authentication flow for a web application
 
-How to make the login page consistent with the color theme?
+Elaborate the guidelines to follow for making the navigation links secure and accessible only upon login?
 
 ### Ishan:
 I have a React + Tailwind component for a multi-step progress indicator that overflows horizontally on mobile (step 3 causes scrolling). How can I make it fully responsive and prevent overflow while keeping steps aligned properly?

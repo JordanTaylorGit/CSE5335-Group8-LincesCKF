@@ -43,6 +43,216 @@ function AccountProfile() {
   );
 }
 
+function BrandInquiriesSection() {
+  const { t } = useTranslation();
+  const [inquiries, setInquiries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+
+    setLoading(true);
+    setError('');
+
+    fetchWithAuth('/contact/brand-inquiries')
+      .then((data) => {
+        if (mounted) {
+          setInquiries(Array.isArray(data) ? data : []);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        if (mounted) {
+          setError(err.message || t('account.brand_inquiries_error'));
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [t]);
+
+  const getSubjectLabel = (subject) => {
+    const key = {
+      'product-inquiry': 'contact.form.options.product',
+      'custom-order': 'contact.form.options.custom',
+      'b2b-partnership': 'contact.form.options.b2b',
+      support: 'contact.form.options.support',
+      other: 'contact.form.options.other',
+    }[String(subject || '').trim()];
+
+    return key ? t(key) : subject || t('account.not_available');
+  };
+
+  const getStatusLabel = (status) => {
+    const key = {
+      OPEN: 'account.inquiry_status_open',
+      IN_PROGRESS: 'account.inquiry_status_in_progress',
+      RESOLVED: 'account.inquiry_status_resolved',
+    }[String(status || '').trim()];
+
+    return key ? t(key) : status || t('account.not_available');
+  };
+
+  return (
+    <section>
+      <div className="mb-6">
+        <h2 className="font-display text-xl text-navy">{t('account.brand_inquiries')}</h2>
+        <p className="mt-1 text-sm text-navy/60">{t('account.brand_inquiries_desc')}</p>
+      </div>
+
+      {loading ? (
+        <p>{t('account.loading_brand_inquiries')}</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : inquiries.length === 0 ? (
+        <p className="text-navy/60">{t('account.no_brand_inquiries')}</p>
+      ) : (
+        <div className="space-y-4">
+          {inquiries.map((inquiry) => (
+            <article key={inquiry.id} className="rounded-md border border-zinc-200 p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="font-medium text-navy">{inquiry.name || t('account.not_available')}</p>
+                  <p className="text-sm text-navy/60">{inquiry.email || t('account.not_available')}</p>
+                </div>
+                <p className="text-xs text-navy/50">
+                  {t('account.received_on')}: {inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleDateString() : t('account.not_available')}
+                </p>
+              </div>
+
+              <p className="mt-3 text-sm text-navy/70">
+                {t('account.inquiry_subject')}: {getSubjectLabel(inquiry.subject)}
+              </p>
+              <p className="mt-1 text-sm text-navy/70">
+                {t('account.status')}: {getStatusLabel(inquiry.status)}
+              </p>
+              <div className="mt-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-navy/60">{t('account.inquiry_message')}</p>
+                <p className="mt-1 whitespace-pre-wrap text-sm text-navy">{inquiry.message || t('account.not_available')}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function BrandCustomOrderRequestsSection() {
+  const { t } = useTranslation();
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+
+    setLoading(true);
+    setError('');
+
+    fetchWithAuth('/custom-orders/brand-requests')
+      .then((data) => {
+        if (mounted) {
+          setRequests(Array.isArray(data) ? data : []);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        if (mounted) {
+          setError(err.message || t('account.custom_order_requests_error'));
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [t]);
+
+  const getOrderTypeLabel = (orderType) => {
+    const key = {
+      'custom-garment': 'customOrders.types.customGarment.title',
+      'bulk-order': 'customOrders.types.bulkOrder.title',
+      'b2b-manufacturing': 'customOrders.types.b2bManufacturing.title',
+    }[String(orderType || '').trim()];
+
+    return key ? t(key) : orderType || t('account.not_available');
+  };
+
+  const getStatusLabel = (status) => {
+    const key = {
+      NEW: 'account.custom_order_status_new',
+      IN_REVIEW: 'account.custom_order_status_in_review',
+      QUOTED: 'account.custom_order_status_quoted',
+      APPROVED: 'account.custom_order_status_approved',
+      IN_PRODUCTION: 'account.custom_order_status_in_production',
+      COMPLETED: 'account.custom_order_status_completed',
+      CANCELLED: 'account.custom_order_status_cancelled',
+    }[String(status || '').trim()];
+
+    return key ? t(key) : status || t('account.not_available');
+  };
+
+  return (
+    <section>
+      <div className="mb-6">
+        <h2 className="font-display text-xl text-navy">{t('account.custom_order_requests')}</h2>
+        <p className="mt-1 text-sm text-navy/60">{t('account.custom_order_requests_desc')}</p>
+      </div>
+
+      {loading ? (
+        <p>{t('account.loading_custom_order_requests')}</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : requests.length === 0 ? (
+        <p className="text-navy/60">{t('account.no_custom_order_requests')}</p>
+      ) : (
+        <div className="space-y-4">
+          {requests.map((request) => (
+            <article key={request.id} className="rounded-md border border-zinc-200 p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="font-medium text-navy">{request.contactInfo?.name || t('account.not_available')}</p>
+                  <p className="text-sm text-navy/60">{request.contactInfo?.email || t('account.not_available')}</p>
+                </div>
+                <p className="text-xs text-navy/50">
+                  {t('account.received_on')}: {request.createdAt ? new Date(request.createdAt).toLocaleDateString() : t('account.not_available')}
+                </p>
+              </div>
+
+              <div className="mt-3 space-y-1 text-sm text-navy/70">
+                <p>{t('account.request_number', { id: request.requestNumber || request.id })}</p>
+                <p>{t('account.type')}: {getOrderTypeLabel(request.orderType)}</p>
+                <p>{t('account.quantity')}: {request.requirements?.quantity || t('account.not_specified')}</p>
+                <p>{t('account.timeline')}: {request.requirements?.timeline || t('account.not_specified')}</p>
+                <p>{t('account.status')}: {getStatusLabel(request.status)}</p>
+              </div>
+
+              <div className="mt-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-navy/60">{t('account.project_details')}</p>
+                <p className="mt-1 whitespace-pre-wrap text-sm text-navy">
+                  {request.requirements?.message || t('account.not_specified')}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 /* ── Settings ────────────────────────────────────────────────── */
 function AccountSettings() {
   const { user, updateProfile, updatePassword } = useAuth();
@@ -186,6 +396,9 @@ function AccountSettings() {
         </form>
       </section>
 
+      {isBrand && <BrandInquiriesSection />}
+      {isBrand && <BrandCustomOrderRequestsSection />}
+
       {/* Change Password */}
       <section>
         <h2 className="font-display text-xl mb-6 text-navy">{t('account.change_password')}</h2>
@@ -278,7 +491,7 @@ function AccountNotifications() {
 
 /* ── Orders ──────────────────────────────────────────────────── */
 function AccountOrders() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -291,9 +504,26 @@ function AccountOrders() {
       Processing: 'account.status_processing',
       Delivered: 'account.status_delivered',
       'Partially Delivered': 'account.status_partially_delivered',
+      NEW: 'account.custom_order_status_new',
+      IN_REVIEW: 'account.custom_order_status_in_review',
+      QUOTED: 'account.custom_order_status_quoted',
+      APPROVED: 'account.custom_order_status_approved',
+      IN_PRODUCTION: 'account.custom_order_status_in_production',
+      COMPLETED: 'account.custom_order_status_completed',
+      CANCELLED: 'account.custom_order_status_cancelled',
     }[String(status || '').trim()];
 
     return key ? t(key) : status || t('account.not_available');
+  };
+
+  const getCustomOrderTypeLabel = (orderType) => {
+    const key = {
+      'custom-garment': 'customOrders.types.customGarment.title',
+      'bulk-order': 'customOrders.types.bulkOrder.title',
+      'b2b-manufacturing': 'customOrders.types.b2bManufacturing.title',
+    }[String(orderType || '').trim()];
+
+    return key ? t(key) : String(orderType || '').replaceAll('-', ' ') || t('account.not_available');
   };
 
   useEffect(() => {
@@ -375,10 +605,13 @@ function AccountOrders() {
 
               {order.orderKind === 'custom' ? (
                 <>
-                  <p className="text-sm text-navy/70">{t('account.request_number', { id: order.id })}</p>
-                  <p className="text-sm text-navy/70">{t('account.type')}: {String(order.orderType || '').replaceAll('-', ' ')}</p>
+                  <p className="text-sm text-navy/70">{t('account.request_number', { id: order.requestNumber || order.id })}</p>
+                  <p className="text-sm text-navy/70">{t('account.type')}: {getCustomOrderTypeLabel(order.orderType)}</p>
                   <p className="text-sm text-navy/70">{t('account.timeline')}: {order.requirements?.timeline || t('account.not_specified')}</p>
                   <p className="text-sm text-navy/70">{t('account.quantity')}: {order.requirements?.quantity || t('account.not_specified')}</p>
+                  {order.brandName && (
+                    <p className="text-sm text-navy/70">{t('product.brand')}: {order.brandName}</p>
+                  )}
                 </>
               ) : (
                 <>
@@ -399,7 +632,13 @@ function AccountOrders() {
                         )}
                         <div className="account-orders__item-grid mt-2 grid grid-cols-1 sm:grid-cols-5 gap-1 text-xs text-navy/60">
                           <span>{t('account.size')}: {item.selectedSize || t('account.not_available')}</span>
-                          <span>{t('account.color')}: {item.selectedColor || t('account.not_available')}</span>
+                          <span>
+                            {t('account.color')}: {(
+                              i18n.language === 'es'
+                                ? item.selectedColorEs || item.selectedColor
+                                : item.selectedColor
+                            ) || t('account.not_available')}
+                          </span>
                           <span>{t('account.qty')}: {item.quantity || 1}</span>
                           <span>
                             {t('account.line_total')}: ${(

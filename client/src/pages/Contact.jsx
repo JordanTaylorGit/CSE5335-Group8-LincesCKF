@@ -5,10 +5,20 @@
  * Student 5 - Poudel, Ishan - ID# - 1001838432
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, Phone, MapPin, CheckCircle } from 'lucide-react';
 import { fetchWithAuth } from '../services/api';
+
+const INITIAL_FORM_DATA = {
+  name: '',
+  email: '',
+  subject: '',
+  brandId: '',
+  message: '',
+};
+
+const BRAND_TARGET_SUBJECTS = ['product-inquiry', 'custom-order', 'b2b-partnership'];
 
 export default function Contact() {
   const { t } = useTranslation();
@@ -16,12 +26,54 @@ export default function Contact() {
   const encodedMapAddress = encodeURIComponent(mapAddress);
   const googleMapEmbedUrl = `https://www.google.com/maps?q=${encodedMapAddress}&output=embed`;
   const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [brands, setBrands] = useState([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+
+  const shouldShowBrandField = BRAND_TARGET_SUBJECTS.includes(formData.subject);
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetchWithAuth('/brands')
+      .then((data) => {
+        if (mounted) {
+          setBrands(Array.isArray(data) ? data : []);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        if (mounted) {
+          setBrands([]);
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setBrandsLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleFieldChange = (field) => (e) => {
+    const nextValue = e.target.value;
+
+    setFormData((current) => {
+      const nextFormData = {
+        ...current,
+        [field]: nextValue,
+      };
+
+      if (field === 'subject' && !BRAND_TARGET_SUBJECTS.includes(nextValue)) {
+        nextFormData.brandId = '';
+      }
+
+      return nextFormData;
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +82,7 @@ export default function Contact() {
         method: 'POST',
         body: JSON.stringify(formData)
       });
+      setFormData(INITIAL_FORM_DATA);
       setSubmitted(true);
     } catch (err) {
       alert(err.message || t('contact.form.error'));
@@ -48,7 +101,10 @@ export default function Contact() {
             {t('contact.success.message')}
           </p>
           <button
-            onClick={() => setSubmitted(false)}
+            onClick={() => {
+              setFormData(INITIAL_FORM_DATA);
+              setSubmitted(false);
+            }}
             className="px-8 py-3 bg-navy text-white hover:bg-silk-gold transition-colors"
           >
             {t('contact.success.sendAnother')}
@@ -137,7 +193,7 @@ export default function Contact() {
                   id="name"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={handleFieldChange('name')}
                   className="w-full px-4 py-3 bg-gray-50 border border-navy/20 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent transition-all"
                 />
               </div>
@@ -151,7 +207,7 @@ export default function Contact() {
                   id="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={handleFieldChange('email')}
                   className="w-full px-4 py-3 bg-gray-50 border border-navy/20 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent transition-all"
                 />
               </div>
@@ -164,7 +220,7 @@ export default function Contact() {
                   id="subject"
                   required
                   value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  onChange={handleFieldChange('subject')}
                   className="w-full px-4 py-3 bg-gray-50 border border-navy/20 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent transition-all"
                 >
                   <option value="">{t('contact.form.selectSubject')}</option>
@@ -176,6 +232,30 @@ export default function Contact() {
                 </select>
               </div>
 
+              {shouldShowBrandField && (
+                <div>
+                  <label htmlFor="brandId" className="block text-sm font-medium text-navy/70 mb-2">
+                    {t('contact.form.brand')}
+                  </label>
+                  <select
+                    id="brandId"
+                    value={formData.brandId}
+                    onChange={handleFieldChange('brandId')}
+                    className="w-full px-4 py-3 bg-gray-50 border border-navy/20 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent transition-all"
+                  >
+                    <option value="">
+                      {brandsLoading ? t('contact.form.loadingBrands') : t('contact.form.selectBrand')}
+                    </option>
+                    {brands.map((brand) => (
+                      <option key={brand.id} value={brand.id}>
+                        {brand.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-2 text-xs text-navy/60">{t('contact.form.brandHelp')}</p>
+                </div>
+              )}
+
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-navy/70 mb-2">
                   {t('contact.form.message')}
@@ -185,7 +265,7 @@ export default function Contact() {
                   required
                   rows={6}
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={handleFieldChange('message')}
                   className="w-full px-4 py-3 bg-gray-50 border border-navy/20 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent transition-all resize-none"
                 />
               </div>

@@ -105,7 +105,8 @@ function slugify(value) {
 }
 
 function normalizeAccountType(accountType) {
-  const normalized = String(accountType || 'CUSTOMER').trim().toUpperCase();
+  const normalized = String(accountType ?? '').trim().toUpperCase();
+  if (!normalized) return null;
   return VALID_ACCOUNT_TYPES.has(normalized) ? normalized : null;
 }
 
@@ -201,6 +202,104 @@ function buildUserResponse(user) {
     notifications: notificationPreferences,
   };
 }
+
+function mapContactFormRow(row) {
+  return {
+    id: row.contact_id,
+    userId: row.user_id,
+    brandUserId: row.brand_user_id || null,
+    brandName: row.brand_name || '',
+    name: row.name || '',
+    email: row.email || '',
+    subject: row.subject || '',
+    message: row.message || '',
+    inquiryType: row.inquiry_type || 'GENERAL',
+    status: row.status || 'OPEN',
+    responseMessage: row.response_message || '',
+    respondedAt: row.responded_at || null,
+    createdAt: row.created_at || null,
+  };
+}
+
+function mapCustomOrderRow(row) {
+  const requirementsJson = readJson(row.requirements_json, {});
+
+  return {
+    id: row.custom_order_id,
+    requestNumber: row.request_number || '',
+    orderType: requirementsJson.orderType || row.service_name_en || 'custom-order',
+    brandUserId: row.brand_user_id || null,
+    brandName: row.brand_name || '',
+    requirements: {
+      quantity: Number(row.quantity || 0),
+      timeline: row.timeline || requirementsJson.timeline || '',
+      message: row.project_description || requirementsJson.message || '',
+    },
+    contactInfo: {
+      name: row.contact_name || '',
+      email: row.contact_email || '',
+      phone: row.contact_phone || '',
+      company: row.company_name || '',
+    },
+    status: row.request_status,
+    quoteAmount: Number(row.quote_amount || 0),
+    expectedDeliveryDate: row.expected_delivery_date,
+    createdAt: row.created_at,
+  };
+}
+
+async function ensureContactFormBrandSupport() {
+  const tableRows = await dbQuery(`SHOW TABLES LIKE 'contact_forms'`);
+
+  if (!tableRows.length) return;
+
+  const columnRows = await dbQuery(`SHOW COLUMNS FROM contact_forms LIKE 'brand_user_id'`);
+
+  if (!columnRows.length) {
+    await dbQuery(`ALTER TABLE contact_forms ADD COLUMN brand_user_id INT NULL AFTER user_id`);
+    console.log('Added brand_user_id column to contact_forms');
+  }
+}
+
+async function ensureCustomOrderBrandSupport() {
+  const tableRows = await dbQuery(`SHOW TABLES LIKE 'custom_orders'`);
+
+  if (!tableRows.length) return;
+
+  const columnRows = await dbQuery(`SHOW COLUMNS FROM custom_orders LIKE 'brand_user_id'`);
+
+  if (!columnRows.length) {
+    await dbQuery(`ALTER TABLE custom_orders ADD COLUMN brand_user_id INT NULL AFTER user_id`);
+    console.log('Added brand_user_id column to custom_orders');
+  }
+}
+
+const CONTACT_FORM_SELECT_SQL = `
+  SELECT
+    cf.*,
+    COALESCE(
+      NULLIF(b.company_name, ''),
+      NULLIF(TRIM(CONCAT_WS(' ', b.first_name, b.last_name)), ''),
+      b.email
+    ) AS brand_name
+  FROM contact_forms cf
+  LEFT JOIN users b ON b.user_id = cf.brand_user_id
+`;
+
+const CUSTOM_ORDER_SELECT_SQL = `
+  SELECT
+    co.*,
+    st.name_en AS service_name_en,
+    st.name_es AS service_name_es,
+    COALESCE(
+      NULLIF(b.company_name, ''),
+      NULLIF(TRIM(CONCAT_WS(' ', b.first_name, b.last_name)), ''),
+      b.email
+    ) AS brand_name
+  FROM custom_orders co
+  LEFT JOIN service_types st ON st.service_type_id = co.service_type_id
+  LEFT JOIN users b ON b.user_id = co.brand_user_id
+`;
 
 function createToken(user) {
   return jwt.sign(
@@ -358,6 +457,71 @@ async function getOrCreateCategoryId(categoryName) {
 }
 
 // Product helpers
+const COLOR_NAME_ES = {
+  white: 'Blanco',
+  navy: 'Azul marino',
+  burgundy: 'Borgona',
+  black: 'Negro',
+  rose: 'Rosa',
+  silver: 'Plateado',
+  blush: 'Rosa palo',
+  ivory: 'Marfil',
+  emerald: 'Esmeralda',
+  'midnight blue': 'Azul medianoche',
+  champagne: 'Champan',
+  ruby: 'Rubi',
+  sapphire: 'Zafiro',
+  pearl: 'Perla',
+  plum: 'Ciruela',
+  crimson: 'Carmesi',
+  gold: 'Dorado',
+  charcoal: 'Carbon',
+  'light blue': 'Azul claro',
+  olive: 'Oliva',
+  sand: 'Arena',
+  rust: 'Oxido',
+  cream: 'Crema',
+  'geometric print': 'Estampado geometrico',
+  'floral print': 'Estampado floral',
+  leopard: 'Leopardo',
+  'polka dot': 'Lunares',
+  'solid black': 'Negro solido',
+  camel: 'Camel',
+  'soft grey': 'Gris suave',
+  'ocean blue': 'Azul oceano',
+  'sunset orange': 'Naranja atardecer',
+  amethyst: 'Amatista',
+  maroon: 'Granate',
+  pink: 'Rosa',
+  blue: 'Azul',
+  red: 'Rojo',
+};
+
+function translateColorName(name) {
+  const normalizedName = String(name || '').trim();
+  if (!normalizedName) return '';
+
+  return COLOR_NAME_ES[normalizedName.toLowerCase()] || normalizedName;
+}
+
+function serializeColorOption(color) {
+  if (typeof color === 'string') {
+    const name = color.trim();
+    return name ? { name, nameEs: translateColorName(name) } : null;
+  }
+
+  if (!color || typeof color !== 'object') return null;
+
+  const name = String(color.name || color.label || '').trim();
+  if (!name) return null;
+
+  return {
+    ...color,
+    name,
+    nameEs: String(color.nameEs || color.labelEs || '').trim() || translateColorName(name),
+  };
+}
+
 function normalizeImageList(value) {
   const images = readJson(value, Array.isArray(value) ? value : []);
 
@@ -516,7 +680,9 @@ const PRODUCT_SELECT_SQL = `
 function serializeProduct(row) {
   const images = readJson(row.image_urls, row.image ? [row.image] : []);
   const sizes = readJson(row.sizes_json, []);
-  const colors = readJson(row.colors_json, []);
+  const colors = readJson(row.colors_json, [])
+    .map(serializeColorOption)
+    .filter(Boolean);
 
   return {
     id: row.product_id,
@@ -612,6 +778,9 @@ async function enrichOrderItems(items) {
     const productId = Number(item.productId || item.id);
     const product = productMap.get(productId);
     const brandId = Number(item.brandId ?? product?.brandId);
+    const itemPrice = item.price === undefined || item.price === null || item.price === ''
+      ? product?.price
+      : item.price;
 
     return {
       ...item,
@@ -622,6 +791,12 @@ async function enrichOrderItems(items) {
       nameEn: item.nameEn || product?.nameEn || item.name || '',
       nameEs: item.nameEs || product?.nameEs || item.name || '',
       image: item.image || product?.image || '',
+      price: Number(itemPrice || 0),
+      quantity: Number(item.quantity || 0),
+      selectedColor: String(item.selectedColor || item.selected_color || '').trim(),
+      selectedColorEs:
+        String(item.selectedColorEs || item.selected_color_es || '').trim() ||
+        translateColorName(item.selectedColor || item.selected_color || ''),
       deliveryStatus: normalizeDeliveryStatus(item.deliveryStatus || item.delivery_status),
       deliveredAt: item.deliveredAt || item.delivered_at || null,
     };
@@ -853,6 +1028,7 @@ async function getOrderItems(orderId, brandUserId = null) {
     price: Number(row.unit_price || 0),
     quantity: Number(row.quantity || 0),
     selectedColor: row.selected_color || '',
+    selectedColorEs: translateColorName(row.selected_color || ''),
     selectedSize: row.selected_size || '',
     deliveryStatus: normalizeDeliveryStatus(row.delivery_status),
     deliveredAt: row.delivered_at || null,
@@ -968,11 +1144,24 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 app.post('/api/auth/login', async (req, res) => {
-  const { email = '', password = '' } = req.body;
+  const requestBody = req.body && typeof req.body === 'object' ? req.body : {};
+  const email = requestBody.email ?? '';
+  const password = requestBody.password ?? '';
+  const hasRequestedAccountType =
+    Object.prototype.hasOwnProperty.call(requestBody, 'accountType') ||
+    Object.prototype.hasOwnProperty.call(requestBody, 'account_type');
+  const requestedAccountType = hasRequestedAccountType
+    ? requestBody.accountType ?? requestBody.account_type
+    : undefined;
   const normalizedEmail = String(email).trim().toLowerCase();
+  const normalizedAccountType = normalizeAccountType(requestedAccountType);
 
   if (!isValidEmail(normalizedEmail) || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
+  }
+
+  if (hasRequestedAccountType && normalizedAccountType === null) {
+    return res.status(400).json({ error: 'Account type must be CUSTOMER or BRAND' });
   }
 
   try {
@@ -990,6 +1179,12 @@ app.post('/api/auth/login', async (req, res) => {
 
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const currentUserAccountType = normalizeAccountType(user.account_type || user.accountType);
+
+    if (normalizedAccountType && currentUserAccountType !== normalizedAccountType) {
+      return res.status(401).json({ error: 'Selected account type does not match this account' });
     }
 
     res.json({
@@ -1019,6 +1214,26 @@ app.get('/api/auth/session', async (req, res) => {
 
 app.post('/api/auth/logout', (req, res) => {
   res.json({ message: 'Logout successful' });
+});
+
+app.get('/api/brands', async (req, res) => {
+  try {
+    const rows = await dbQuery(
+      `SELECT user_id, email, first_name, last_name, company_name, account_type
+       FROM users
+       WHERE account_type = 'BRAND' AND is_active = TRUE
+       ORDER BY COALESCE(NULLIF(company_name, ''), email) ASC`
+    );
+
+    res.json(rows.map((brand) => ({
+      id: brand.user_id,
+      name: buildUserName(brand),
+      email: brand.email,
+      companyName: brand.company_name || '',
+    })));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.get('/api/users/profile', async (req, res) => {
@@ -1533,7 +1748,7 @@ app.put(
 
 // Custom order routes
 app.post('/api/custom-orders', async (req, res) => {
-  const { orderType, requirements = {}, contactInfo = {} } = req.body;
+  const { orderType, requirements = {}, contactInfo = {}, brandId } = req.body;
 
   if (!orderType) {
     return res.status(400).json({ error: 'Order type is required' });
@@ -1556,12 +1771,35 @@ app.post('/api/custom-orders', async (req, res) => {
   }
 
   try {
+    let normalizedBrandId = null;
+
+    if (brandId !== undefined && brandId !== null && String(brandId).trim() !== '') {
+      normalizedBrandId = Number.parseInt(brandId, 10);
+
+      if (!Number.isInteger(normalizedBrandId) || normalizedBrandId <= 0) {
+        return res.status(400).json({ error: 'A valid brand is required' });
+      }
+
+      const brandRows = await dbQuery(
+        `SELECT user_id
+         FROM users
+         WHERE user_id = ? AND account_type = 'BRAND' AND is_active = TRUE
+         LIMIT 1`,
+        [normalizedBrandId]
+      );
+
+      if (!brandRows.length) {
+        return res.status(400).json({ error: 'Selected brand does not exist' });
+      }
+    }
+
     const serviceTypeId = await getOrCreateServiceType(orderType);
     const requestNumber = generateRequestNumber();
 
     const result = await dbQuery(
       `INSERT INTO custom_orders (
         user_id,
+        brand_user_id,
         service_type_id,
         request_number,
         company_name,
@@ -1576,9 +1814,10 @@ app.post('/api/custom-orders', async (req, res) => {
         contact_email,
         contact_phone,
         requirements_json
-      ) VALUES (?, ?, ?, ?, ?, ?, 'NEW', 0.00, NULL, NULL, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'NEW', 0.00, NULL, NULL, ?, ?, ?, ?, ?)`,
       [
         req.user.id,
+        normalizedBrandId,
         serviceTypeId,
         requestNumber,
         String(contactInfo.company || '').trim(),
@@ -1590,6 +1829,7 @@ app.post('/api/custom-orders', async (req, res) => {
         phoneDigits,
         JSON.stringify({
           orderType,
+          brandId: normalizedBrandId,
           timeline: String(requirements.timeline || '').trim(),
           message: String(requirements.message || '').trim(),
         }),
@@ -1606,43 +1846,31 @@ app.post('/api/custom-orders', async (req, res) => {
   }
 });
 
+app.get('/api/custom-orders/brand-requests', requireAccountTypes('BRAND', 'ADMIN'), async (req, res) => {
+  try {
+    const rows = req.user.accountType === 'ADMIN'
+      ? await dbQuery(`${CUSTOM_ORDER_SELECT_SQL} ORDER BY co.created_at DESC`)
+      : await dbQuery(
+          `${CUSTOM_ORDER_SELECT_SQL} WHERE co.brand_user_id = ? ORDER BY co.created_at DESC`,
+          [req.user.id]
+        );
+
+    res.json(rows.map(mapCustomOrderRow));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/custom-orders/my-requests', async (req, res) => {
   try {
     const rows = await dbQuery(
-      `SELECT
-        co.*,
-        st.name_en AS service_name_en,
-        st.name_es AS service_name_es
-       FROM custom_orders co
-       LEFT JOIN service_types st ON st.service_type_id = co.service_type_id
+      `${CUSTOM_ORDER_SELECT_SQL}
        WHERE co.user_id = ?
        ORDER BY co.created_at DESC`,
       [req.user.id]
     );
 
-    res.json(rows.map((request) => {
-      const requirementsJson = readJson(request.requirements_json, {});
-
-      return {
-        id: request.custom_order_id,
-        orderType: requirementsJson.orderType || request.service_name_en || 'custom-order',
-        requirements: {
-          quantity: Number(request.quantity || 0),
-          timeline: request.timeline || requirementsJson.timeline || '',
-          message: request.project_description || requirementsJson.message || '',
-        },
-        contactInfo: {
-          name: request.contact_name || '',
-          email: request.contact_email || '',
-          phone: request.contact_phone || '',
-          company: request.company_name || '',
-        },
-        status: request.request_status,
-        quoteAmount: Number(request.quote_amount || 0),
-        expectedDeliveryDate: request.expected_delivery_date,
-        createdAt: request.created_at,
-      };
-    }));
+    res.json(rows.map(mapCustomOrderRow));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1650,25 +1878,49 @@ app.get('/api/custom-orders/my-requests', async (req, res) => {
 
 // Contact routes
 app.post('/api/contact', async (req, res) => {
-  const { name, email, subject, message } = req.body;
+  const { name, email, subject, message, brandId } = req.body;
 
   if (!name || !isValidEmail(email) || !message) {
     return res.status(400).json({ error: 'Name, valid email, and message are required' });
   }
 
   try {
+    let normalizedBrandId = null;
+
+    if (brandId !== undefined && brandId !== null && String(brandId).trim() !== '') {
+      normalizedBrandId = Number.parseInt(brandId, 10);
+
+      if (!Number.isInteger(normalizedBrandId) || normalizedBrandId <= 0) {
+        return res.status(400).json({ error: 'A valid brand is required' });
+      }
+
+      const brandRows = await dbQuery(
+        `SELECT user_id
+         FROM users
+         WHERE user_id = ? AND account_type = 'BRAND' AND is_active = TRUE
+         LIMIT 1`,
+        [normalizedBrandId]
+      );
+
+      if (!brandRows.length) {
+        return res.status(400).json({ error: 'Selected brand does not exist' });
+      }
+    }
+
     const result = await dbQuery(
       `INSERT INTO contact_forms (
         user_id,
+        brand_user_id,
         name,
         email,
         subject,
         message,
         inquiry_type,
         status
-      ) VALUES (?, ?, ?, ?, ?, ?, 'OPEN')`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN')`,
       [
         req.user.id || null,
+        normalizedBrandId,
         String(name).trim(),
         String(email).trim().toLowerCase(),
         String(subject || '').trim(),
@@ -1686,16 +1938,42 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
+app.get('/api/contact/brand-inquiries', requireAccountTypes('BRAND', 'ADMIN'), async (req, res) => {
+  try {
+    const rows = req.user.accountType === 'ADMIN'
+      ? await dbQuery(`${CONTACT_FORM_SELECT_SQL} ORDER BY cf.contact_id DESC`)
+      : await dbQuery(
+          `${CONTACT_FORM_SELECT_SQL} WHERE cf.brand_user_id = ? ORDER BY cf.contact_id DESC`,
+          [req.user.id]
+        );
+
+    res.json(rows.map(mapContactFormRow));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/contact', requireAccountTypes('ADMIN'), async (req, res) => {
   try {
-    const rows = await dbQuery(`SELECT * FROM contact_forms ORDER BY contact_id DESC`);
-    res.json(rows);
+    const rows = await dbQuery(`${CONTACT_FORM_SELECT_SQL} ORDER BY cf.contact_id DESC`);
+    res.json(rows.map(mapContactFormRow));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+async function initializeServer() {
+  await ensureContactFormBrandSupport();
+  await ensureCustomOrderBrandSupport();
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+initializeServer().catch((error) => {
+  console.error('Failed to initialize server:', error);
+  process.exit(1);
 });

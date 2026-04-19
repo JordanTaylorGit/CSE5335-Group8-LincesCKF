@@ -39,6 +39,25 @@ function getTotalAvailableStock(product, sizes) {
   return Number.isFinite(stock) ? stock : Infinity;
 }
 
+function normalizeColorOption(color) {
+  if (typeof color === "string") {
+    return { name: color, nameEs: color };
+  }
+
+  if (!color || typeof color !== "object") {
+    return null;
+  }
+
+  const name = String(color.name || color.label || "").trim();
+  if (!name) return null;
+
+  return {
+    ...color,
+    name,
+    nameEs: String(color.nameEs || color.labelEs || color.name || color.label || "").trim() || name,
+  };
+}
+
 function ProductCard({ product }) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -58,14 +77,16 @@ function ProductCard({ product }) {
     }
   };
 
-  const parsedColors = parseField(product.colors);
+  const parsedColors = parseField(product.colors)
+    .map(normalizeColorOption)
+    .filter(Boolean);
   const parsedSizes = parseField(product.sizes);
   const parsedImages = parseField(product.images);
   const firstAvailableSize = parsedSizes.find(isSizeAvailable);
   const isOutOfStock = getTotalAvailableStock(product, parsedSizes) <= 0;
 
   const displayPrice = Number(product.price).toFixed(2);
-  const [selectedColor, setSelectedColor] = useState(parsedColors.length > 0 ? { name: parsedColors[0] } : null);
+  const [selectedColor, setSelectedColor] = useState(parsedColors[0] || null);
   const [selectedSize, setSelectedSize] = useState(firstAvailableSize ? getSizeName(firstAvailableSize) : "");
 
   const handleAddToCart = () => {
@@ -115,18 +136,18 @@ function ProductCard({ product }) {
           <div className="flex flex-wrap gap-1">
             {parsedColors.map((color) => (
               <button
-                key={color}
+                key={color.name}
                 type="button"
-                onClick={() => setSelectedColor({ name: color })}
+                onClick={() => setSelectedColor(color)}
                 className={`product-card__option inline-flex cursor-pointer items-center gap-1 rounded-md border px-1.5 py-1 transition active:scale-95 ${
-                  selectedColor?.name === color
+                  selectedColor?.name === color.name
                     ? "border-slate-900 bg-slate-900 text-white"
                     : "border-gray-300 bg-white text-slate-700 hover:border-slate-400"
                 }`}
-                title={color}
-                aria-pressed={selectedColor?.name === color}
+                title={i18n.language === "es" ? color.nameEs : color.name}
+                aria-pressed={selectedColor?.name === color.name}
               >
-                <span>{color}</span>
+                <span>{i18n.language === "es" ? color.nameEs : color.name}</span>
               </button>
             ))}
           </div>

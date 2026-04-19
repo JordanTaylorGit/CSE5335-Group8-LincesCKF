@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "seed": "node seed.js",
+    "reset-stock": "node reset_stock_full.js",
     "test": "node test.js"
   },
   "keywords": [],
