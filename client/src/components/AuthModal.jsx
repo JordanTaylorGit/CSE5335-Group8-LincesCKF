@@ -146,11 +146,11 @@ export default function AuthModal({ isOpen, onClose }) {
     if (res.success) {
       const name = res.user?.name || res.user?.firstName || res.user?.companyName || res.user?.email || email;
       const successMessage = isLogin
-        ? `${t('auth.welcome_back')}, ${name}!`
+        ? t('auth.welcome_back_user', { name })
         : t('auth.register_success');
 
       if (isLogin) {
-        window.alert(`Welcome back, ${name}!`);
+        window.alert(t('auth.welcome_back_user', { name }));
       }
 
       handleAuthSuccess(successMessage);

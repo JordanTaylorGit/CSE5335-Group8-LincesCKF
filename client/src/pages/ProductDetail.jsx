@@ -111,7 +111,7 @@ function ProductDetails() {
   }
 
   const parsedImages = parseField(product.images);
-  const imageUrl = parsedImages[0] || '';
+  const imageUrl = parsedImages[0] || product.image || '';
   const parsedColors = parseField(product.colors)
     .map(normalizeColorOption)
     .filter(Boolean);
@@ -123,11 +123,11 @@ function ProductDetails() {
     <div className="product-detail-page min-h-screen bg-[#f5f5f5] py-10">
 
       <div className="product-detail-page__layout mx-auto grid max-w-[1400px] gap-10 px-8 lg:grid-cols-2">
-        <div className="product-detail-page__media relative overflow-hidden rounded-[18px] bg-white shadow-sm">
+        <div className="product-detail-page__media relative flex min-h-[300px] items-center justify-center overflow-hidden rounded-[18px] bg-slate-50 p-4 shadow-sm sm:min-h-[360px] lg:min-h-[520px]">
           <img
             src={imageUrl}
             alt={product.name}
-            className={`product-detail-page__image h-[520px] w-full object-cover ${isOutOfStock ? "opacity-60" : ""}`}
+            className={`product-detail-page__image max-h-[300px] w-auto max-w-full object-contain object-center sm:max-h-[360px] lg:max-h-[520px] ${isOutOfStock ? "opacity-60" : ""}`}
           />
           {isOutOfStock && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/55">

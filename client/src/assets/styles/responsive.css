@@ -402,8 +402,13 @@
     padding-inline: 0.75rem;
   }
 
+  .product-detail-page__media {
+    min-height: 360px;
+  }
+
   .product-detail-page__image {
-    height: 360px;
+    height: auto;
+    max-height: 360px;
   }
 
   .product-detail-page__content {
@@ -540,8 +545,13 @@
     width: 100%;
   }
 
+  .product-detail-page__media {
+    min-height: 300px;
+  }
+
   .product-detail-page__image {
-    height: 300px;
+    height: auto;
+    max-height: 300px;
   }
 
   .about-page__hero {
