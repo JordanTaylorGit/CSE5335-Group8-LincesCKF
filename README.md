@@ -27,7 +27,31 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
     - `atelier.marfil@lincesckf.com`
 
 ---
+## User Flows
 
+### Customer Flow
+
+1. Open the app in a fresh browser session. The app loads in English first, and later uses the language saved in `localStorage`.
+2. Browse the Home page, featured products, and Catalog listings.
+3. Open a product detail page, choose color and size, and add the item to cart.
+4. Refresh the page if needed. The cart remains saved until the user removes items or completes checkout.
+5. Open Checkout, review brand names in the order summary, and submit the order.
+6. Open `My Account` to review placed orders, delivery progress, profile details, and notification settings.
+7. Submit Contact Us messages or custom-order requests, with the option to route requests to a selected brand.
+8. Track both regular orders and custom orders from the customer account view.
+
+### Brand Flow
+
+1. Log in using a Brand account.
+2. Open `My Account` and review brand-specific sections such as `My Products`, `Orders`, and `Notifications`.
+3. Add a new product with bilingual content, images, pricing, category, size-based stock, and the option to mark it as featured. All fields except the featured toggle must be filled before submit.
+4. Confirm the product appears in the brand product list and public Catalog. It appears on the Home page when marked as featured.
+5. Review `My Orders`, which includes both orders placed by the brand account and orders/custom requests routed to that brand for fulfillment.
+6. Mark eligible routed order items as delivered. Customers then see updated Delivered or Partially Delivered status in their account.
+7. Review targeted custom orders in the brand order view and mark them delivered when completed.
+8. Review brand-directed Contact Us messages in the Notifications section.
+
+---
 ## Team
 
 | # | Student | Responsibilities |
@@ -45,8 +69,7 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 
 | Phase | Host | URL |
 |-------|------|-----|
-| Frontend demo | UTA Cloud | [jxt0693.uta.cloud](http://jxt0693.uta.cloud) |
-| Current full-stack deployment | AWS | [dctdo5snio73e.cloudfront.net](dctdo5snio73e.cloudfront.net) |
+| Phase 3 full-stack deployment | AWS | [dctdo5snio73e.cloudfront.net](dctdo5snio73e.cloudfront.net) |
 
 ---
 
@@ -75,7 +98,14 @@ The platform is fully bilingual — all UI strings, product names, descriptions,
 | Styling | Tailwind CSS + inline styles | Custom token system (see Design System) |
 | Build Tool | Vite | Fast dev server + optimized builds |
 | Package Manager | npm | |
-
+| Backend Framework | Node.js + Express.js | REST API, middleware, route handling |
+| Database | MySQL 8 | Hosted on AWS RDS |
+| ORM / DB Driver | mysql2 | Direct query driver for Express |
+| Authentication | bcrypt + JWT | Password hashing and session tokens |
+| Frontend Hosting | AWS S3 + CloudFront | Static build files, HTTPS via CDN |
+| Backend Hosting | AWS EC2 (t2.micro) | Node.js server managed via PM2 |
+| Database Hosting | AWS RDS (db.t3.micro) | Managed MySQL, private subnet |
+| Process Manager | PM2 | Auto-restart and process monitoring on EC2 |
 ---
 
 ## Project Structure
@@ -194,12 +224,6 @@ npm run dev
 Backend runs at **http://localhost:5001**  
 Frontend runs at **http://localhost:5173**
 
-### Testing and Maintenance Support
-
-- `TESTING_CHECKLIST.md` is the end-to-end manual verification guide for local runs, AWS deployment checks, API spot checks, and database write verification.
-- `PROJECT_OVERVIEW.md` summarizes the implemented feature set, architecture notes, and original team-planning breakdown.
-- The backend smoke suite plus the cleanup and stock-reset scripts are intended to support repeatable demos, regression passes, and merge validation.
-
 ---
 
 ## Naming Conventions
@@ -282,30 +306,6 @@ npm run preview
 - Brand-targeted custom orders are routed to the selected brand and shown in that brand's My Orders view
 - Contact Us supports brand-directed inquiries
 - Brand-directed contact messages appear in the target brand's Notifications section
-
-## User Flows
-
-### Customer Flow
-
-1. Open the app in a fresh browser session. The app loads in English first, and later uses the language saved in `localStorage`.
-2. Browse the Home page, featured products, and Catalog listings.
-3. Open a product detail page, choose color and size, and add the item to cart.
-4. Refresh the page if needed. The cart remains saved until the user removes items or completes checkout.
-5. Open Checkout, review brand names in the order summary, and submit the order.
-6. Open `My Account` to review placed orders, delivery progress, profile details, and notification settings.
-7. Submit Contact Us messages or custom-order requests, with the option to route requests to a selected brand.
-8. Track both regular orders and custom orders from the customer account view.
-
-### Brand Flow
-
-1. Log in using a Brand account.
-2. Open `My Account` and review brand-specific sections such as `My Products`, `Orders`, and `Notifications`.
-3. Add a new product with bilingual content, images, pricing, category, size-based stock, and the option to mark it as featured. All fields except the featured toggle must be filled before submit.
-4. Confirm the product appears in the brand product list and public Catalog. It appears on the Home page when marked as featured.
-5. Review `My Orders`, which includes both orders placed by the brand account and orders/custom requests routed to that brand for fulfillment.
-6. Mark eligible routed order items as delivered. Customers then see updated Delivered or Partially Delivered status in their account.
-7. Review targeted custom orders in the brand order view and mark them delivered when completed.
-8. Review brand-directed Contact Us messages in the Notifications section.
 
 ## Database Write Map
 
@@ -505,7 +505,17 @@ Phase3:
 
 2. The eccommerce site has been deployed to aws and the ec2 server can connect to the backend, but on the cloudfront frontend the products are not being displayed. Console output shows error connecting to MySQL server. What are the most likely cause for error and solution to resolve.
 
-### Lakshmi Priya: 
+### Lakshmi Priya:
+Phase2:  
+1. Suggest guidelines on how to fix vite errors after initial scaffolding
+
+2. Describe the best way to design a login and register page for a Customer and a Brand with validations
+
+3. Suggest how to structure the account details page of a logged in user
+
+4. How to make the login page consistent with the color theme?
+
+Phase3:  
 1. Explain how to integrate frontend form validation with backend validation for login and registration APIs. Include error messaging, status codes, and UX-friendly feedback.
 
 2. Describe how JWT-based authentication between frontend and backend works and suggest how to integrate it
