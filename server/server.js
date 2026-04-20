@@ -26,9 +26,13 @@ const DEFAULT_PAYMENT_METHOD = 'CARD';
 
 
 // Small helpers
-async function dbQuery(sql, params = []) {
-  const [rows] = await db.query(sql, params);
-  return rows;
+function dbQuery(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, params, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
 }
 
 function beginTransaction() {

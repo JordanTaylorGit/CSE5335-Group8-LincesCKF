@@ -35,7 +35,7 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 | 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, Brand vs. Customer order logic in the website Brand and Account Creation Pages, Project Regression Testing, Peer Review, Bug Fixes and collaborated in drafting README |
 | 2 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
 | 3 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
-| 4 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, README |
+| 4 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, sqlite to mysql conversion, aws backend setup, aws backend deployment, README |
 | 5 | Poudel, Ishan | Custom orders page, contact page, about page, LanguageContext |
 
 
@@ -493,11 +493,17 @@ const description = i18n.language === 'es' ? product.descriptionEs : product.des
 This section is preserved as part of the course process documentation. The sections above describe the current implementation and current behavior of the app.
 
 ### Jordan:
+Phase2:
 Generate just essential scaffolding for multi phase e-commerce web development project. Phase 1 was planning and design. Phase 2 front-end. Phase 3 back end. Phase 4 integration. Phase 1 is completed by time, we are on phase 2 front-end. Linces'CKF is a bilingual (Spanish/English) e -commerce platform for a premium silk garment brand that offers two main business lines:
 1. Direct-to-Consumer Sales
 2. B2B Manufacturing Services
 
 Describe best practices for implementing hero section and b2b process steps into Linces'CKF home page and b2b services page respectively. Hero section and process steps must ensure responsive design across platforms
+
+Phase3:
+Using aws free tier list what aws core services are required to deploy an ecommerce site using a MySQL database and step by step guide to deploy to aws.
+
+The eccommerce site has been deployed to aws and the ec2 server can connect to the backend, but on the cloudfront frontend the products are not being displayed. Console output shows error connecting to MySQL server. What are the most likely cause for error and solution to resolve.
 
 ### Lakshmi Priya: 
 Explain how to integrate frontend form validation with backend validation for login and registration APIs. Include error messaging, status codes, and UX-friendly feedback.
