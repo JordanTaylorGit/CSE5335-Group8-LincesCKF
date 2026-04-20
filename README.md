@@ -493,39 +493,51 @@ const description = i18n.language === 'es' ? product.descriptionEs : product.des
 This section is preserved as part of the course process documentation. The sections above describe the current implementation and current behavior of the app.
 
 ### Jordan:
-Phase2:
-Generate just essential scaffolding for multi phase e-commerce web development project. Phase 1 was planning and design. Phase 2 front-end. Phase 3 back end. Phase 4 integration. Phase 1 is completed by time, we are on phase 2 front-end. Linces'CKF is a bilingual (Spanish/English) e -commerce platform for a premium silk garment brand that offers two main business lines:
-1. Direct-to-Consumer Sales
-2. B2B Manufacturing Services
+Phase2:  
+1. Generate just essential scaffolding for multi phase e-commerce web development project. Phase 1 was planning and design. Phase 2 front-end. Phase 3 back end. Phase 4 integration. Phase 1 is completed by time, we are on phase 2 front-end. Linces'CKF is a bilingual (Spanish/English) e -commerce platform for a premium silk garment brand that offers two main business lines:
+   1. Direct-to-Consumer Sales
+   2. B2B Manufacturing Services
 
-Describe best practices for implementing hero section and b2b process steps into Linces'CKF home page and b2b services page respectively. Hero section and process steps must ensure responsive design across platforms
+2. Describe best practices for implementing hero section and b2b process steps into Linces'CKF home page and b2b services page respectively. Hero section and process steps must ensure responsive design across platforms
 
-Phase3:
-Using aws free tier list what aws core services are required to deploy an ecommerce site using a MySQL database and step by step guide to deploy to aws.
+Phase3:  
+1. Using aws free tier list what aws core services are required to deploy an ecommerce site using a MySQL database and step by step guide to deploy to aws.
 
-The eccommerce site has been deployed to aws and the ec2 server can connect to the backend, but on the cloudfront frontend the products are not being displayed. Console output shows error connecting to MySQL server. What are the most likely cause for error and solution to resolve.
+2. The eccommerce site has been deployed to aws and the ec2 server can connect to the backend, but on the cloudfront frontend the products are not being displayed. Console output shows error connecting to MySQL server. What are the most likely cause for error and solution to resolve.
 
 ### Lakshmi Priya: 
-Explain how to integrate frontend form validation with backend validation for login and registration APIs. Include error messaging, status codes, and UX-friendly feedback.
+1. Explain how to integrate frontend form validation with backend validation for login and registration APIs. Include error messaging, status codes, and UX-friendly feedback.
 
-Describe how JWT-based authentication between frontend and backend works and suggest how to integrate it
+2. Describe how JWT-based authentication between frontend and backend works and suggest how to integrate it
 
-Walkthrough the best practices of designing a login authentication flow for a web application
+3. Walkthrough the best practices of designing a login authentication flow for a web application
 
-Elaborate the guidelines to follow for making the navigation links secure and accessible only upon login?
+4. Elaborate the guidelines to follow for making the navigation links secure and accessible only upon login?
 
 ### Ishan:
-I have a React + Tailwind component for a multi-step progress indicator that overflows horizontally on mobile (step 3 causes scrolling). How can I make it fully responsive and prevent overflow while keeping steps aligned properly?
+Phase2:  
+1. I have a React + Tailwind component for a multi-step progress indicator that overflows horizontally on mobile (step 3 causes scrolling). How can I make it fully responsive and prevent overflow while keeping steps aligned properly?
 
-I replaced custom Tailwind colors (obsidian, ivory, silk-500) with new theme values (navy, silk-amber, silk-gold). How do I ensure consistency across all React components and avoid leftover old styles?
+2. I replaced custom Tailwind colors (obsidian, ivory, silk-500) with new theme values (navy, silk-amber, silk-gold). How do I ensure consistency across all React components and avoid leftover old styles?
+
+Phase3:  
+1. How does Nginx route incoming requests to different services, such as sending frontend traffic to a React app on port 5173 and API requests (e.g., /api) to a Node.js backend on port 5001? How does the proxy_pass directive control this behavior?
+
+2. Why do API calls using localhost fail when a frontend is deployed on an EC2 instance, even if the backend server is running on the same machine? How does the browser interpret localhost in this context?
+
+3. How does the presence or absence of a trailing slash in the Nginx proxy_pass configuration affect how request paths are forwarded to the backend, and how can this lead to 404 errors if not configured correctly?
 
 ### Hareesh:
-Describe design for a product catalog with category filtering using React Context API.
+phase2:  
+1. Describe design for a product catalog with category filtering using React Context API.
 
-For the cart, describe Context to add, update quantity, and remove items, along with cart message.
+2. For the cart, describe Context to add, update quantity, and remove items, along with cart message.
+
+phase3:  
+No prompts used for this phase.
 
 ### Andy: 
-No prompts used for this phase.
+No prompts used.
 
 ## External websites referenced
 Node.js Documentation: https://nodejs.org/docs/latest/api/  
@@ -534,4 +546,8 @@ React Documentation: https://react.dev/
 Express Documentation: https://expressjs.com/  
 MDN Web Docs: https://developer.mozilla.org/  
 Phrase i18n overview: https://phrase.com/blog/posts/i18n-a-simple-definition/  
+AWS S3 Static Website Hosting: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html  
+AWS CloudFront Getting Started: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html  
+AWS EC2 User Guide: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide  
+AWS RDS MySQL: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html    
 Additional reference sites used during development: W3Schools, GeeksforGeeks, and Stack Overflow.
