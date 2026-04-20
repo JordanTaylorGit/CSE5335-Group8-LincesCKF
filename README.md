@@ -44,7 +44,7 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 
 1. Log in using a Brand account.
 2. Open `My Account` and review brand-specific sections such as `My Products`, `Orders`, and `Notifications`.
-3. Add a new product with bilingual content, images, pricing, category, size-based stock, and the option to mark it as featured. All fields except the featured toggle must be filled before submit.
+3. Add a new product with bilingual content, images, pricing, category, size-based stock, and the option to mark it as featured. When adding Image URL, make sure to copy the 'Image Address' of the image rather than Site URL of a website. All fields except the featured toggle must be filled before submit.
 4. Confirm the product appears in the brand product list and public Catalog. It appears on the Home page when marked as featured.
 5. Review `My Orders`, which includes both orders placed by the brand account and orders/custom requests routed to that brand for fulfillment.
 6. Mark eligible routed order items as delivered. Customers then see updated Delivered or Partially Delivered status in their account.
@@ -69,7 +69,7 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 
 | Phase | Host | URL |
 |-------|------|-----|
-| Phase 3 full-stack deployment | AWS | [dctdo5snio73e.cloudfront.net](dctdo5snio73e.cloudfront.net) |
+| Phase 3 full-stack deployment | AWS | [dctdo5snio73e.cloudfront.net](https://dctdo5snio73e.cloudfront.net) |
 
 ---
 
