@@ -46,7 +46,7 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 | Phase | Host | URL |
 |-------|------|-----|
 | Frontend demo | UTA Cloud | [jxt0693.uta.cloud](http://jxt0693.uta.cloud) |
-| Current full-stack deployment | TBD | TBD |
+| Current full-stack deployment | AWS | [dctdo5snio73e.cloudfront.net](dctdo5snio73e.cloudfront.net) |
 
 ---
 
