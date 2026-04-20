@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
+const LEGACY_CART_STORAGE_KEY = "lincesckf_cart";
 const GUEST_CART_STORAGE_KEY = "lincesckf_cart_guest";
 
 function loadStoredCart(storageKey) {
@@ -24,6 +25,53 @@ function loadStoredCart(storageKey) {
   } catch {
     return [];
   }
+}
+
+function migrateLegacyGuestCart() {
+  if (typeof window === "undefined") return;
+
+  try {
+    const legacyCart = window.localStorage.getItem(LEGACY_CART_STORAGE_KEY);
+    const guestCart = window.localStorage.getItem(GUEST_CART_STORAGE_KEY);
+
+    if (legacyCart && !guestCart) {
+      window.localStorage.setItem(GUEST_CART_STORAGE_KEY, legacyCart);
+    }
+
+    window.localStorage.removeItem(LEGACY_CART_STORAGE_KEY);
+  } catch {
+    // Ignore storage migration failures and continue with the active cart key.
+  }
+}
+
+function decodeJwtPayload(token) {
+  try {
+    const payload = String(token || "").split(".")[1];
+    if (!payload) return null;
+
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
+    const decoded = window.atob(padded);
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+}
+
+function getStoredAuthIdentity() {
+  if (typeof window === "undefined") return null;
+
+  const token = window.localStorage.getItem("token");
+  if (!token) return null;
+
+  const payload = decodeJwtPayload(token);
+  if (!payload || !payload.id) return null;
+
+  return {
+    id: payload.id,
+    email: payload.email || "",
+    accountType: payload.accountType || "CUSTOMER",
+  };
 }
 
 function getCartStorageKey(user) {
@@ -44,14 +92,18 @@ function getCartStorageKey(user) {
 
 export function CartProvider({ children }) {
   const { t } = useTranslation();
-  const { user, loading: authLoading } = useAuth();
-  const [cartItems, setCartItems] = useState([]);
+  const { user } = useAuth();
+  const [cartItems, setCartItems] = useState(() => {
+    migrateLegacyGuestCart();
+    return loadStoredCart(getCartStorageKey(getStoredAuthIdentity()));
+  });
   const [message, setMessage] = useState("");
   const [hydratedStorageKey, setHydratedStorageKey] = useState(null);
   const timerRef = useRef(null);
+  const activeCartIdentity = user || getStoredAuthIdentity();
   const storageKey = useMemo(
-    () => getCartStorageKey(user),
-    [user?.id, user?.userId, user?.email, user?.accountType]
+    () => getCartStorageKey(activeCartIdentity),
+    [activeCartIdentity?.id, activeCartIdentity?.userId, activeCartIdentity?.email, activeCartIdentity?.accountType]
   );
 
   const showMessage = (text) => {
@@ -67,17 +119,18 @@ export function CartProvider({ children }) {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined" || authLoading) return;
+    if (typeof window === "undefined") return;
 
+    migrateLegacyGuestCart();
     setCartItems(loadStoredCart(storageKey));
     setHydratedStorageKey(storageKey);
-  }, [storageKey, authLoading]);
+  }, [storageKey]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || authLoading || hydratedStorageKey !== storageKey) return;
+    if (typeof window === "undefined" || hydratedStorageKey !== storageKey) return;
 
     window.localStorage.setItem(storageKey, JSON.stringify(cartItems));
-  }, [cartItems, storageKey, authLoading, hydratedStorageKey]);
+  }, [cartItems, storageKey, hydratedStorageKey]);
 
   useEffect(() => () => {
     if (timerRef.current) {
