@@ -56,7 +56,7 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 
 | # | Student | Responsibilities |
 |---|---------|-----------------|
-| 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, Brand vs. Customer order logic in the website Brand and Account Creation Pages, Project Regression Testing, Peer Review, Bug Fixes and collaborated in drafting README |
+| 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, Brand vs. Customer order logic in the website Brand and Account Creation Pages, Project Regression Testing, Peer Review, Bug Fixes in cart, products, orders, catalog, responsiveness, accessibility and collaborated in drafting README |
 | 2 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
 | 3 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
 | 4 | Taylor, Jordan | Home page, B2B Services page, hero section, process steps, documentation, sqlite to mysql conversion, aws backend setup, aws backend deployment, README |
