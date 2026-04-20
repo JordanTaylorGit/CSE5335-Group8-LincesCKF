@@ -7,15 +7,16 @@
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
-const CART_STORAGE_KEY = "lincesckf_cart";
+const GUEST_CART_STORAGE_KEY = "lincesckf_cart_guest";
 
-function loadStoredCart() {
+function loadStoredCart(storageKey) {
   if (typeof window === "undefined") return [];
 
   try {
-    const rawCart = window.localStorage.getItem(CART_STORAGE_KEY);
+    const rawCart = window.localStorage.getItem(storageKey);
     if (!rawCart) return [];
 
     const parsedCart = JSON.parse(rawCart);
@@ -25,11 +26,33 @@ function loadStoredCart() {
   }
 }
 
+function getCartStorageKey(user) {
+  const numericUserId = Number(user?.id ?? user?.userId);
+  if (Number.isInteger(numericUserId) && numericUserId > 0) {
+    return `lincesckf_cart_user_${numericUserId}`;
+  }
+
+  const email = String(user?.email || "").trim().toLowerCase();
+  const accountType = String(user?.accountType || "guest").trim().toLowerCase();
+
+  if (email) {
+    return `lincesckf_cart_${accountType}_${encodeURIComponent(email)}`;
+  }
+
+  return GUEST_CART_STORAGE_KEY;
+}
+
 export function CartProvider({ children }) {
   const { t } = useTranslation();
-  const [cartItems, setCartItems] = useState(loadStoredCart);
+  const { user, loading: authLoading } = useAuth();
+  const [cartItems, setCartItems] = useState([]);
   const [message, setMessage] = useState("");
+  const [hydratedStorageKey, setHydratedStorageKey] = useState(null);
   const timerRef = useRef(null);
+  const storageKey = useMemo(
+    () => getCartStorageKey(user),
+    [user?.id, user?.userId, user?.email, user?.accountType]
+  );
 
   const showMessage = (text) => {
     setMessage(text);
@@ -44,10 +67,17 @@ export function CartProvider({ children }) {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || authLoading) return;
 
-    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-  }, [cartItems]);
+    setCartItems(loadStoredCart(storageKey));
+    setHydratedStorageKey(storageKey);
+  }, [storageKey, authLoading]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || authLoading || hydratedStorageKey !== storageKey) return;
+
+    window.localStorage.setItem(storageKey, JSON.stringify(cartItems));
+  }, [cartItems, storageKey, authLoading, hydratedStorageKey]);
 
   useEffect(() => () => {
     if (timerRef.current) {
