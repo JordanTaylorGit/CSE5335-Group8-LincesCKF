@@ -56,11 +56,11 @@ A bilingual (English/Spanish) e-commerce platform for a premium silk garment bra
 
 | # | Student | Responsibilities |
 |---|---------|-----------------|
-| 1 | Velupula, Lakshmi Priya | Authentication (login/register/account), AuthContext, AuthModal, Brand vs. Customer order logic in the website Brand and Account Creation Pages, Project Regression Testing, Peer Review, Bug Fixes for all modules, responsiveness, accessibility and collaborated in drafting README |
+| 1 | Velupula, Lakshmi Priya | Authentication pages and account system (login/register, auth modal, profile/account features), customer-vs-brand role ideation and integration with Products, Catalog, Custom Orders and Contact Us Pages, Featured products logic, Out of Stock logic, Inventory Decrement logic, API images, Enabling route authentication for each links, cart/order/account workflow ideation with local storage and delivery status implementation, bilingual translation and responsive UI, accessibility improvements for all pages, SEO, backend schema/seed/test updates, demo seed account setup, Google Map integration, dynamically adding new Product item, contact inquiry with profile integration, orders page, profile update, notifications, regression & smoke testing, and README/documentation |
 | 2 | Tran, Andy | Main navigation bar, Mobile responsive menu, Footer design, Language switcher functionality |
 | 3 | Todupunoori, Hareesh | Product catalog, product detail page, shopping cart, CartContext |
 | 4 | Taylor, Jordan | GitHub repository management (branching, pull requests, merge conflict resolution), project scaffolding and rebuilds, AWS backend setup and deployment, frontend hosting updates, database migration (SQLite to MySQL), route troubleshooting and backend stability, Home page, B2B Services page, hero section and process steps, documentation and README |
-| 5 | Poudel, Ishan | Custom orders page, contact page, about page, LanguageContext, Role-based access control (Customer vs. Brand users), frontend and backend route protection, Brand dashboard (“My Products”) and product management APIs, backend API integration and abstract route design, cart and order flow improvements, custom orders flow and unified order dashboard, catalog optimization and filtering improvements |
+| 5 | Poudel, Ishan | Backend/API integration, SQLite refactor, custom orders/contact/about pages, translation updates, brand product management, cart/order fixes, mobile UI fixes, and deployment/backend configuration testing in EC2
 
 ---
 
