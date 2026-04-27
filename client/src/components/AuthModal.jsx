@@ -125,6 +125,23 @@ export default function AuthModal({ isOpen, onClose }) {
     }, 900);
   }
 
+  function getFriendlyAuthMessage(message) {
+    const normalizedMessage = String(message || '').trim();
+
+    if (
+      normalizedMessage === 'Invalid credentials' ||
+      normalizedMessage === 'User does not exist'
+    ) {
+      return t('auth.error_invalid_credentials');
+    }
+
+    if (normalizedMessage === 'Selected account type does not match this account') {
+      return t('auth.error_wrong_account_type');
+    }
+
+    return normalizedMessage || t('auth.error_login_failed');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
@@ -155,7 +172,7 @@ export default function AuthModal({ isOpen, onClose }) {
 
       handleAuthSuccess(successMessage);
     } else {
-      handleAuthError(res.message || t('auth.error_login_failed'));
+      handleAuthError(getFriendlyAuthMessage(res.message));
     }
   }
 

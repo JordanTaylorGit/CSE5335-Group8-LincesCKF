@@ -194,9 +194,11 @@ const translations = {
       sign_in_link: "Sign in",
       forgot_password: "Forgot password?",
       error_invalid_email: "Please enter a valid email address.",
+      error_invalid_credentials: "The email or password is incorrect.",
       error_password_length: "Password must be at least 6 characters.",
       error_passwords_match: "Passwords do not match.",
       error_login_failed: "Login failed. Please try again.",
+      error_wrong_account_type: "This email is registered under a different account type. Please switch Customer or Fashion Brand and try again.",
       error_register_failed: "Registration failed. Please try again.",
       register_success: "Account created successfully.",
       error_invalid_phone: "Phone number must be exactly 10 digits.",
@@ -847,10 +849,13 @@ const translations = {
       sign_in_link: "Inicia sesión",
       forgot_password: "¿Olvidaste tu contraseña?",
       error_invalid_email: "Por favor ingresa un correo electrónico válido.",
+      error_invalid_credentials: "El correo electrónico o la contraseña son incorrectos.",
       error_password_length: "La contraseña debe tener al menos 6 caracteres.",
       error_passwords_match: "Las contraseñas no coinciden.",
       error_login_failed:
         "Error al iniciar sesión. Por favor intenta de nuevo.",
+      error_wrong_account_type:
+        "Este correo está registrado con un tipo de cuenta diferente. Cambia entre Cliente o Marca de Moda e inténtalo de nuevo.",
       error_register_failed:
         "Error al registrarse. Por favor intenta de nuevo.",
       register_success: "Cuenta creada con éxito.",
