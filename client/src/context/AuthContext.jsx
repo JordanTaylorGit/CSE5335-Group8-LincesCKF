@@ -23,28 +23,22 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function login({ email, password, accountType }) {
-    setLoading(true);
     try {
       const currentUser = await authService.login(email, password, accountType);
       setUser(currentUser);
       return { success: true, user: currentUser };
     } catch (error) {
       return { success: false, message: error?.message || 'Login failed. Please try again.' };
-    } finally {
-      setLoading(false);
     }
   }
 
   async function register({ email, password, accountType = 'CUSTOMER', firstName = '', lastName = '', companyName = '', phone = '' }) {
-    setLoading(true);
     try {
       const currentUser = await authService.register({ email, password, accountType, firstName, lastName, companyName, phone });
       setUser(currentUser);
       return { success: true, user: currentUser };
     } catch (error) {
       return { success: false, message: error?.message || 'Registration failed. Please try again.' };
-    } finally {
-      setLoading(false);
     }
   }
 
